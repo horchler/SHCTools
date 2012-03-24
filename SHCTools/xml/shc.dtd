@@ -1,0 +1,22 @@
+<!-- SHCTools for Matlab, Andrew D. Horchler, adh9@case.edu -->
+<!-- Created 1-8-12, Revision: 1.0, 3-24-12 -->
+<!ELEMENT net (contour|channel|cluster)>
+<!ELEMENT contour (contourfields,subnets?)>
+<!ELEMENT channel (channelfields,subnets?)>
+<!ELEMENT cluster (clusterfields,subnets?)>
+<!ELEMENT contourfields (parent?,node,size,alpha,beta?,gamma,delta,direction?)>
+<!ELEMENT channelfields (parent?,node,size,alpha,beta?,gamma,delta,direction?)>
+<!ELEMENT clusterfields (parent?,node,size,alpha,beta?,gamma,delta?,direction?)>
+<!ELEMENT subnets (contour|channel|cluster)*>
+<!ELEMENT parent (#PCDATA)>
+<!ELEMENT node (#PCDATA)>
+<!ELEMENT size (#PCDATA)>
+<!ELEMENT alpha (#PCDATA)>
+<!ELEMENT beta (#PCDATA)>
+<!ELEMENT gamma (#PCDATA)>
+<!ELEMENT delta (#PCDATA)>
+<!ELEMENT direction (#PCDATA)>
+<!ENTITY rootparent "1">
+<!ENTITY rootnode "1">
+<!ENTITY clockwise "1">
+<!ENTITY counterclockwise "-1">

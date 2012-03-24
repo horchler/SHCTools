@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- SHCTools for Matlab, Andrew D. Horchler, adh9@case.edu -->
+<!-- Created 1-16-12, Revision: 1.0, 3-24-12 -->
+
+<!-- Restricted values -->
+<xs:simpleType name="parenttype">
+    <xs:restriction base="xs:integer">
+        <xs:minInclusive value="1"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="rootparenttype">
+    <xs:restriction base="xs:integer">
+        <xs:enumeration value="1"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="nodetype">
+    <xs:restriction base="xs:integer">
+        <xs:minInclusive value="1"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="rootnodetype">
+    <xs:restriction base="xs:integer">
+        <xs:enumeration value="1"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="sizetype">
+    <xs:restriction base="xs:integer">
+        <xs:minInclusive value="1"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:simpleType name="directiontype">
+    <xs:restriction base="xs:integer">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="-1"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<!-- Contours -->
+<xs:complexType name="contoursubnetfields">
+    <xs:all>
+        <xs:element name="parent" minOccurs="0" type="parenttype"/>
+        <xs:element name="node" minOccurs="1" type="nodetype"/>
+        <xs:element name="size" minOccurs="1" type="sizetype"/>
+        <xs:element name="alpha" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="beta" minOccurs="0" type="xs:decimal" default="1"/>
+        <xs:element name="gamma" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="delta" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="direction" minOccurs="0" type="directiontype" default="1"/>
+    </xs:all>
+</xs:complexType>
+
+<xs:complexType name="contourrootfields">
+    <xs:all>
+        <xs:element name="parent" minOccurs="0" type="rootparenttype" default="1"/>
+        <xs:element name="node" minOccurs="0" type="rootnodetype" default="1"/>
+        <xs:element name="size" minOccurs="1" type="sizetype"/>
+        <xs:element name="alpha" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="beta" minOccurs="0" type="xs:decimal" default="1"/>
+        <xs:element name="gamma" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="delta" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="direction" minOccurs="0" type="directiontype" default="1"/>
+    </xs:all>
+</xs:complexType>
+
+<!-- Channels -->
+<xs:complexType name="channelsubnetfields">
+    <xs:all>
+        <xs:element name="parent" minOccurs="0" type="parenttype"/>
+        <xs:element name="node" minOccurs="1" type="nodetype"/>
+        <xs:element name="size" minOccurs="1" type="sizetype"/>
+        <xs:element name="alpha" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="beta" minOccurs="0" type="xs:decimal" default="1"/>
+        <xs:element name="gamma" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="delta" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="direction" minOccurs="0" type="directiontype" default="1"/>
+    </xs:all>
+</xs:complexType>
+
+<xs:complexType name="channelrootfields">
+    <xs:all>
+        <xs:element name="parent" minOccurs="0" type="rootparenttype" default="1"/>
+        <xs:element name="node" minOccurs="0" type="rootnodetype" default="1"/>
+        <xs:element name="size" minOccurs="1" type="sizetype"/>
+        <xs:element name="alpha" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="beta" minOccurs="0" type="xs:decimal" default="1"/>
+        <xs:element name="gamma" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="delta" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="direction" minOccurs="0" type="directiontype" default="1"/>
+    </xs:all>
+</xs:complexType>
+
+<!-- Clusters -->
+<xs:complexType name="clustersubnetfields">
+    <xs:all>
+        <xs:element name="parent" minOccurs="0" type="parenttype"/>
+        <xs:element name="node" minOccurs="1" type="nodetype"/>
+        <xs:element name="size" minOccurs="1" type="sizetype"/>
+        <xs:element name="alpha" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="beta" minOccurs="0" type="xs:decimal" default="1"/>
+        <xs:element name="gamma" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="direction" minOccurs="0" type="directiontype" default="1"/>
+    </xs:all>
+</xs:complexType>
+
+<xs:complexType name="clusterrootfields">
+    <xs:all>
+        <xs:element name="parent" minOccurs="0" type="rootparenttype" default="1"/>
+        <xs:element name="node" minOccurs="0" type="rootnodetype" default="1"/>
+        <xs:element name="size" minOccurs="1" type="sizetype"/>
+        <xs:element name="alpha" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="beta" minOccurs="0" type="xs:decimal" default="1"/>
+        <xs:element name="gamma" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="direction" minOccurs="0" type="directiontype" default="1"/>
+    </xs:all>
+</xs:complexType>
+
+<!-- Subnetworks -->
+<xs:complexType name="subnets">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="contour" type="contoursubnet"/>
+        <xs:element name="channel" type="channelsubnet"/>
+        <xs:element name="cluster" type="clustersubnet"/>
+    </xs:choice>
+</xs:complexType>
+
+<!-- Subnetwork types -->
+<xs:complexType name="contoursubnet">
+    <xs:sequence maxOccurs="1">
+        <xs:element name="contourfields" minOccurs="1" type="contoursubnetfields"/>
+        <xs:element name="subnets" minOccurs="0" type="subnets"/>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="channelsubnet">
+    <xs:sequence maxOccurs="1">
+        <xs:element name="channelfields" minOccurs="1" type="channelsubnetfields"/>
+        <xs:element name="subnets" minOccurs="0" type="subnets"/>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="clustersubnet">
+    <xs:sequence maxOccurs="1">
+        <xs:element name="clusterfields" minOccurs="1" type="clustersubnetfields"/>
+        <xs:element name="subnets" minOccurs="0" type="subnets"/>
+    </xs:sequence>
+</xs:complexType>
+
+<!-- Root networks -->
+<xs:complexType name="contourroot">
+    <xs:sequence maxOccurs="1">
+        <xs:element name="contourfields" minOccurs="1" type="contourrootfields"/>
+        <xs:element name="subnets" minOccurs="0" type="subnets"/>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="channelroot">
+    <xs:sequence maxOccurs="1">
+        <xs:element name="channelfields" minOccurs="1" type="channelrootfields"/>
+        <xs:element name="subnets" minOccurs="0" type="subnets"/>
+    </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="clusterroot">
+    <xs:sequence maxOccurs="1">
+        <xs:element name="clusterfields" minOccurs="1" type="clusterrootfields"/>
+        <xs:element name="subnets" minOccurs="0" type="subnets"/>
+    </xs:sequence>
+</xs:complexType>
+
+<!-- Root node -->
+<xs:element name="net">
+    <xs:complexType>
+        <xs:sequence minOccurs="1" maxOccurs="1">
+            <xs:choice minOccurs="1" maxOccurs="1">
+                <xs:element name="contour" type="contourroot"/>
+                <xs:element name="channel" type="channelroot"/>
+                <xs:element name="cluster" type="clusterroot"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+</xs:element>
+
+</xs:schema>
