@@ -55,7 +55,7 @@ for i = 1:nnets
         s.beta = 1;
     end
     
-    % Delata is optional for clusters, but needs to be set to 0 if not specified
+    % Delta is optional for clusters, but needs to be set to 0 if not specified
     if strcmp(s.type,'cluster') && ~isfield(s,'delta')
         s.delta = 0;
     end
@@ -115,7 +115,7 @@ for i = 1:nnets
                 s.direction = 1;
             end
 
-            j = 0.5*s.size*(1-s.direction)+1;
+            j = 0.5*(s.size-1)*(1-s.direction)+1;
             s.T(j+1:s.size+1:end) = true;
             if strcmp(s.type,'contour')
                 s.T(j,j+s.direction*(s.size-1)) = true;

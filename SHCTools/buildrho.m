@@ -88,3 +88,6 @@ end
 q = ones(1,n);
 net.rho = ~net.T.*net.gamma(:,q)+net.T.*net.delta(:,q);
 net.rho(1:n+1:end) = net.alpha./net.beta;
+if nargout == 0
+    net = net.rho;
+end

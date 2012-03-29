@@ -1,10 +1,10 @@
 function net=shc_addnetwork(net,s,p,n)
-%SHC_ADDNETWORK  Save SHC network structure as XML or MAT file.
+%SHC_ADDNETWORK  Insert a sub-network into SHC network structure.
 %
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-18-12
-%   Revision: 1.0, 3-24-12
+%   Revision: 1.0, 3-28-12
 
 
 % Check base network

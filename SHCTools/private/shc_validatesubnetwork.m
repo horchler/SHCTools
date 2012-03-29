@@ -8,7 +8,7 @@ function shc_validatesubnetwork(s,varargin)
 %shc_validatesubnetwork(s,num,'strict')
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-15-12
-%   Revision: 1.0, 3-24-12
+%   Revision: 1.0, 3-28-12
 
 
 if nargin > 1 && ~ischar(varargin{1})
@@ -56,10 +56,10 @@ if ~isfield(s,'type')
     error(  'SHCTools:shc_validatesubnetwork:InvalidArgument',...
             'Network%s does not have required field named ''type''.',i);
 end
-if ~any(strcmp(s.type,{'contour','channel','cluster'}))
+if ~any(strcmp(s.type,{'contour','channel','cluster','custom'}))
     error(  'SHCTools:shc_validatesubnetwork:InvalidParameter',...
            ['The ''type'' field of network%s must be ''contour'', '...
-            '''channel'', or ''cluster''.'],i);
+            '''channel'', ''cluster'', or ''custom''.'],i);
 end
 
 if ~isfield(s,'size')
@@ -82,27 +82,27 @@ if ~isfield(s,'alpha')
     error(  'SHCTools:shc_validatesubnetwork:InvalidArgument',...
             'Network%s does not have required field named ''alpha''.',i);
 end
-if ndims(s.alpha) ~= 2 || length(s.alpha) ~= 1
+if ~isscalar(s.alpha) || ~(isnumeric(s.alpha) || isa(s.alpha,'sym'))
     error(  'SHCTools:shc_validatesubnetwork:InvalidParameter',...
-            'The ''alpha'' field of network%s must be a scalar value.',i);
+           ['The ''alpha'' field of network%s must be a scalar numeric or '...
+            'symbolic value.'],i);
 end
-if ~isnumeric(s.alpha) || ~isreal(s.alpha) || ~isfinite(s.alpha) 
+if ~isreal(s.alpha) || abs(s.alpha) == Inf || isnan(s.alpha)
     error(  'SHCTools:shc_validatesubnetwork:InvalidParameter',...
-           ['The ''alpha'' field of network%s must be a real, finite '...
-            'numeric value.'],i);
+            'The ''alpha'' field of network%s must be a real, finite value.',i);
 end
 
 % Beta is optional
 if isfield(s,'beta')
-    if ndims(s.beta) ~= 2 || length(s.beta) ~= 1
+    if ~isscalar(s.beta) || ~(isnumeric(s.beta) || isa(s.beta,'sym'))
         error(  'SHCTools:shc_validatesubnetwork:InvalidParameter',...
                ['The optional ''beta'' field of network%s must be a scalar '...
-                'value.'],i);
+                'numeric or symbolic value.'],i);
     end
-    if ~isnumeric(s.beta) || ~isreal(s.beta) || ~isfinite(s.beta) 
+    if ~isreal(s.beta) || abs(s.beta) == Inf || isnan(s.beta)
         error(  'SHCTools:shc_validatesubnetwork:InvalidParameter',...
                ['The optional ''beta'' field of network%s must be a real, '...
-                'finite numeric value.'],i);
+                'finite value.'],i);
     end
 end
 
@@ -110,26 +110,27 @@ if ~isfield(s,'gamma')
     error(  'SHCTools:shc_validatesubnetwork:InvalidArgument',...
             'Network%s does not have required field named ''gamma''.',i);
 end
-if ndims(s.gamma) ~= 2 || length(s.gamma) ~= 1
+if ~isscalar(s.gamma) || ~(isnumeric(s.gamma) || isa(s.gamma,'sym'))
     error(  'SHCTools:shc_validatesubnetwork:InvalidParameter',...
-            'The ''gamma'' field of network%s must be a scalar value.',i);
+           ['The ''gamma'' field of network%s must be a scalar numeric or '...
+            'symbolic value.'],i);
 end
-if ~isnumeric(s.gamma) || ~isreal(s.gamma) || ~isfinite(s.gamma) 
+if ~isreal(s.gamma) || abs(s.gamma) == Inf || isnan(s.gamma)
     error(  'SHCTools:shc_validatesubnetwork:InvalidParameter',...
-           ['The ''gamma'' field of network%s must be a real, finite '...
-            'numeric value.'],i);
+            'The ''gamma'' field of network%s must be a real, finite value.',i);
 end
 
 % Delta is optional is for clusters
 if isfield(s,'delta')
-    if ndims(s.delta) ~= 2 || length(s.delta) ~= 1
+    if ~isscalar(s.delta) || ~(isnumeric(s.delta) || isa(s.delta,'sym'))
         error(  'SHCTools:shc_validatesubnetwork:InvalidParameter',...
-                'The ''delta'' field of network%s must be a scalar value.',i);
+               ['The ''delta'' field of network%s must be a scalar numeric '...
+                'or symbolic value.'],i);
     end
-    if ~isnumeric(s.delta) || ~isreal(s.delta) || ~isfinite(s.delta)
+    if ~isreal(s.delta) || abs(s.delta) == Inf || isnan(s.delta)
         error(  'SHCTools:shc_validatesubnetwork:InvalidParameter',...
                ['The optional ''delta'' field of the ''cluster'' type '...
-                'network%s must be a real, finite numeric value.'],i);
+                'network%s must be a real, finite value.'],i);
     end
 elseif ~strcmp(s.type,'cluster')
     error(  'SHCTools:shc_validatesubnetwork:InvalidArgument',...
@@ -138,7 +139,7 @@ end
 
 % Direction is optional, except for channels and contours in 'strict' mode
 if isfield(s,'direction')
-    if ndims(s.direction) ~= 2 || length(s.direction) ~= 1
+    if ~isscalar(s.direction)
         error(  'SHCTools:shc_validatesubnetwork:InvalidParameter',...
                ['The ''direction'' field of network%s must be a scalar '...
                 'value.'],i);
@@ -335,17 +336,19 @@ if isfield(s,'T')
     end
 
     % Create test T matrix to compare
-    t = false(s.size);
-    if ~strcmp(s.type,'cluster')
-        j=0.5*s.size*(1-s.direction)+1;
-        t(j+1:s.size+1:end) = true;
-        if strcmp(s.type,'contour')
-            t(j,j+s.direction*(s.size-1)) = true;
+    if ~strcmp(s.type,'custom')
+        t = false(s.size);
+        if ~strcmp(s.type,'cluster')
+            j=0.5*(s.size-1)*(1-s.direction)+1;
+            t(j+1:s.size+1:end) = true;
+            if strcmp(s.type,'contour')
+                t(j,j+s.direction*(s.size-1)) = true;
+            end
         end
-    end
-    if ~all(t(:) == s.T(:))
-        error(  'SHCTools:shc_validatesubnetwork:InvalidParameter',...
-               ['The optional ''T'' field values of network%s do not match '...
-                'those of a ''%s'' type network.'],i,s.type);
+        if ~all(t(:) == s.T(:))
+            error(  'SHCTools:shc_validatesubnetwork:InvalidParameter',...
+                   ['The optional ''T'' field values of network%s do not '...
+                    'match those of a ''%s'' type network.'],i,s.type);
+        end
     end
 end
