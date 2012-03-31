@@ -1,10 +1,10 @@
 function net=shc_create(nettype,varargin)
-%SHC_CREATE  
+%SHC_CREATE  Create RHO matrix from parameters or transition matrix.
 %
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-28-12
-%   Revision: 1.0, 3-28-12
+%   Revision: 1.0, 3-31-12
 
 
 if ~any(strcmp(nettype,{'contour','channel','cluster','custom'}))
