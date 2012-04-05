@@ -21,7 +21,7 @@
 %       shc_lv_symequilibria    - Symbolic equlibrium points and eigenvalues.
 %
 %   Stone-Holmes distribution.
-%       stoneholmescdf      - Cummulative distribution function.
+%       stoneholmescdf    	- Cummulative distribution function.
 %       stoneholmesfit      - Parameter estimates from data.
 %       stoneholmesinv      - Inverse cummulative distribution.
 %       stoneholmeslike   	- Negative log-likelihood.

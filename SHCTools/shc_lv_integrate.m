@@ -191,7 +191,7 @@ end
 
 A = zeros(lt,N,dataType);   % State array
 
-% Generate Wiener increments
+% Generate Wiener increments if not all eta values are zero
 if any(eta ~= 0)
     RandFUN = sdeget(options,'RandFUN',[],'flag');
     if ~isempty(RandFUN)
@@ -290,13 +290,13 @@ if any(eta ~= 0)
     for i = 1:lt-1
         if ~ConstStep
             dt = h(i);
-        end
+        end 
         A(i+1,:) = max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt+A(i+1,:),0);
     end
 else
     % Only allocate W matrix if requested as output
     if nargout == 2
-        W = zeros(lt,N);
+        W = zeros(lt,N,datatype);
     end
     
     % Integration loop
