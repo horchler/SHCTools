@@ -13,47 +13,64 @@ function J=shc_lv_jacobian(rho,eqpt)
 %   equilibrium point vectors from the columns of an identity matrix of size N.
 %
 %   See also:
-%       BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA, EIG
+%       SHC_LV_EIGS, BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA
 
 %   Andrew D. Horchler, adh9@case.edu, Created 12-1-10
-%   Revision: 1.0, 3-31-12
+%   Revision: 1.0, 4-6-12
 
 
 % Check Rho matrix
 if isstruct(rho) && isfield(rho,'rho')
     if isfield(rho,'alpha')
         alpv = rho.alpha;
-        if ~isfloat(alpv) || ~isreal(alpv) || ~all(isfinite(alpv))
+        if ~isvector(alpv) || ~(isfloat(alpv) || isa(alpv,'sym'))
             error('SHCTools:shc_lv_jacobian:AlphaVectorInvalid',...
-                 ['The ''alpha'' field of the SHC network structure must '...
-                  'be a finite real floating-point vector.']);
+                 ['The ''alpha'' field of the SHC network structure must be '...
+                  'a symbolic or floating-point vector.']);
         end
-        rho = rho.rho;
-        [m n] = size(rho);
-        if ~isvector(alpv) || size(alpv,1) ~= n
+        if ~isreal(alpv) || any(abs(alpv) == Inf) || any(isnan(alpv))
+            error('SHCTools:shc_lv_jacobian:AlphaVectorNonFiniteReal',...
+                 ['The ''alpha'' field of the SHC network structure must be '...
+                  'a finite real symbolic or floating-point vector.']);
+        end
+        p = rho.rho;
+        [m n] = size(p);
+        if size(alpv,1) ~= n
             error('SHCTools:shc_lv_jacobian:AlphaVectorDimensionMismatch',...
-                 ['The ''alpha'' field of the SHC network structure must '...
-                  'be a column vector the same dimension as RHO.']);
+                 ['The ''alpha'' field of the SHC network structure must be '...
+                  'a column vector the same dimension as RHO.']);
         end
     else
-        rho = rho.rho;
-        alpv = diag(rho);
-        [m n] = size(rho);
+        p = rho.rho;
+        alpv = diag(p);
+        [m n] = size(p);
     end
-    if ~isfloat(rho) || ~isreal(rho) || ~all(isfinite(rho(:)))
+    if ~(isfloat(p) || isa(p,'sym'))
         error('SHCTools:shc_lv_jacobian:InvalidRhoStruct',...
-             ['If the input RHO is a SHC network structure, the ''rho'' '...
-              'field must be a finite real floating-point matrix.']);
+             ['The ''rho'' field of the SHC network structure must be a '...
+              'symbolic or floating-point matrix.']);
+    end
+    if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
+        error('SHCTools:shc_lv_jacobian:RhoStructNonFiniteReal',...
+             ['The ''rho'' field of the SHC network structure must be a '...
+              'finite real symbolic or floating-point matrix.']);
     end
 else
-    if ~isfloat(rho) || ~isreal(rho) || ~all(isfinite(rho(:)))
-        error('SHTools:shc_lv_jacobian:RhoInvalidDatatype',...
-              'RHO must be a finite real floating-point matrix.');
+    p = rho;
+    if ~(isfloat(p) || isa(p,'sym'))
+        error('SHCTools:shc_lv_jacobian:InvalidRho',...
+             ['The ''rho'' field of the SHC network structure must be a '...
+              'symbolic or floating-point matrix.']);
     end
-    alpv = diag(rho);
-    [m n] = size(rho);
+    if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
+        error('SHCTools:shc_lv_jacobian:RhoNonFiniteReal',...
+             ['The ''rho'' field of the SHC network structure must be a '...
+              'finite real symbolic or floating-point matrix.']);
+    end
+    alpv = diag(p);
+    [m n] = size(p);
 end
-if isempty(rho) || ndims(rho) ~= 2 || m ~= n
+if isempty(p) || ndims(p) ~= 2 || m ~= n
     error('SHTools:shc_lv_jacobian:RhoDimensionMismatch',...
          ['RHO must be a non-empty square matrix the same dimension as '...
           'the equilibrium point vector.']);
@@ -65,23 +82,58 @@ if nargin == 2
         error('SHTools:shc_lv_jacobian:EquilibriumPointDimensionMismatch',...
               'Equilibrium point must be a vector the same dimension as RHO.');
     end
-    if ~isfloat(eqpt) || ~isreal(eqpt) || ~all(isfinite(eqpt))
-        error('SHTools:shc_lv_jacobian:EquilibriumPointInvalidDatatype',...
-              'Equilibrium point must be a finite real floating-point vector.');
+    if ~(isfloat(eqpt) || isa(eqpt,'sym'))
+        error('SHCTools:shc_lv_jacobian:InvalidEquilibriumPoint',...
+              'Equilibrium point must be a symbolic or floating-point vector.');
+    end
+    if ~isreal(eqpt) || any(abs(eqpt) == Inf) || any(isnan(eqpt))
+        error('SHCTools:shc_lv_jacobian:EquilibriumPointNonFiniteReal',...
+             ['Equilibrium point must be a finite real symbolic or '...
+              'floating-point vector.']);
     end
     eqpt = -eqpt(:);
     
     % Calculate Jacobian
-    J = rho.*eqpt(:,ones(1,n));
-    J(1:n+1:end) = alpv.*(1+eqpt)+rho*eqpt;
+    J = p.*eqpt(:,ones(1,n));
+    J(1:n+1:end) = alpv.*(1+eqpt)+p*eqpt;
+    
+    if isa(J,'sym')
+        J = simplify(J);
+    end
 else
-    eqpt = eye(n);
+    if isstruct(rho) && isfield(rho,'rho') && isfield(rho,'beta')
+        betv = rho.beta;
+        if ~isvector(betv) || ~(isfloat(betv) || isa(betv,'sym'))
+            error('SHCTools:shc_lv_jacobian:BetaVectorInvalid',...
+                 ['The ''beta'' field of the SHC network structure must be '...
+                  'a symbolic or floating-point vector.']);
+        end
+        if ~isreal(betv) || any(abs(betv) == Inf) || any(isnan(betv))
+            error('SHCTools:shc_lv_jacobian:BetaVectorNonFiniteReal',...
+                 ['The ''beta'' field of the SHC network structure must be '...
+                  'a finite real symbolic or floating-point vector.']);
+        end
+        if size(betv,1) ~= n
+            error('SHCTools:shc_lv_jacobian:BetaVectorDimensionMismatch',...
+                 ['The ''beta'' field of the SHC network structure must be '...
+                  'a column vector the same dimension as RHO.']);
+        end
+        eqpt = diag(-betv);
+    else
+        eqpt = -eye(n);
+    end
+    
     J = cell(1,n);
+    isSym = (isa(p,'sym') || isa(alpv,'sym') || isa(eqpt,'sym'));
+    z = ones(1,n);
     for i = 1:n
-        J{i} = zeros(n);
-        
         % Calculate Jacobian
-        J{i}(i,:) = -rho(i,:);
-        J{i}(1:n+1:end) = alpv.*(1-eqpt(:,i))-rho(:,i);
+        v = eqpt(:,i);
+        J{i} = p.*v(:,z);
+        J{i}(1:n+1:end) = alpv.*(1+v)+p*v;
+        
+        if isSym
+            J{i} = simplify(J{i});
+        end
     end
 end
