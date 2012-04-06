@@ -18,7 +18,7 @@ SHCTOOLS
        shc_lv_eigs          - Eigenvalues of Lotka-Volterra system.
        shc_lv_integrate     - Solve stochastic Lotka-Volterra ODEs.
        shc_lv_jacobian      - Jacobian of Lotka-Volterra system.
-       shc_lv_ode         	- ODEs for N-dimensional Lotka-Volterra system.
+       shc_lv_ode           - ODEs for N-dimensional Lotka-Volterra system.
        shc_lv_symequilibria - Symbolic equlibrium points and eigenvalues.
 
    Stone-Holmes distribution.
