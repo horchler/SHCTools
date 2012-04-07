@@ -72,8 +72,8 @@ else
 end
 if isempty(p) || ndims(p) ~= 2 || m ~= n
     error('SHTools:shc_lv_jacobian:RhoDimensionMismatch',...
-         ['RHO must be a non-empty square matrix the same dimension as '...
-          'the equilibrium point vector.']);
+         ['RHO must be a non-empty square matrix the same dimension as the '...
+          'equilibrium point vector.']);
 end
 
 if nargin == 2

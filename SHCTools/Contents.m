@@ -1,5 +1,5 @@
 %SHCTOOLS
-%   Version 1.0, 4-6-12
+%   Version 1.0, 4-7-12
 %
 %   SHC network creation, modification, and visualization, and conversion.
 %       buildrho             - Create RHO matrix from SHC network structure.
@@ -15,11 +15,11 @@
 %       shc_validatenetwork	 - Validate SHC network structure.
 %
 %   Lotka-Volterra SHC network tools.
-%       shc_lv_eigs          - Eigenvalues of Lotka-Volterra system.
-%       shc_lv_integrate     - Solve stochastic Lotka-Volterra ODEs.
-%       shc_lv_jacobian      - Jacobian of Lotka-Volterra system.
+%       shc_lv_eigs          - Eigenvalues/vectors of Lotka-Volterra system.
+%       shc_lv_integrate     - Solve Lotka-Volterra SDEs numerically.
+%       shc_lv_jacobian      - Jacobian of N-dimensional Lotka-Volterra system.
 %       shc_lv_ode         	 - ODEs for N-dimensional Lotka-Volterra system.
-%       shc_lv_symequilibria - Symbolic equlibrium points and eigenvalues.
+%       shc_lv_symequilibria - Solve for all equlibrium points symbolically.
 %
 %   Stone-Holmes distribution.
 %       stoneholmescdf    	 - Cummulative distribution function.
@@ -39,4 +39,4 @@
 %   Mac OS X 10.6.8 (Build: 10K549), Java 1.6.0_31-b04-413-10M3623
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-4-12
-%   Revision: 1.0, 4-6-12
+%   Revision: 1.0, 4-7-12
