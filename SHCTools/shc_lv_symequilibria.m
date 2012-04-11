@@ -74,7 +74,7 @@ if isempty(p) || ndims(p) ~= 2 || m ~= n
 end
 
 % Column vector of number state variables
-a = sym(sym('a%d',[n 1]),'real');
+a = sym(sym('a%d',[n 1]),'positive');
 
 % Generate equations and convert to strings
 eq = char((a.*(alpv-p*a))');

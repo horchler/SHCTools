@@ -4,7 +4,7 @@ function net=shc_create(nettype,varargin)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-28-12
-%   Revision: 1.0, 3-31-12
+%   Revision: 1.0, 4-7-12
 
 
 if ~any(strcmp(nettype,{'contour','channel','cluster','custom'}))
@@ -105,7 +105,7 @@ end
 % Build network structure
 net = struct;
 if isCustom
-    if length(params) == 3 || params(2) == 1
+    if length(params) == 3
         net.s{1} = struct('type','custom','size',m,'alpha',params(1),'gamma',...
             params(2),'delta',params(3),'T',logical(T));
     else
@@ -113,7 +113,7 @@ if isCustom
             params(2),'gamma',params(3),'delta',params(4),'T',logical(T));
     end
 elseif isCluster
-    if length(params) == 2 || params(2) == 1
+    if length(params) == 2
         net.s{1} = struct('type','cluster','size',m,'alpha',params(1),...
             'gamma',params(2));
     else
@@ -124,7 +124,7 @@ else
     if nargin == 3
         netdir = 1;
     end
-    if length(params) == 3 || params(2) == 1
+    if length(params) == 3
         net.s{1} = struct('type',nettype,'size',m,'alpha',params(1),'gamma',...
             params(2),'delta',params(3),'direction',netdir);
     else

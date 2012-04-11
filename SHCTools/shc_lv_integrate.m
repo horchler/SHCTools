@@ -5,10 +5,12 @@ function [A W]=shc_lv_integrate(tspan,a0,rho,eta,varargin)
 %   Lotka-Volterra system with diagonal additive noise from time T0 to TFINAL
 %   (all increasing or all decreasing with arbitrary step size) with initial
 %   conditions A0. RHO is the N-by-N connection matrix and can be specified via
-%   a floating-point matrix or an SHC network structure. ETA is a scalar or
-%   length N vector denoting the root-mean-squared magnitude of the noise
-%   perturbing each dimension. If all elelments of ETA are equal to zero, the
-%   system is treated as an ODE rather than an SDE. Each row in the solution
+%   a floating-point matrix or an SHC network structure. If RHO is a matrix, the
+%   amplitude scaling parameters, beta, are asummed to all be equal to one. If
+%   RHO is an SHC network structure, arbitrary beta values may be used. ETA is a
+%   scalar or length N vector denoting the root-mean-squared magnitude of the
+%   noise perturbing each dimension. If all elelments of ETA are equal to zero,
+%   the system is treated as an ODE rather than an SDE. Each row in the solution
 %   array AOUT corresponds to a time in the input vector TSPAN.
 %
 %   [AOUT, W] = SHC_LV_INTEGRATE(TSPAN,A0,RHO,ETA) outputs the matrix W of
@@ -26,14 +28,16 @@ function [A W]=shc_lv_integrate(tspan,a0,rho,eta,varargin)
 %       SHC_LV_ODE, RANDSTREAM
 
 %   SHC_LV_INTEGRATE is an implementation of the explicit Euler-Maruyama scheme
-%   with additive noise (order 1.0 strong convergence).
+%   with diagonal additive noise (order 1.0 strong convergence). Ito and
+%   Stratonovich interpretations coincide for this case and higher order schemes
+%   such as Euler-Heun and Milstein effectively simplify to Euler-Maruyama.
 
 %   For details of this integration method, see: Peter E. Kloeden and Eckhard
 %   Platen, "Numerical solution of Stochastic Differential Equations,"
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-30-12
-%   Revision: 1.0, 3-31-12
+%   Revision: 1.0, 4-7-12
 
 
 % Check inputs and outputs
