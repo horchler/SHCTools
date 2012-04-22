@@ -46,7 +46,7 @@ function r=stoneholmesrnd(delta,epsilon,lambda_u,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-6-12
-%   Revision: 1.0, 3-22-12
+%   Revision: 1.0, 4-21-12
 
 
 % Check three parameters
@@ -186,11 +186,11 @@ else
         % Generate uniformly-distributed probabilities on (0, 1)
         p=rand(stream,[nnz(i) 1],dtype);
         
-        % Matlab 7.13.0.564 (R2011b), and possibly earlier, has a bug where
-        % erfcinv(eps(realmin)) returns NaN instead of a finite real value.
-        % There is a small chance (higher for single precision) that this number
-        % could be drawn by the RAND function from the uniform distribution, so
-        % a workaround is applied.
+        % Matlab 7.14.0.739 (R2012a), 7.13.0.564 (R2011b), and possibly earlier,
+        % has a bug where erfcinv(eps(realmin)) returns NaN instead of a finite
+        % real value. There is a small chance (higher for single precision) that
+        % this number could be drawn by the RAND function from the uniform
+        % distribution, so a workaround is applied.
         ecip=erfcinv(p);
         if isa(p,'double')
             ecip(p == 2^-1074)=27.213293210812949;

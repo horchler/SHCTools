@@ -16,7 +16,7 @@ function J=shc_lv_jacobian(rho,eqpt)
 %       SHC_LV_EIGS, BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA
 
 %   Andrew D. Horchler, adh9@case.edu, Created 12-1-10
-%   Revision: 1.0, 4-6-12
+%   Revision: 1.0, 4-21-12
 
 
 % Check Rho matrix
@@ -70,7 +70,7 @@ else
     alpv = diag(p);
     [m n] = size(p);
 end
-if isempty(p) || ndims(p) ~= 2 || m ~= n
+if isempty(p) || ndims(p) ~= 2 || m ~= n    %#ok<*ISMAT>
     error('SHTools:shc_lv_jacobian:RhoDimensionMismatch',...
          ['RHO must be a non-empty square matrix the same dimension as the '...
           'equilibrium point vector.']);

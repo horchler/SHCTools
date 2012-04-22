@@ -4,7 +4,7 @@ function varargout=validateindex(i)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-19-12
-%   Revision: 1.0, 3-24-12
+%   Revision: 1.0, 4-21-12
 
 
 if nargout  > 2
@@ -12,7 +12,7 @@ if nargout  > 2
 end
 
 % Don't throw errors if output requested
-if ndims(i) ~= 2 || length(i) ~= 1
+if ndims(i) ~= 2 || length(i) ~= 1  %#ok<*ISMAT>
     if nargout == 1
         varargout{1} = false;
     else

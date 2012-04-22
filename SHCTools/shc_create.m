@@ -4,7 +4,7 @@ function net=shc_create(nettype,varargin)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-28-12
-%   Revision: 1.0, 4-7-12
+%   Revision: 1.0, 4-21-12
 
 
 if ~any(strcmp(nettype,{'contour','channel','cluster','custom'}))
@@ -24,7 +24,7 @@ if isCustom
     
     T = varargin{1};
     m = size(T,1);
-    if ndims(T) ~= 2 || isempty(T) || m ~= size(T,2)
+    if ndims(T) ~= 2 || isempty(T) || m ~= size(T,2)    %#ok<*ISMAT>
         error('SHCTools:shc_create:InvalidTMatrix',...
               'T must be a non-empty square matrix.');
     end

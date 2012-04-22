@@ -8,7 +8,7 @@ function shc_validatesubnetwork(s,varargin)
 %shc_validatesubnetwork(s,num,'strict')
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-15-12
-%   Revision: 1.0, 4-6-12
+%   Revision: 1.0, 4-21-12
 
 
 if nargin > 1 && ~ischar(varargin{1})
@@ -189,7 +189,7 @@ if isempty(i)
     end
     
     if isfield(s,'children')
-        if ndims(s.children) ~= 2 || size(s.children,1) > 1
+        if ndims(s.children) ~= 2 || size(s.children,1) > 1     %#ok<*ISMAT>
             error('SHCTools:shc_validatesubnetwork:InvalidChildren',...
                  ['The optional ''children'' field must be a scalar value '...
                   'or a row vector.']);

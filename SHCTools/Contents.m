@@ -1,5 +1,5 @@
 %SHCTools
-%   Version 1.0, 4-10-12
+%   Version 1.0, 4-21-12
 %
 %   SHC network creation, modification, and visualization, and conversion.
 %       buildrho             - Create RHO matrix from SHC network structure.
@@ -35,8 +35,9 @@
 %       shc.dtd              - Document Type Definition.
 %       shc.xsd              - XML Schema.
 
-%   Tested with Matlab 7.13.0.564 (R2011b)
-%   Mac OS X 10.6.8 (Build: 10K549), Java 1.6.0_31-b04-413-10M3623
+%   Tested with Matlab 7.14.0.739 (R2012a)
+%   Mac OS X 10.6.8 (Build: 10K549), Java 1.6.0_31-b04-415-10M3635
+%   Compatibility maintained back through Matlab 7.4 (R2007a)
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-4-12
-%   Revision: 1.0, 4-10-12
+%   Revision: 1.0, 4-21-12

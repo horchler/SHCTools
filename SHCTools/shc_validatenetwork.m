@@ -4,7 +4,7 @@ function shc_validatenetwork(net,usestrict)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-11-12
-%   Revision: 1.0, 3-24-12
+%   Revision: 1.0, 4-21-12
 
 
 % Check base structure input
@@ -58,7 +58,7 @@ if isfield(net,'alpha')
                ['The ''alpha'' field of the combined network is specified, '...
                 'but the ''size'' field is not.']);
     end
-    if ndims(net.alpha) ~= 2 || ~all(size(net.alpha) == [net.size 1]) 
+    if ndims(net.alpha) ~= 2 || ~all(size(net.alpha) == [net.size 1])	%#ok<*ISMAT>
         error(  'SHCTools:shc_validatenetwork:InvalidParameter',...
                ['The ''alpha'' field of the combined network must be a '...
                 'scalar value or a column vector the same dimension as the '...

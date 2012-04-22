@@ -34,7 +34,7 @@ function x=stoneholmesinv(p,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-5-12
-%   Revision: 1.0, 3-23-12
+%   Revision: 1.0, 4-21-12
 
 
 % Check variable inputs
@@ -156,8 +156,9 @@ else
             end
         end
         
-        % Matlab 7.13.0.564 (R2011b), and possibly earlier, has a bug where
-        % erfcinv(eps(realmin)) returns NaN instead of a finite real value.
+        % Matlab 7.14.0.739 (R2012a), 7.13.0.564 (R2011b), and possibly earlier,
+        % has a bug where erfcinv(eps(realmin)) returns NaN instead of a finite
+        % real value.
         ecip=erfcinv(p);
         if isa(p,'double')
             ecip(p == 2^-1074)=27.213293210812949;

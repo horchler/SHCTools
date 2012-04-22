@@ -37,7 +37,7 @@ function [A W]=shc_lv_integrate(tspan,a0,rho,eta,varargin)
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-30-12
-%   Revision: 1.0, 4-7-12
+%   Revision: 1.0, 4-21-12
 
 
 % Check inputs and outputs
@@ -129,7 +129,7 @@ else
            ['RHO must be finite real floating-point matrix or SHC network '...
             'structure with a ''rho'' field.']);
 end
-if ndims(rho) ~= 2 || ~all(size(rho) == N)
+if ndims(rho) ~= 2 || ~all(size(rho) == N)	%#ok<*ISMAT>
     error(  'SHCTools:shc_lv_integrate:RhoDimensionMismatch',...
             'RHO must be a square matrix the same dimension as A0.');
 end

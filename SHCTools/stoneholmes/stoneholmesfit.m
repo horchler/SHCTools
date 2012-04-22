@@ -43,7 +43,8 @@ function varargout=stoneholmesfit(x,varargin)
 %       title(['Stone-Holmes Fit: \epsilon = ' num2str(ephat) ...
 %              ', \lambda_u = ' num2str(lamhat)]);
 %   
-%   See also STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESINV, STONEHOLMESLIKE,
+%   See also:
+%       STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESINV, STONEHOLMESLIKE,
 %       STONEHOLMESRND, FZERO, OPTIMSET
 
 %   ISROW, ISCOLUMN, and ISMATRIX are not used to maintain compatibility with
@@ -61,7 +62,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-11-12
-%   Revision: 1.0, 3-22-12
+%   Revision: 1.0, 4-20-12
 
 
 % Check number of input and output arguments
@@ -216,45 +217,14 @@ else
     wtx=sum(frequncensored.*xuncensored)/n;
 end
 
-% FZERO only accepts inputs of data type double
-lambda_uhat=cast(lambda_uhat,'double');
-
 % Create function handle for Lambda_U likelihood equation
 likelihood=@(lambda_u)likeeq(lambda_u,x,6/n,2*wtx,freq);
 
 % Bracket the root of the Lambda_U likelihood equation
-lamlike=likelihood(lambda_uhat);
-if lamlike < 0
-    upper=lambda_uhat;
-    lower=0.5*upper;
-    while likelihood(lower) < 0
-        upper=lower;
-        lower=0.5*upper;
-        if lower < eps(realmin(classX))	% underflow, no positive root
-            error('SHCTools:stoneholmesfit:NoSolutionUnderflow',...
-                  'Unable to reach a maximum likelihood solution.');
-        end
-    end
-elseif lamlike >= 0
-    lower=lambda_uhat;
-    upper=2*lower;
-    while likelihood(upper) > 0
-        lower=upper;
-        upper=2*lower;
-        if upper > realmax(classX)      % overflow, no finite root
-            error('SHCTools:stoneholmesfit:NoSolutionOverflow',...
-                  'Unable to reach a maximum likelihood solution.');
-        end
-    end
-else
-    error('SHCTools:stoneholmesfit:NoSolutionNonFiniteFunctionValue',...
-         ['Unable to reach a maximum likelihood solution. The likelihood '...
-          'function returned a non-finite value. This is possibly because '...
-          'the data in X are not sufficiently distinct.']);
-end
+bnds=bracketroot(likelihood,lambda_uhat,[eps(realmin(classX)) realmax(classX)]);
 
 % Find root of of the likelihood equation, MLE for Lambda_U
-[lambda_uhat,likelihoodval,err]=fzero(likelihood,[lower upper],options);
+[lambda_uhat,likelihoodval,err]=fzero(likelihood,bnds,options);
 if err < 0
     error('SHCTools:stoneholmesfit:NoSolution',...
           'Unable to reach a maximum likelihood solution.');
@@ -283,11 +253,12 @@ else
     varargout{3}=lambda_uhat;
 end
 
-% Likelihood equation for Lambda_U
+
+% Likelihood equation for Lambda_U, actually negative of it for bracketroot()
 function z=likeeq(lambda_u,x,n,wtx,freq)
 
 lam2x=2*lambda_u*x;
 exi=1./expm1(lam2x);
 fexi=freq.*exi;
 s=sum(fexi.*exi.*(1+exp(lam2x).*(lam2x-1)));
-z=(3+s/sum(fexi))/lambda_u-n*sum(fexi.*x)-wtx;
+z=n*sum(fexi.*x)+wtx-(3+s/sum(fexi))/lambda_u;
