@@ -12,20 +12,21 @@ function y=stoneholmesmedian(varargin)
 %   subset of the parameters are scalars or column vectors, the size of Y is the
 %   size of the other parameter(s).
 %
-%   Y = STONEHOLMESMEDIAN(X,THETA,LAMBDA_U) returns the median of the two
+%   Y = STONEHOLMESMEDIAN(THETA,LAMBDA_U) returns the median of the two
 %   parameter Stone-Holmes probability density function, where
 %   Theta = Epsilon/Delta (Theta << 1) is the size of the noise relative to that
 %   of the neighborhood.
 %   
-%   See also STONEHOLMESPDF, STONEHOLMESMODE, STONEHOLMESCDF, STONEHOLMESRND,
-%       STONEHOLMESINV, STONEHOLMESFIT, STONEHOLMESLIKE, STONEHOLMESARGS
+%   See also:
+%       STONEHOLMESPDF, STONEHOLMESMODE, STONEHOLMESCDF, STONEHOLMESRND,
+%       STONEHOLMESINV, STONEHOLMESFIT, STONEHOLMESLIKE, STONEHOLMESPASSAGETIME
 
 %   Based on Eqs. (2.31) and (2.24) in: Emily Stone and Philip Holmes, "Random
 %   Perturbations of Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50,
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-23-12
-%   Revision: 1.0, 3-23-12
+%   Revision: 1.0, 4-24-12
 
 
 % Check variable inputs
@@ -38,9 +39,11 @@ elseif nargin == 2
     epsilon=varargin{1};
     lambda_u=varargin{2};
 elseif nargin < 2
-	error('SHCTools:stoneholmesmedian:TooFewInputs','Not enough input arguments.')
+	error('SHCTools:stoneholmesmedian:TooFewInputs',...
+          'Not enough input arguments.')
 else
-	error('SHCTools:stoneholmesmedian:TooManyInputs','Too many input arguments.')
+	error('SHCTools:stoneholmesmedian:TooManyInputs',...
+          'Too many input arguments.')
 end
 
 % Check three parameters
@@ -63,10 +66,12 @@ if ~isreal(lambda_u) || ~isfloat(lambda_u)
 end
 
 % Check that sizes of parameter inputs are consistent, return size of Y
-szdelta=size(delta);
-szepsilon=size(epsilon);
-szlambda_u=size(lambda_u);
-[szy,expansion]=stoneholmesargs([],szdelta,szepsilon,szlambda_u,'median');
+if nargin == 3
+    [szy,expansion]=stoneholmesargs('median',size(delta),size(epsilon),...
+                                    size(lambda_u));
+else
+    [szy,expansion]=stoneholmesargs('median',size(epsilon),size(lambda_u));
+end
 
 % Column vector expansion
 if any(expansion)
@@ -128,7 +133,7 @@ else
                         'Delta value(s), but the Stone-Holmes distribution '...
                         'defines Epsilon << Delta.'])
             else
-                warning('SHCTools:stoneholmesmedian:DeltaEpsilonScaling',...
+                warning('SHCTools:stoneholmesmedian:ThetaScaling',...
                        ['One or more Theta = Epsilon/Delta values is '...
                         'greater than 1, but the the Stone-Holmes '...
                         'distribution defines Epsilon << Delta.'])

@@ -1,190 +1,224 @@
-function [szy,expnd]=stoneholmesargs(szx,szdelta,szepsilon,szlambda_u,str)
+function [szy,expnd]=stoneholmesargs(str,varargin)
 %STONEHOLMESARGS  Checks input arguments for Stone-Holmes distribution functions
-%   [SZY,EXPANSION] = STONEHOLMESARGS(SZX,SZDELTA,SZEPSILON,SZLAMBDA_U) returns
-%   the combined size vector, SZY, of the input size vectors and a Boolean
-%   vector indicating if any of the input arrays are column vectors that will
-%   need to be expanded to match SZY.
+%   [SZY,EXPANSION] = STONEHOLMESARGS(STR,SZX,SZDELTA,SZEPSILON,SZLAMBDA_U)
+%   returns the combined size vector, SZY, of the input size vectors and a
+%   Boolean vector indicating if any of the input arrays are column vectors that
+%   will need to be expanded to match SZY. STR is a string specifying the name
+%   of the calling function in order to tailor error messages and check specific
+%   constraints. Valid strings for this input format are 'pdf', 'cdf', 'inv',
+%   'rnd', and 'like'.
 %
-%   [SZY,EXPANSION] = STONEHOLMESARGS(SZX,SZDELTA,SZEPSILON,SZLAMBDA_U,STR)
-%   accepts a string specifying the name of the calling function in order to
-%   tailor error messages. Valid strings are: 'pdf', 'cdf', 'inv', 'rnd',
-%   'like', 'median', and 'mode'.
+%   [...] = STONEHOLMESARGS(STR,SZX,SZTHETA,SZLAMBDA_U) handles the two
+%   parameter case, but only for the input strings 'pdf', 'cdf', and 'inv' as
+%   'rnd' and 'like' do permit the parameters to be specified as Theta and
+%   Lambda_U.
+%
+%   [...] = STONEHOLMESARGS(STR,SZDELTA,SZEPSILON,SZLAMBDA_U) and
+%   [...] = STONEHOLMESARGS(STR,SZTHETA,SZLAMBDA_U) are as above, but valid
+%   strings, STR, for this input format are 'median' and 'mode'.
+%
+%   [...] = STONEHOLMESARGS(STR,SZDELTA,SZEPSILON,SZLAMBDA_U,SZLAMBDA_S) and
+%   [...] = STONEHOLMESARGS(STR,SZTHETA,SZLAMBDA_U,SZLAMBDA_S) are as above, but
+%   the valid string, STR, for this input format is 'passagetime'.
 %   
-%   See also STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESINV, STONEHOLMESRND,
-%       STONEHOLMESLIKE, STONEHOLMESMEDIAN, STONEHOLMESMODE
+%   See also:
+%       STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESINV, STONEHOLMESRND,
+%       STONEHOLMESLIKE, STONEHOLMESMEDIAN, STONEHOLMESMODE,
+%       STONEHOLMESPASSAGETIME
 
 %   ISROW, ISCOLUMN, and ISMATRIX are not used to maintain compatibility with
 %   versions prior to Matlab 7.11 (R2010b).
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-12-12
-%   Revision: 1.0, 3-23-12
+%   Revision: 1.0, 4-24-12
 
 
-% Non-scalars
-nsX=~all(szx == 1);
-nsDelta=~all(szdelta == 1);
-nsEpsilon=~all(szepsilon == 1);
-nsLambda_u=~all(szlambda_u == 1);
+if ~ischar(str)
+    error('SHCTools:stoneholmesargs:StringMissing',...
+         ['First argument must be a string. Valid strings are: ''pdf'', '...
+          '''cdf'', ''inv'', ''rnd'', ''like'', ''median'', ''mode'', and '...
+          '''passagetime''.']);
+end
 
 % Special cases
 isLike=strcmpi(str,'like');
 isMedianMode=any(strcmpi(str,{'mode','median'}));
-        
+isLikeRnd=any(strcmpi(str,{'like','rnd'}));
+isPassageTime=strcmpi(str,'passagetime');
+isX=~(isMedianMode || isPassageTime);
+
+if isMedianMode && nargin < 3 || isLikeRnd && nargin < 5 || nargin < 4
+    error('SHCTools:stoneholmesargs:TooFewInputs','Not enough input arguments.')
+end
+if isMedianMode && nargin > 4 || nargin > 5
+    error('SHCTools:stoneholmesargs:TooManyInputs','Too many input arguments.')
+end
+
+% Check for two parameter case
+isTheta=true;
+if isMedianMode && nargin == 4 || nargin == 5
+    isTheta=false;
+end
+
+% Create size matrix used for comparisons
+lv=cellfun('length',varargin);
+if any(lv ~= lv(1))
+    len=length(lv);
+    sz=ones(len,max(lv));
+    for i=1:len
+        vi=varargin{i};
+        sz(i,1:length(vi))=vi;
+    end
+else
+    sz=cat(1,varargin{:});
+end
+
+% Non-scalar inputs
+ns=~all(sz == 1,2);
+
 % Check that first dimension is consistent for column expansion case
-if nsX && ~(isLike || isMedianMode)
-    if nsDelta && nsEpsilon && nsLambda_u && ...
-            ~isequal(szx(1),szdelta(1),szepsilon(1),szlambda_u(1)) || ...
-            nsDelta && nsEpsilon && ...
-            ~isequal(szx(1),szdelta(1),szepsilon(1)) || ...
-            nsDelta && nsLambda_u && ...
-            ~isequal(szx(1),szdelta(1),szlambda_u(1)) || ...
-            nsEpsilon && nsLambda_u && ...
-            ~isequal(szx(1),szepsilon(1),szlambda_u(1)) || ...
-            nsDelta && szx(1) ~= szdelta(1) || ...
-            nsEpsilon && szx(1) ~= szepsilon(1) || ...
-            nsLambda_u && szx(1) ~= szlambda_u(1)
+if any(sz([false;ns(2:end)],1) ~= sz(ns(1),1))
+    if ~(isLike || isMedianMode)
+        if isTheta
+            thetastr='Theta'; 
+        else
+            thetastr='Delta, Epsilon';
+        end
+    end
+    if isX && ns(1) && ~isLike
         if nargin < 5
-            str='the data';
+            msgstr='the data';
         else
             switch(lower(str))
                 case {'pdf','cdf'}
-                    str='X';
+                    msgstr='X';
                 case 'inv'
-                    str='P';
+                    msgstr='P';
                 case 'rnd'
-                    str='the specified dimensions';
+                    msgstr='the specified dimensions';
                 otherwise
-                    str='the data';
+                    msgstr='the data';
             end
         end
-        error('SHCTools:stoneholmesargs:ParameterFirstDimensionMismatch',...
-             ['If more than one of Delta, Epsilon, Lambda_U, or %s are '...
-              'non-scalar, they must have the same number of rows.'],str)
-    end
-else
-    if nsDelta && nsEpsilon && nsLambda_u && ...
-            ~isequal(szdelta(1),szepsilon(1),szlambda_u(1)) || ...
-            nsDelta && nsEpsilon && szdelta(1) ~= szepsilon(1) || ...
-            nsDelta && nsLambda_u && szdelta(1) ~= szlambda_u(1) || ...
-            nsEpsilon && nsLambda_u && szepsilon(1) ~= szlambda_u(1)
-        if isLike
+        errmsg=['If more than one of ' thetastr ', Lambda_U, or ' msgstr ...
+                ' are non-scalar, they must have the same number of rows.'];
+    elseif isPassageTime
+        errmsg=['If more than one of ' thetastr ', Lambda_U, or Lambda_S '...
+                'are non-scalar, they must have the same number of rows.'];
+    elseif isLike
+        if isTheta
+            errmsg=['Theta and Lambda_U must be scalars or 1-by-N-by-... '...
+                    'arrays.'];
+        else
             errmsg=['Delta, Epsilon, and Lambda_U must be scalars or '...
                     '1-by-N-by-... arrays.'];
+        end
+    else
+        if isTheta
+            errmsg=['If Theta and/or Lambda_U are non-scalar, they must '...
+                    'have the same number of rows.'];
         else
             errmsg=['If more than one of Delta, Epsilon, or Lambda_U, are '...
                     'non-scalar, they must have the same number of rows.'];
         end
-        error('SHCTools:stoneholmesargs:FirstDimensionMismatch',errmsg)
     end
+    error('SHCTools:stoneholmesargs:ParameterFirstDimensionMismatch',errmsg);
 end
 
-% Column vectors
-isColX=~isMedianMode && (szx(1) > 1 && all(szx(2:end) == 1));
-isColDelta=(szdelta(1) > 1 && all(szdelta(2:end) == 1));
-isColEpsilon=(szepsilon(1) > 1 && all(szepsilon(2:end) == 1));
-isColLambda_u=(szlambda_u(1) > 1 && all(szlambda_u(2:end) == 1));
+% Column vector and non-scalar, noncolumn vector array inputs
+isCol=(sz(:,1) > 1 & all(sz(:,2:end) == 1,2));
+isArray=(ns & ~isCol);
 
-% Non-scalars and non-column vectors
-isArrayX=nsX && ~isColX;
-isArrayDelta=nsDelta && ~isColDelta;
-isArrayEpsilon=nsEpsilon && ~isColEpsilon;
-isArrayLambda_u=nsLambda_u && ~isColLambda_u;
+% Elements of size matrix that correspond to arrays
+sza=sz(isArray,:);
 
 % Check that all array (non-scalar, non-column vector) dimensions are consistent
-if isArrayX
-    cx=[1 szx(2:end)];
-    if isArrayDelta && isArrayEpsilon && isArrayLambda_u && ...
-            ~isequal(cx,szdelta,szepsilon,szlambda_u) || ...
-            isArrayDelta && isArrayEpsilon && ...
-            ~isequal(cx,szdelta,szepsilon) || ...
-            isArrayDelta && isArrayLambda_u && ...
-            ~isequal(cx,szdelta,szlambda_u) || ...
-            isArrayEpsilon && isArrayLambda_u && ...
-            ~isequal(cx,szepsilon,szlambda_u) || ...
-            isArrayDelta && ~isequal(cx,szdelta) || ...
-            isArrayEpsilon && ~isequal(cx,szepsilon) || ...
-            isArrayLambda_u && ~isequal(cx,szlambda_u)
+if size(sza,1) > 1 && any(any(bsxfun(@ne,sza(2:end,2:end),sza(1,2:end)),2))
+    if ~(isLike || isMedianMode)
+        if isTheta
+            thetastr='Theta'; 
+        else
+            thetastr='Delta, Epsilon';
+        end
+    end
+    if isX && isArray(1)
         if nargin < 5
-            str='the data are non-scalar arrays and not column vectors';
+            msgstr='the data are non-scalar arrays and not column vectors';
         elseif isLike
-            str='X are non-scalar arrays';
+            msgstr='X are non-scalar arrays';
         else
             switch(lower(str))
                 case {'pdf','cdf'}
-                    str='X are non-scalar arrays and not column vectors';
+                    msgstr='X are non-scalar arrays and not column vectors';
                 case 'inv'
-                    str='P are non-scalar arrays and not column vectors';
+                    msgstr='P are non-scalar arrays and not column vectors';
                 case 'rnd'
-                    str=['the specified dimensions are non-scalar arrays '...
-                         'and not column vectors'];
+                    msgstr=['the specified dimensions are non-scalar arrays '...
+                            'and not column vectors'];
                 otherwise
-                    str='the data are non-scalar arrays and not column vectors';
+                    msgstr=['the data are non-scalar arrays and not column '...
+                            'vectors'];
             end
         end
-        error('SHCTools:stoneholmesargs:DimensionMismatch',...
-             ['If more than one of Delta, Epsilon, Lambda_U, or %s, they '...
-              'must have the same dimensions.'],str)
-    end
-else
-    if isArrayDelta && isArrayEpsilon && isArrayLambda_u && ...
-            ~isequal(szdelta,szepsilon,szlambda_u) || ...
-            isArrayDelta && isArrayEpsilon && ...
-            ~isequal(szdelta,szepsilon) || ...
-            isArrayDelta && isArrayLambda_u && ...
-            ~isequal(szdelta,szlambda_u) || ...
-            isArrayEpsilon && isArrayLambda_u && ...
-            ~isequal(szepsilon,szlambda_u)
-        if isLike
+        errmsg=['If more than one of ' thetastr ', Lambda_U, or ' msgstr...
+                ', they must have the same dimensions.'];
+    elseif isPassageTime
+        errmsg=['If more than one of ' thetastr ', Lambda_U, or Lambda_S '...
+                'are non-scalar arrays and not column vectors, they must '...
+                'have the same dimensions.'];
+    elseif isLike
+        if isTheta
+            errmsg=['If Theta and/or Lambda_U are non-scalar arrays, they '...
+                    'must have the same dimensions.'];
+        else
             errmsg=['If more than one of Delta, Epsilon, or Lambda_U are '...
                     'non-scalar arrays, they must have the same dimensions.'];
+        end
+    else
+        if isTheta
+            errmsg=['If Theta and/or Lambda_U are non-scalar arrays and not '...
+                    'column vectors, they must have the same dimensions.'];
         else
             errmsg=['If more than one of Delta, Epsilon, or Lambda_U are '...
                     'non-scalar arrays and not column vectors, they must '...
                     'have the same dimensions.'];
         end
-        error('SHCTools:stoneholmesargs:ParameterDimensionMismatch',errmsg)
     end
+    error('SHCTools:stoneholmesargs:ParameterDimensionMismatch',errmsg)
 end
 
-% Set output size of Y allowing for empty inputs
-if isMedianMode
-    v=[szdelta(1) szepsilon(1) szlambda_u(1)];
-else
-    v=[szx(1) szdelta(1) szepsilon(1) szlambda_u(1)];
-end
-if isArrayX
-    szy=szx;
-elseif isArrayDelta
-    szy=szdelta;
-elseif isArrayEpsilon
-    szy=szepsilon;
-elseif isArrayLambda_u
-    szy=szlambda_u;
-elseif any(v == 0)
-        szy=[0 1];
+% Set output size
+if any(isArray)
+    szy=sza(1,:);
+elseif any(sz(:,1) == 0)
+    szy=[0 1];
 else
     if isLike
-        szy=szx;
+        szy=sz(1,:);
     else
-        szy=[max(v) 1];
+        szy=max(sz);
     end
 end
 if isLike && szy(1) ~= 0
-    szy(1)=szx(1);
+    szy(1)=sz(1);
 end
 
 % Set column vector expansion Boolean array
 if nargout == 2
     if isLike
-        expnd=(isColX && (isArrayDelta || isArrayEpsilon || isArrayLambda_u));
-    elseif isMedianMode
-        expnd=[isColDelta && (isArrayEpsilon || isArrayLambda_u) ...
-               isColEpsilon && (isArrayDelta || isArrayLambda_u) ...
-               isColLambda_u && (isArrayDelta || isArrayEpsilon)];
+        expnd=(isCol(1) && any(isArray(2:end)));
     else
-        expnd=[isColX && (isArrayDelta || isArrayEpsilon || isArrayLambda_u) ...
-               isColDelta && (isArrayX || isArrayEpsilon || isArrayLambda_u) ...
-               isColEpsilon && (isArrayX || isArrayDelta || isArrayLambda_u) ...
-               isColLambda_u && (isArrayX || isArrayDelta || isArrayEpsilon)];
+        if isX
+            expnd=isCol & (1-eye(length(sz)))*isArray > 0;
+            if nargin == 4
+                expnd=[expnd(1);false;expnd(2:end)];
+            end
+        else
+            if isPassageTime && nargin == 4 || isMedianMode && nargin == 3
+                expnd=[false;(isCol & (1-eye(length(sz)))*double(isArray) > 0)];
+            else
+                expnd=(isCol & (1-eye(length(sz)))*double(isArray) > 0);
+            end
+        end
     end
 end

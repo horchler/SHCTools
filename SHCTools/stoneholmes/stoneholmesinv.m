@@ -26,15 +26,16 @@ function x=stoneholmesinv(p,varargin)
 %       xlabel('x'); ylabel('P(x)'); title('Stone-Holmes CDF');
 %       rmse=sqrt(mean((x-xi).^2))
 %   
-%   See also STONEHOLMESCDF, STONEHOLMESRND, STONEHOLMESPDF, STONEHOLMESMEDIAN,
-%       STONEHOLMESMODE, STONEHOLMESLIKE, STONEHOLMESFIT, STONEHOLMESARGS
+%   See also:
+%       STONEHOLMESCDF, STONEHOLMESRND, STONEHOLMESPDF, STONEHOLMESMEDIAN,
+%       STONEHOLMESMODE, STONEHOLMESLIKE, STONEHOLMESFIT, STONEHOLMESPASSAGETIME
 
 %   Based on Eqs. (2.31) and (2.24) in: Emily Stone and Philip Holmes, "Random
 %   Perturbations of Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50,
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-5-12
-%   Revision: 1.0, 4-21-12
+%   Revision: 1.0, 4-24-12
 
 
 % Check variable inputs
@@ -76,10 +77,12 @@ if ~isreal(lambda_u) || ~isfloat(lambda_u)
 end
 
 % Check that sizes of P and parameter inputs are consistent, return size of X
-szdelta=size(delta);
-szepsilon=size(epsilon);
-szlambda_u=size(lambda_u);
-[szx,expansion]=stoneholmesargs(size(p),szdelta,szepsilon,szlambda_u,'inv');
+if nargin == 4
+    [szx,expansion]=stoneholmesargs('inv',size(p),size(delta),size(epsilon),...
+                                    size(lambda_u));
+else
+    [szx,expansion]=stoneholmesargs('inv',size(p),size(epsilon),size(lambda_u));
+end
 
 % Column vector expansion
 if any(expansion)
@@ -149,7 +152,7 @@ else
                         'Delta value(s), but the Stone-Holmes distribution '...
                         'defines Epsilon << Delta.'])
             else
-                warning('SHCTools:stoneholmesinv:DeltaEpsilonScaling',...
+                warning('SHCTools:stoneholmesinv:ThetaScaling',...
                        ['One or more Theta = Epsilon/Delta values is '...
                         'greater than 1, but the the Stone-Holmes '...
                         'distribution defines Epsilon << Delta.'])

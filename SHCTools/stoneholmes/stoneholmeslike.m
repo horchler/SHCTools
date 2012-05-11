@@ -33,15 +33,16 @@ function nlogL=stoneholmeslike(x,varargin)
 %       [minL iL]=min(nlogL); plot(ep_hat,nlogL,'b',ep_hat(iL),minL,'r.');
 %       xlabel('\epsilon'); ylabel('Negative Log-likelihood(x|\epsilon)');
 %
-%   See also STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESFIT, STONEHOLMESINV,
-%       STONEHOLMESRND, STONEHOLMESARGS
+%   See also:
+%       STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESFIT, STONEHOLMESINV,
+%       STONEHOLMESRND, STONEHOLMESPASSAGETIME
 
 %   Based on Eqs. (2.31) and (2.24) in: Emily Stone and Philip Holmes, "Random
 %   Perturbations of Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50,
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-11-12
-%   Revision: 1.0, 3-22-12
+%   Revision: 1.0, 4-24-12
 
 
 % Check X
@@ -141,10 +142,12 @@ if ~isreal(lambda_u) || ~isfloat(lambda_u)
 end
 
 % Check that sizes of X and parameter inputs are consistent, return size of L
-szdelta=size(delta);
-szepsilon=size(epsilon);
-szlambda_u=size(lambda_u);
-[szL,expansion]=stoneholmesargs(sx,szdelta,szepsilon,szlambda_u,'like');
+if deltaset
+    [szL,expansion]=stoneholmesargs('like',sx,size(delta),size(epsilon),...
+                                    size(lambda_u));
+else
+    [szL,expansion]=stoneholmesargs('like',sx,size(epsilon),size(lambda_u));
+end
 
 % Set optional inputs if not specified, handle censoring and frequency data
 if freqset
@@ -209,7 +212,7 @@ else
                         'Delta value(s), but the Stone-Holmes distribution '...
                         'defines Epsilon << Delta.'])
             else
-                warning('SHCTools:stoneholmeslike:DeltaEpsilonScaling',...
+                warning('SHCTools:stoneholmeslike:ThetaScaling',...
                        ['One or more Theta = Epsilon/Delta values is '...
                         'greater than 1, but the the Stone-Holmes '...
                         'distribution defines Epsilon << Delta.'])

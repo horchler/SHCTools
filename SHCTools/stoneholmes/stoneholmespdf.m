@@ -16,15 +16,17 @@ function y=stoneholmespdf(x,varargin)
 %   density function for the two parameter case, where Theta = Epsilon/Delta
 %   (Theta << 1) is the size of the noise relative to that of the neighborhood.
 %   
-%   See also STONEHOLMESCDF, STONEHOLMESRND, STONEHOLMESINV, STONEHOLMESFIT,
-%       STONEHOLMESLIKE, STONEHOLMESMODE, STONEHOLMESMEDIAN, STONEHOLMESARGS
+%   See also:
+%       STONEHOLMESCDF, STONEHOLMESRND, STONEHOLMESINV, STONEHOLMESFIT,
+%       STONEHOLMESLIKE, STONEHOLMESMODE, STONEHOLMESMEDIAN,
+%       STONEHOLMESPASSAGETIME
 
 %   Based on Eqs. (2.31) and (2.24) in: Emily Stone and Philip Holmes, "Random
 %   Perturbations of Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50,
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-5-12
-%   Revision: 1.0, 3-23-12
+%   Revision: 1.0, 4-24-12
 
 
 % Check variable inputs
@@ -66,10 +68,12 @@ if ~isreal(lambda_u) || ~isfloat(lambda_u)
 end
 
 % Check that sizes of X and parameter inputs are consistent, return size of Y
-szdelta=size(delta);
-szepsilon=size(epsilon);
-szlambda_u=size(lambda_u);
-[szy,expansion]=stoneholmesargs(size(x),szdelta,szepsilon,szlambda_u,'pdf');
+if nargin == 4
+    [szy,expansion]=stoneholmesargs('pdf',size(x),size(delta),size(epsilon),...
+                                    size(lambda_u));
+else
+    [szy,expansion]=stoneholmesargs('pdf',size(x),size(epsilon),size(lambda_u));
+end
 
 % Column vector expansion
 if any(expansion)
@@ -139,7 +143,7 @@ else
                         'Delta value(s), but the Stone-Holmes distribution '...
                         'defines Epsilon << Delta.'])
             else
-                warning('SHCTools:stoneholmespdf:DeltaEpsilonScaling',...
+                warning('SHCTools:stoneholmespdf:ThetaScaling',...
                        ['One or more Theta = Epsilon/Delta values is '...
                         'greater than 1, but the the Stone-Holmes '...
                         'distribution defines Epsilon << Delta.'])

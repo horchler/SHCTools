@@ -16,15 +16,17 @@ function p=stoneholmescdf(x,varargin)
 %   distribution for the two parameter case, where Theta = Epsilon/Delta
 %   (Theta << 1) is the size of the noise relative to that of the neighborhood.
 %   
-%   See also STONEHOLMESPDF, STONEHOLMESINV, STONEHOLMESRND, STONEHOLMESLIKE,
-%       STONEHOLMESFIT, STONEHOLMESMODE, STONEHOLMESMEDIAN, STONEHOLMESARGS
+%   See also:
+%       STONEHOLMESPDF, STONEHOLMESINV, STONEHOLMESRND, STONEHOLMESLIKE,
+%       STONEHOLMESFIT, STONEHOLMESMODE, STONEHOLMESMEDIAN,
+%       STONEHOLMESPASSAGETIME
 
 %   Based on Eqs. (2.31) and (2.24) in: Emily Stone and Philip Holmes, "Random
 %   Perturbations of Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50,
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-5-12
-%   Revision: 1.0, 3-23-12
+%   Revision: 1.0, 4-24-12
 
 
 % Check variable inputs
@@ -66,10 +68,12 @@ if ~isreal(lambda_u) || ~isfloat(lambda_u)
 end
 
 % Check that sizes of X and parameter inputs are consistent, return size of P
-szdelta=size(delta);
-szepsilon=size(epsilon);
-szlambda_u=size(lambda_u);
-[szp,expansion]=stoneholmesargs(size(x),szdelta,szepsilon,szlambda_u,'cdf');
+if nargin == 4
+    [szp,expansion]=stoneholmesargs('cdf',size(x),size(delta),size(epsilon),...
+                                    size(lambda_u));
+else
+    [szp,expansion]=stoneholmesargs('cdf',size(x),size(epsilon),size(lambda_u));
+end
 
 % Column vector expansion
 if any(expansion)
@@ -139,7 +143,7 @@ else
                         'Delta value(s), but the Stone-Holmes distribution '...
                         'defines Epsilon << Delta.'])
             else
-                warning('SHCTools:stoneholmescdf:DeltaEpsilonScaling',...
+                warning('SHCTools:stoneholmescdf:ThetaScaling',...
                        ['One or more Theta = Epsilon/Delta values is '...
                         'greater than 1, but the the Stone-Holmes '...
                         'distribution defines Epsilon << Delta.'])

@@ -45,7 +45,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   
 %   See also:
 %       STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESINV, STONEHOLMESLIKE,
-%       STONEHOLMESRND, FZERO, OPTIMSET
+%       STONEHOLMESRND, STONEHOLMESPASSAGETIME, FZERO, OPTIMSET
 
 %   ISROW, ISCOLUMN, and ISMATRIX are not used to maintain compatibility with
 %   versions prior to Matlab 7.11 (R2010b).
@@ -62,7 +62,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-11-12
-%   Revision: 1.0, 4-20-12
+%   Revision: 1.0, 4-24-12
 
 
 % Check number of input and output arguments

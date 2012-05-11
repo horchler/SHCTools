@@ -33,8 +33,9 @@ function r=stoneholmesrnd(delta,epsilon,lambda_u,varargin)
 %       plot(x,y(1,:),'m',x,y(2,:),'c'); axis([0 25 0 0.3]);
 %       xlabel('x'); ylabel('p(x)'); title('Stone-Holmes PDF');
 %   
-%   See also STONEHOLMESINV, STONEHOLMESCDF, STONEHOLMESPDF, STONEHOLMESLIKE,
-%       STONEHOLMESFIT, STONEHOLMESARGS, RANDSTREAM
+%   See also:
+%       STONEHOLMESINV, STONEHOLMESCDF, STONEHOLMESPDF, STONEHOLMESLIKE,
+%       STONEHOLMESFIT, STONEHOLMESPASSAGETIME, RANDSTREAM
 
 %   STONEHOLMESRND uses the inversion method.
 
@@ -46,7 +47,7 @@ function r=stoneholmesrnd(delta,epsilon,lambda_u,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-6-12
-%   Revision: 1.0, 4-21-12
+%   Revision: 1.0, 4-24-12
 
 
 % Check three parameters
@@ -110,10 +111,8 @@ else
 end
 
 % Check that sizes of R and parameter inputs are consistent, return size of R
-szdelta=size(delta);
-szepsilon=size(epsilon);
-szlambda_u=size(lambda_u);
-[szr,expansion]=stoneholmesargs(szr,szdelta,szepsilon,szlambda_u,'rnd');
+[szr,expansion]=stoneholmesargs('rnd',szr,size(delta),size(epsilon),...
+                                size(lambda_u));
 
 % Column vector expansion
 if any(expansion)
@@ -176,7 +175,7 @@ else
                         'Delta value(s), but the Stone-Holmes distribution '...
                         'defines Epsilon << Delta.'])
             else
-                warning('SHCTools:stoneholmesrnd:DeltaEpsilonScaling',...
+                warning('SHCTools:stoneholmesrnd:ThetaScaling',...
                        ['One or more Theta = Epsilon/Delta values is '...
                         'greater than 1, but the the Stone-Holmes '...
                         'distribution defines Epsilon << Delta.'])
