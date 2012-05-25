@@ -57,7 +57,7 @@ else
     if nargin == 4
         netdir = varargin{3};
     end
-
+    
     if ~isscalar(m) || ~isnumeric(m) || ~isreal(m) || ~isfinite(m) || ...
             m-floor(m) ~= 0
         error('SHCTools:shc_create:InvalidNetworkSize',...
@@ -67,7 +67,7 @@ else
         error('SHCTools:shc_create:NetworkSizeTooSmall',...
               'The minimum contour network size is 3.');
     end
-
+    
     if ndims(params) ~= 2 || isempty(params) || ~any(size(params) == 1)
         error('SHCTools:shc_create:NonVectorParameters',...
               'The parameters argument must be a non-empty vector.')

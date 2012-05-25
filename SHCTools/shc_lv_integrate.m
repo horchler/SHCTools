@@ -310,6 +310,6 @@ else
         if ~ConstStep
             dt = h(i);
         end
-        A(i+1,:) = max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt,0);
+        A(i+1,:) = A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt;
     end
 end
