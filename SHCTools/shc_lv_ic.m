@@ -4,7 +4,7 @@ function a0=shc_lv_ic(net,a20,tol)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-11-12
-%   Revision: 1.0, 5-25-12
+%   Revision: 1.0, 5-26-12
 
 
 % Check network structure
@@ -26,15 +26,15 @@ if isstruct(net) && isfield(net,'rho')
     else
         alpv = diag(net.rho);
     end
-    if ~isvector(alpv) || isempty(alpv) || ~(isfloat(alpv) || isa(alpv,'sym'))
+    if ~isvector(alpv) || isempty(alpv) || ~isfloat(alpv)
         error('SHCTools:shc_lv_ic:AlphaVectorInvalid',...
              ['The ''alpha'' field of the SHC network structure must be a '...
-              'non-empty symbolic or floating-point vector.']);
+              'non-empty floating-point vector.']);
     end
     if ~isreal(alpv) || any(abs(alpv) == Inf) || any(isnan(alpv))
         error('SHCTools:shc_lv_ic:AlphaVectorNonFiniteReal',...
              ['The ''alpha'' field of the SHC network structure must be a '...
-              'finite real symbolic or floating-point vector.']);
+              'finite real floating-point vector.']);
     end
     if length(alpv) ~= sz
         error('SHCTools:shc_lv_ic:AlphaVectorDimensionMismatch',...
@@ -46,16 +46,15 @@ if isstruct(net) && isfield(net,'rho')
     
     if isfield(net,'beta')
         betv = net.beta;
-        if ~isvector(betv) || isempty(betv) || ~(isfloat(betv) ...
-                           || isa(betv,'sym'))
+        if ~isvector(betv) || isempty(betv) || ~isfloat(betv)
             error('SHCTools:shc_lv_ic:BetaVectorInvalid',...
                  ['The ''beta'' field of the SHC network structure must be '...
-                  'a non-empty symbolic or floating-point vector.']);
+                  'a non-empty floating-point vector.']);
         end
         if ~isreal(betv) || any(abs(betv) == Inf) || any(isnan(betv))
             error('SHCTools:shc_lv_ic:BetaVectorNonFiniteReal',...
                  ['The ''beta'' field of the SHC network structure must be '...
-                  'a finite real symbolic or floating-point vector.']);
+                  'a finite real floating-point vector.']);
         end
         if length(betv) ~= sz
             error('SHCTools:shc_lv_ic:BetaVectorDimensionMismatch',...
@@ -71,8 +70,7 @@ if isstruct(net) && isfield(net,'rho')
     
     if isfield(net,'gamma')
         gamv = net.gamma;
-        if ~isvector(gamv) || isempty(gamv) || ~(isfloat(gamv) ...
-                           || isa(gamv,'sym'))
+        if ~isvector(gamv) || isempty(gamv) || ~isfloat(gamv)
             error('SHCTools:shc_lv_ic:GammaVectorInvalid',...
                  ['The ''gamma'' field of the SHC network structure must be '...
                   'a non-empty symbolic or floating-point vector.']);
@@ -80,7 +78,7 @@ if isstruct(net) && isfield(net,'rho')
         if ~isreal(gamv) || any(abs(gamv) == Inf) || any(isnan(gamv))
             error('SHCTools:shc_lv_ic:GammaVectorNonFiniteReal',...
                  ['The ''gamma'' field of the SHC network structure must be '...
-                  'a finite real symbolic or floating-point vector.']);
+                  'a finite real floating-point vector.']);
         end
         if length(gamv) ~= sz
             error('SHCTools:shc_lv_ic:BetaVectorDimensionMismatch',...
@@ -123,13 +121,12 @@ end
 if nargin > 2
     if ~isscalar(tol) || isempty(tol) || ~isfloat(tol)
         error('SHCTools:shc_lv_ic:TolInvalid',...
-             ['The initial condition must be a non-empty floating-point '...
-              'scalar value.']);
+              'The tolerance must be a non-empty floating-point scalar value.');
     end
     if ~isreal(tol) || ~isfinite(tol) || tol <= 0
         error('SHCTools:shc_lv_ic:TolNonFiniteReal',...
-             ['The initial condition must be a positive finite real '...
-              'floating-point scalar value.']);
+             ['The tolerance must be a positive finite real floating-point '...
+              'scalar value.']);
     end
     if tol < 16*eps(alp1/bet1)
         tol = 16*eps(alp1/bet1);
@@ -158,7 +155,7 @@ a10 = (bet1*(sqrt(bet2)*(alp1-a20*gam1)*aab...
 alpv = [alp1;alp1;alp2];
 rho = [alp1/bet1 gam1      0;
        0         alp1/bet1 gam1;
-       gam1      0         alp2/bet2];
+       gam2      0         alp2/bet2];
 a10 = rkfind(a10,a20,alpv,rho,tol);
 
 a0 = [a10;a20;zeros(sz-2,1)+eps];
