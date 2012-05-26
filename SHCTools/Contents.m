@@ -1,5 +1,5 @@
 %SHCTools
-%  Version 1.0, 5-25-12
+%  Version 1.0, 5-26-12
 %
 %  SHC network creation, modification, and visualization, and conversion.
 %      buildrho               - Create RHO matrix from SHC network structure.
@@ -43,7 +43,7 @@
 %  Compatibility maintained back through Matlab 7.4 (R2007a)
 
 %  Andrew D. Horchler, adh9 @ case . edu
-%  Created: 1-4-12, Revision: 1.0, 5-25-12
+%  Created: 1-4-12, Revision: 1.0, 5-26-12
 
 
 %  Acknowledgment of support: This material is based upon work supported by the
