@@ -4,7 +4,7 @@ function varargout=shc_lv_ic_test(net,tol,seed)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-25-12
-%   Revision: 1.0, 5-26-12
+%   Revision: 1.0, 5-27-12
 
 
 % Check network structure, shc_lv_ic will perform further checks
@@ -48,7 +48,7 @@ end
 
 % Set optional seed
 if nargin > 2
-    if ~isscalar(seed) || isempty(seed) || ~numeric(seed)
+    if ~isscalar(seed) || isempty(seed) || ~isnumeric(seed)
         error('SHCTools:shc_lv_ic_test:SeedInvalidType',...
               'The random seed must be a non-empty scalar numeric value.');
     end

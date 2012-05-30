@@ -4,19 +4,18 @@ function dom=shc_net2dom(net)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-8-12
-%   Revision: 1.0, 3-24-12
+%   Revision: 1.0, 5-29-12
 
 
 if isempty(net) || ~isstruct(net) || ~isfield(net,'s')
-    error(  'SHCTools:shc_net2dom:InvalidNetStruct',...
-            'SHC network structure is invalid.');
+    error('SHCTools:shc_net2dom:InvalidNetStruct',...
+          'SHC network structure is invalid.');
 end
 
 dom = com.mathworks.xml.XMLUtils.createDocument('net'); % net root
 
 channelFields = {'parent','node','size','alpha','beta','gamma','delta','direction'};
 clusterFields = {'parent','node','size','alpha','beta','gamma'};
-validNets = {'contour','cluster','channel'};
 
 n = length(net.s);
 netType = cell(n,1);
@@ -24,9 +23,9 @@ for i = 1:n
     nettype =net.s{i}.type;
     netType{i} = dom.createElement(nettype);
     if strncmp(nettype,'cluster',2)
-        validFields = clusterFields;    % clusters
+        validFields = clusterFields;            % clusters
     else
-        validFields = channelFields;    % channels or contours
+        validFields = channelFields;            % channels or contours
     end
     netFields = dom.createElement([nettype 'fields']);
     netType{i}.appendChild(netFields);
@@ -57,9 +56,9 @@ for i = 1:n
     end
     
     if i == 1
-        baseNode = dom.getDocumentElement;	% net root
+        baseNode = dom.getDocumentElement;      % net root
     else
-        baseNode = netType{net.s{i}.parent};    % parent
+        baseNode = netType{net.s{i}.parent};	% parent
         if baseNode.getLength() ~= 2
             subNets = dom.createElement('subnets');
             baseNode.appendChild(subNets);
@@ -67,11 +66,5 @@ for i = 1:n
         baseNode = baseNode.item(1);            % subnet of parent
     end
     
-    if baseNode.hasChildNodes &&...
-            any(strcmp(char(baseNode.getLastChild.getNodeName),validNets)) &&...
-            baseNode.getLastChild.node > netType{i}.node
-        baseNode.getLastChild.insertBefore(netType{i});
-    else
-        baseNode.appendChild(netType{i});
-    end
+    baseNode.appendChild(netType{i});
 end

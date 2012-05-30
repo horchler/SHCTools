@@ -8,7 +8,7 @@ function shc_validatesubnetwork(s,varargin)
 %shc_validatesubnetwork(s,num,'strict')
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-15-12
-%   Revision: 1.0, 4-21-12
+%   Revision: 1.0, 5-29-12
 
 
 if nargin > 1 && ~ischar(varargin{1})
@@ -120,21 +120,23 @@ if ~isreal(s.gamma) || abs(s.gamma) == Inf || isnan(s.gamma)
           'The ''gamma'' field of network%s must be a real, finite value.',i);
 end
 
-% Delta is optional is for clusters
+% Delta is optional, except for channels and contours in 'strict' mode
 if isfield(s,'delta')
     if ~isscalar(s.delta) || ~(isfloat(s.delta) || isa(s.delta,'sym'))
         error('SHCTools:shc_validatesubnetwork:InvalidDelta',...
-             ['The ''delta'' field of network%s must be a scalar symbolic '...
-              'or floating-point value.'],i);
+             ['The optional ''delta'' field of network%s must be a scalar '...
+              'symbolic or floating-point value.'],i);
     end
     if ~isreal(s.delta) || abs(s.delta) == Inf || isnan(s.delta)
         error('SHCTools:shc_validatesubnetwork:NonFiniteRealDelta',...
-             ['The optional ''delta'' field of the ''cluster'' type '...
-              'network%s must be a real, finite value.'],i);
+             ['The optional ''delta'' field of network%s must be a real, '...
+              'finite value.'],i);
     end
-elseif ~strcmp(s.type,'cluster')
-    error('SHCTools:shc_validatesubnetwork:MissingDeltaField',...
-          'Network%s does not have required field named ''delta''.',i);
+elseif strict && ~strcmp(s.type,'cluster')
+	error('SHCTools:shc_validatesubnetwork:MissingDeltaField',...
+         ['The ''delta'' field of network%s was not specified, but is '...
+          'required when using ''strict'' mode validation of a %s type '...
+          'network.'],i,s.type);
 end
 
 % Direction is optional, except for channels and contours in 'strict' mode

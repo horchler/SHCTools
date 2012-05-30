@@ -13,7 +13,7 @@ function [alp,bet,gam]=shc_lv_params(tau,tp,varargin)
 %       BUILDRHO, SHC_CREATE, SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_LV_JACOBIAN
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-5-10
-%   Revision: 1.0, 5-25-12
+%   Revision: 1.0, 5-28-12
 
 
 % Check datatypes and handle varibale input
@@ -382,7 +382,7 @@ z = tp+(erf(lim)*log1p(lambda_u/lambda_s)-q)/(2*lambda_u);
 
 
 function y=f(x,d_etalambda_u)
-% Integrand for quadrature integration used by afun()
+% Integrand for quadrature integration used by alproot() and alproot1d()
 y = log1p(d_etalambda_u./x.^2).*exp(-x.^2);
 
 
@@ -466,6 +466,17 @@ z = d-(a10*bet1*exp(alp1*td))/(((dex-d+bet2)/bet2)^bga*(bet1...
 
 
 function z=g1d(gam,alp,bet,d,td,tol)
+%
+% Numerically integrate for one full period (tau) to find a2(td) on manifold
+rho = [alp/bet gam     0;
+       0       alp/bet gam;
+       gam     0       alp/bet];
+a2td = rkfind(0.5*bet,d,alp,rho,tol);
+
+% Zero equation for  decay time, td, given alp, bet, td, a2(0) = d, and a2(td)
+z = td-(log((d-bet)/d)-log(1-bet/a2td))/alp;
+%
+%{
 bga = bet*gam/alp;
 dex = d*exp(alp*td);
 
@@ -477,13 +488,95 @@ a10 = (bet-d*bga)/2+sign(rad)*sqrt(abs(rad))/(2*sqrt(bet+1));
 rho = [alp/bet gam     0;
        0       alp/bet gam;
        gam     0       alp/bet];
-a10 = rkfind(a10,d,alp,rho,tol);
+a10 = rkfind2(a10,d,alp,rho,tol);
 
 % Zero equation for gam, given alp, bet, td, a10, and d
 z = d-bet*(1-bga)*dex/((bet*((d-d*bga)/a10-1)*((dex-d+bet)/bet)^bga+dex-1));
+%}
+
+function a2=rkfind(a2,d,alpv,rho,tol)
+global dt
+threshold = d+tol;
+
+% Dormand-Prince Butcher tableau
+B1 = 0.2;
+B2 = [3/40;9/40;0;0;0;0;0];
+B3 = [44/45;-56/15;32/9;0;0;0;0];
+B4 = [19372/6561;-25360/2187;64448/6561;-212/729;0;0;0];
+B5 = [9017/3168;-355/33;46732/5247;49/176;-5103/18656;0;0];
+B6 = [35/384;0;500/1113;125/192;-2187/6784;11/84;0];
+E = [71/57600;0;-71/16695;71/1920;-17253/339200;22/525;-1/40];
+
+f = zeros(3,7);
+y = [d;a2;tol^1.5];
+f(:,1) = y.*(alpv-rho*y);
+
+% Integrate until a(2) > d+tol
+while true
+    ynew = y+dt*f(:,1)*B1;
+    f(:,2) = ynew.*(alpv-rho*ynew);
+    ynew = y+dt*(f*B2);
+    f(:,3) = ynew.*(alpv-rho*ynew);
+    ynew = y+dt*(f*B3);
+    f(:,4) = ynew.*(alpv-rho*ynew);
+    ynew = y+dt*(f*B4);
+    f(:,5) = ynew.*(alpv-rho*ynew);
+    ynew = y+dt*(f*B5);
+    f(:,6) = ynew.*(alpv-rho*ynew);
+    
+    % 5th order solution
+    ynew = max(y+dt*(f*B6),eps);
+    if ynew(2) < threshold
+        break
+    end
+    f(:,7) = ynew.*(alpv-rho*ynew);
+
+    % Relative error between 5th and 4th order solutions
+    err = dt*norm(f*E,Inf);
+    if err < tol
+        y = ynew;
+        f(:,1) = f(:,7);
+        dt = max(dt*max(0.7*(tol/err)^0.2,0.1),16*eps(dt));	% Adjust step-size
+    else
+        dt = max(0.5*dt,16*eps(dt));                        % Failed step
+    end
+end
+
+% Use last integration step-size as initial step-size for next call
+dt2 = dt;
+
+% Perform interpolated time-steps until abs(a(2)-d) <= tol
+while abs(ynew(2)-d) > tol
+    % Linearly interpolate for time-step to a(2) = d
+    dt2 = dt2*(d-ynew(2))/(ynew(2)-y(2));
+    dt2 = sign(dt2)*max(abs(dt2),16*eps(dt2));
+    
+    y = ynew;
+    f(:,1) = ynew.*(alpv-rho*ynew);
+    ynew = y+dt2*f(:,1)*B1;
+    f(:,2) = ynew.*(alpv-rho*ynew);
+    ynew = y+dt2*(f*B2);
+    f(:,3) = ynew.*(alpv-rho*ynew);
+    ynew = y+dt2*(f*B3);
+    f(:,4) = ynew.*(alpv-rho*ynew);
+    ynew = y+dt2*(f*B4);
+    f(:,5) = ynew.*(alpv-rho*ynew);
+    ynew = y+dt2*(f*B5);
+    f(:,6) = ynew.*(alpv-rho*ynew);
+    
+    % 5th order solution
+    ynew = max(y+dt2*(f*B6),eps);
+end
+
+% Linearly interpolate for a(3) at a(2) = d
+a2 = y(3)+(ynew(3)-y(3))*(d-y(2))/(ynew(2)-y(2));
 
 
-function a10=rkfind(a10,d,alpv,rho,tol)
+
+
+
+
+function a10=rkfind2(a10,d,alpv,rho,tol)
 global dt
 threshold = d-tol;
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 <!-- SHCTools for Matlab, Andrew D. Horchler, adh9@case.edu -->
-<!-- Created 1-16-12, Revision: 1.0, 3-24-12 -->
+<!-- Created 1-16-12, Revision: 1.0, 5-29-12 -->
 
 <!-- Restricted values -->
 <xs:simpleType name="parenttype">
@@ -50,7 +50,7 @@
         <xs:element name="alpha" minOccurs="1" type="xs:decimal"/>
         <xs:element name="beta" minOccurs="0" type="xs:decimal" default="1"/>
         <xs:element name="gamma" minOccurs="1" type="xs:decimal"/>
-        <xs:element name="delta" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="delta" minOccurs="0" type="xs:decimal" default="0"/>
         <xs:element name="direction" minOccurs="0" type="directiontype" default="1"/>
     </xs:all>
 </xs:complexType>
@@ -63,7 +63,7 @@
         <xs:element name="alpha" minOccurs="1" type="xs:decimal"/>
         <xs:element name="beta" minOccurs="0" type="xs:decimal" default="1"/>
         <xs:element name="gamma" minOccurs="1" type="xs:decimal"/>
-        <xs:element name="delta" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="delta" minOccurs="0" type="xs:decimal" default="0"/>
         <xs:element name="direction" minOccurs="0" type="directiontype" default="1"/>
     </xs:all>
 </xs:complexType>
@@ -77,7 +77,7 @@
         <xs:element name="alpha" minOccurs="1" type="xs:decimal"/>
         <xs:element name="beta" minOccurs="0" type="xs:decimal" default="1"/>
         <xs:element name="gamma" minOccurs="1" type="xs:decimal"/>
-        <xs:element name="delta" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="delta" minOccurs="0" type="xs:decimal" default="0"/>
         <xs:element name="direction" minOccurs="0" type="directiontype" default="1"/>
     </xs:all>
 </xs:complexType>
@@ -90,7 +90,7 @@
         <xs:element name="alpha" minOccurs="1" type="xs:decimal"/>
         <xs:element name="beta" minOccurs="0" type="xs:decimal" default="1"/>
         <xs:element name="gamma" minOccurs="1" type="xs:decimal"/>
-        <xs:element name="delta" minOccurs="1" type="xs:decimal"/>
+        <xs:element name="delta" minOccurs="0" type="xs:decimal" default="0"/>
         <xs:element name="direction" minOccurs="0" type="directiontype" default="1"/>
     </xs:all>
 </xs:complexType>

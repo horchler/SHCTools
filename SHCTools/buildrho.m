@@ -4,7 +4,7 @@ function net=buildrho(net)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-21-10
-%   Revision: 1.0, 3-24-12
+%   Revision: 1.0, 5-29-12
 
 
 % Convert from XML file to structure if necessary
@@ -35,7 +35,11 @@ for i = 2:length(net.s)
     m = n;
     n = net.s{i}.size;
     x = net.s{i}.index;
-    z = zz(1:n);
+    if isempty(zz)
+        z = 0;
+    else
+        z = zz(1:n);
+    end
     
     n = n+m-1;
     net.alpha(x:n) = [z+net.s{i}.alpha;net.alpha(x+1:m)];
@@ -53,28 +57,17 @@ for i = 2:length(net.s)
     else
         q1 = false(n-m,x-1);
         q2 = false(n-m,m-x);
-        %xp = (x-1)*net.size;
         
         if net.s{i}.direction == 1
             qx1 = [net.T(x,1:x-1);q1];
             qx2 = [net.T(x,x+1:m);q2];
             qy1 = [q1' net.T(1:x-1,x)];
             qy2 = [q2' net.T(x+1:m,x)];
-            
-            %qx1 = [net.T(x:p:xp+x-1);q1];
-            %qx2 = [net.T(xp+x+1:p:xp+m);q2];
-            %qy1 = [q1;net.T(xp+1:xp+x-1)]';
-            %qy2 = [q2;net.T(xp+x+1:xp+m)]';
         else
             qx1 = [q1;net.T(x,1:x-1)];
             qx2 = [q2;net.T(x,x+1:m)];
             qy1 = [net.T(1:x-1,x) q1'];
             qy2 = [net.T(x+1:m,x) q2'];
-            
-            %qx1 = [q1;net.T(x:p:xp+x-1)];
-            %qx2 = [q2;net.T(xp+x+1:p:xp+m)];
-            %qy1 = [net.T(xp+1:xp+x-1);q1]';
-            %qy2 = [net.T(xp+x+1:xp+m);q2]';
         end
     end
     

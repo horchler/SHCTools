@@ -4,7 +4,7 @@ function net=shc_reset(net)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-19-12
-%   Revision: 1.0, 3-24-12
+%   Revision: 1.0, 5-29-12
 
 
 % Check base structure input
@@ -87,9 +87,7 @@ for i = 1:nnets
         end
     else
         if ~isfield(s,'delta')
-            error(  'SHCTools:shc_reset:InvalidArgument',...
-                   ['Network %d does not have required field named '...
-                    '''delta''.'],i);
+            s.delta = 0;
         end
         if ~isfield(s,'direction')
             s.direction = 1;

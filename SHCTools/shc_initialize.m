@@ -4,7 +4,7 @@ function net=shc_initialize(net,reinit)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-14-12
-%   Revision: 1.0, 3-24-12
+%   Revision: 1.0, 5-29-12
 
 
 % Check for 'reset' mode to clear and reset 'children', 'index,' and 'T' fields
@@ -55,8 +55,8 @@ for i = 1:nnets
         s.beta = 1;
     end
     
-    % Delta is optional for clusters, but needs to be set to 0 if not specified
-    if strcmp(s.type,'cluster') && ~isfield(s,'delta')
+    % Delta is optional, but needs to be set to 0 if not specified
+    if ~isfield(s,'delta')
         s.delta = 0;
     end
     
