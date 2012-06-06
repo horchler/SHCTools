@@ -1,28 +1,72 @@
-function varargout=shc_lv_ic_test(net,tol,seed)
+function varargout=shc_lv_ic_test(net,eta,tol,seed)
 %SHC_LV_IC_TEST  
 %
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-25-12
-%   Revision: 1.0, 5-27-12
+%   Revision: 1.0, 6-6-12
 
 
 % Check network structure, shc_lv_ic will perform further checks
 if isstruct(net) && isfield(net,'rho')
     if isfield(net,'beta')
-        betv = net.beta;
-        if ~isvector(betv) || isempty(betv) || ~isfloat(betv)
+        bet = net.beta;
+        if ~isvector(bet) || isempty(bet) || ~isfloat(bet)
             error('SHCTools:shc_lv_ic_test:BetaVectorInvalid',...
                  ['The ''beta'' field of the SHC network structure must be '...
                   'a non-empty floating-point vector.']);
         end
-        if ~isreal(betv) || any(abs(betv) == Inf) || any(isnan(betv))
+        if ~isreal(bet) || any(abs(bet) == Inf) || any(isnan(bet))
             error('SHCTools:shc_lv_ic_test:BetaVectorNonFiniteReal',...
                  ['The ''beta'' field of the SHC network structure must be '...
                   'a finite real floating-point vector.']);
         end
+        if any(bet <= 0)
+            error('SHCTools:shc_lv_ic_test:BetaNonPositive',...
+                 ['The ''beta'' field of the SHC network structure must be '...
+                  'strictly greater than zero.']);
+        end
+    elseif isfield(net,'alpha')
+        alp = net.alpha;
+        if ~isvector(alp) || isempty(alp) || ~isfloat(alp)
+            error('SHCTools:shc_lv_ic_test:AlphaVectorInvalid',...
+                 ['The ''alpha'' field of the SHC network structure must be '...
+                  'a non-empty floating-point vector.']);
+        end
+        if ~isreal(alp) || any(abs(alp) == Inf) || any(isnan(alp))
+            error('SHCTools:shc_lv_ic_test:AlphaVectorNonFiniteReal',...
+                 ['The ''alpha'' field of the SHC network structure must be '...
+                  'a finite real floating-point vector.']);
+        end
+        if any(alp < 0)
+            error('SHCTools:shc_lv_ic_test:AlphaNonPositive',...
+                 ['The ''alpha'' field of the SHC network structure must be '...
+                  'greater than zero.']);
+        end
+        drho = diag(net.rho);
+        if ~isvector(drho) || isempty(drho) || ~isfloat(drho)
+            error('SHCTools:shc_lv_ic_test:RhoInvalid',...
+                 ['The ''rho'' field of the SHC network structure must be '...
+                  'a non-empty floating-point matrix.']);
+        end
+        if ~isreal(drho) || any(abs(drho) == Inf) || any(isnan(drho))
+            error('SHCTools:shc_lv_ic_test:RhoVectorNonFiniteReal',...
+                 ['The ''rho'' field of the SHC network structure must be '...
+                  'a finite real floating-point matrix.']);
+        end
+        if any(drho <= 0)
+            error('SHCTools:shc_lv_ic_test:RhoDiagonalNonPositive',...
+                 ['The diagonal of the ''rho'' field of the SHC network '...
+                  'structure must be strictly greater than zero.']);
+        end
+        bet = alp./drho;
     else
-        betv = 1;
+        bet = 1;
+    end
+    if isfield(net,'size')
+        m = net.size;
+    else
+        m = size(rho,1);
     end
 else
     error('SHCTools:shc_lv_ic_test:NetworkStructInvalid',...
@@ -31,8 +75,25 @@ else
           '(otional, default: 1), and ''gamma'' fields.']);
 end
 
+% Check Eta
+if ~isvector(eta) || isempty(eta) || ~isfloat(eta)
+    error('SHCTools:shc_lv_ic_test:EtaInvalid',...
+         ['The noise magnitude, Eta, must be a non-empty floating-point '...
+          'vector.']);
+end
+if ~isreal(eta) || ~all(isfinite(eta)) || any(eta <= 0)
+    error('SHCTools:shc_lv_ic_test:EtaNonFiniteReal',...
+         ['The noise magnitude, Eta, must be a positive finite real '...
+          'floating-point vector.']);
+end
+if ~any(length(eta) == [1 m])
+    error('SHCTools:shc_lv_ic_test:EtaDimensionMismatch',...
+         ['If Eta is a non-scalar a vector, it must have the same length as '...
+          'the dimension of the RHO matrix.']);
+end
+
 % Set optional tolerance
-if nargin > 1
+if nargin > 2
     if ~isscalar(tol) || isempty(tol) || ~isfloat(tol)
         error('SHCTools:shc_lv_ic_test:TolInvalid',...
               'The tolerance must be a non-empty floating-point scalar value.');
@@ -47,7 +108,7 @@ else
 end
 
 % Set optional seed
-if nargin > 2
+if nargin > 3
     if ~isscalar(seed) || isempty(seed) || ~isnumeric(seed)
         error('SHCTools:shc_lv_ic_test:SeedInvalidType',...
               'The random seed must be a non-empty scalar numeric value.');
@@ -63,18 +124,16 @@ else
     opts = [];
 end
 
-% Find initial condition
-d = 0.05*betv(1);
+% Neighborhood size
+d = shc_lv_neighborhood(bet);
 a20 = d;
 a0 = shc_lv_ic(net,a20,tol);
 
 % Simulate SHC using initial condition
 t0 = 0;
-dt = 1e-3;
-tf = 2e3;
+dt = 5e-4;
+tf = 1e3;
 t = t0:dt:tf;
-
-eta = 1e-5;
 
 a = shc_lv_integrate(t,a0,net,eta,opts);
 

@@ -4,7 +4,7 @@ function a0=shc_lv_ic(net,a20,tol)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-11-12
-%   Revision: 1.0, 5-26-12
+%   Revision: 1.0, 6-6-12
 
 
 % Check network structure
@@ -86,11 +86,6 @@ if isstruct(net) && isfield(net,'rho')
                   'a vector the length as the dimension of the rho matrix.']);
         end
         gam1 = gamv(1);
-        if sz == 2
-            gam2 = 0;
-        else
-            gam2 = gamv(2);
-        end
     else
         error('SHCTools:shc_lv_ic:GammaVectorMissing',...
               'The ''gamma'' field of the SHC network structure is required.');
@@ -137,13 +132,14 @@ end
 
 %{
 % Find initial guess for a10 as a funtion of a20 and eigenvector for a1
-params = [sym('alp','positive') sym('bet','positive') sym('gam','positive') 0];
-net = buildrho(shc_initialize(shc_create('channel',2,params)));
+params = {sym('alp','positive') sym('bet','positive') sym('gam','positive') 0};
+net = shc_create('channel',params,2);
 eq = shc_lv_ode(0,sym('[a10;a20]'),net);
 [V,~] = shc_lv_eigs(net,1);
 a10 = solve([char(eq(2)/eq(1)-V(2,1)/V(1,1)) '=0'],'a10');
 % Result is two equations (quadratic solution arises in a10), simplified below:
 %}
+
 % Estimate a1(0) by assuming slope parallel to a1 eigenvector
 aab = alp1+alp2*bet1;
 rad = aab*(a20^2*gam1*(bet2*gam1*aab-4*alp1*alp2)...
@@ -155,15 +151,15 @@ a10 = (bet1*(sqrt(bet2)*(alp1-a20*gam1)*aab...
 alpv = [alp1;alp1;alp2];
 rho = [alp1/bet1 gam1      0;
        0         alp1/bet1 gam1;
-       gam2      0         alp2/bet2];
+       0         0         alp2/bet2];
 a10 = rkfind(a10,a20,alpv,rho,tol);
 
+% Output initial condition vector with non-zero states for deterministic case
 a0 = [a10;a20;zeros(sz-2,1)+eps];
 
 
 function a10=rkfind(a10,a20,alpv,rho,tol)
 dt = 1e-2;
-threshold = a20-tol;
 
 % Dormand-Prince Butcher tableau
 B1 = 0.2;
@@ -193,14 +189,14 @@ while true
     
     % 5th order solution
     ynew = max(y+dt*(f*B6),eps);
-    if ynew(3) > threshold
-        break
-    end
     f(:,7) = ynew.*(alpv-rho*ynew);
 
     % Relative error between 5th and 4th order solutions
     err = dt*norm(f*E,Inf);
     if err < tol
+        if ynew(3) > a20
+            break
+        end
         y = ynew;
         f(:,1) = f(:,7);
         dt = max(dt*max(0.7*(tol/err)^0.2,0.1),16*eps(dt));	% Adjust step-size
