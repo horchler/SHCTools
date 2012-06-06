@@ -1,7 +1,7 @@
 SHCTools
 ========
 ######Version 1.0, 6-6-12######
-#####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems Based&nbsp;on&nbsp;Networks&nbsp;of&nbsp;Stable Heteroclinic Channels (SHCs).#####
+#####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems Based&nbsp;on&nbsp;Networks&nbsp;of&nbsp;Stablenbsp;Heteroclinicnbsp;Channelsnbsp;(SHCs).#####
 
 
 SHC network creation, modification, and visualization, and conversion.  
@@ -24,7 +24,7 @@ Lotka-Volterra SHC network tools.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_jacobian```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Jacobian of N-dimensional Lotka-Volterra system.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_ode```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ODEs for N-dimensional Lotka-Volterra system.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_params```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Find RHO matrix parameters from description.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_passagetime```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Find passage times from SHC network structure.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_passagetime```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Find passage times from SHC network structure.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_symequilibria```&nbsp;&nbsp;&nbsp;&nbsp;- Solve for all equlibrium points symbolically.
 
 Stone-Holmes distribution.  
