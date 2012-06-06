@@ -28,19 +28,19 @@ Lotka-Volterra SHC network tools.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_symequilibria```&nbsp;&nbsp;&nbsp;- Solve for all equlibrium points symbolically.
 
 Stone-Holmes distribution.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmescdf```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Cummulative distribution function.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmesfit```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Parameter estimates from data.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmesinv```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Inverse cummulative distribution.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmeslike```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Negative log-likelihood.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmesmedian```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Median of distribution.   
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmesmode```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Mode (maximum value) of distribution.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmescdf```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Cummulative distribution function.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmesfit```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Parameter estimates from data.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmesinv```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Inverse cummulative distribution.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmeslike```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Negative log-likelihood.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmesmedian```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Median of distribution.   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmesmode```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Mode (maximum value) of distribution.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmespassagetime```&nbsp;- Mean passage time.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmespdf```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Probability density function.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmesrnd```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Random number generator.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmespdf```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Probability density function.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```stoneholmesrnd```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Random number generator.
 
 XML validation files.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc.dtd```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Document Type Definition.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc.xsd```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- XML Schema.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc.dtd```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Document Type Definition.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc.xsd```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- XML Schema.
 
 --------
 
