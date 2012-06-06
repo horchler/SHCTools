@@ -1,7 +1,7 @@
 SHCTools
 ========
 ######Version 1.0, 6-6-12######
-#####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems Based on Networks of Stable Heteroclinic Channels (SHCs).#####
+#####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems Based&nbsp;on&nbsp;Networks&nbsp;of&nbsp;Stable Heteroclinic Channels (SHCs).#####
 
 
 SHC network creation, modification, and visualization, and conversion.  
@@ -11,7 +11,7 @@ SHC network creation, modification, and visualization, and conversion.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```plotnet```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Visualization of SHC network topology.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```savenet```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Save SHC network structure as XML or MAT file.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_addnetwork```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Insert a sub-network into SHC network structure.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_create```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- RHO matrix from parameters or transition matrix.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_create```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create SHC network structure from parameters.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_deletenetwork```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Remove a sub-network and its children.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_initialize```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create required SHC network structure fields.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_reset```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Reset SHC network structure to default values.  
@@ -24,6 +24,7 @@ Lotka-Volterra SHC network tools.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_jacobian```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Jacobian of N-dimensional Lotka-Volterra system.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_ode```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ODEs for N-dimensional Lotka-Volterra system.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_params```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Find RHO matrix parameters from description.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_passagetime```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Find passage times from SHC network structure.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_symequilibria```&nbsp;&nbsp;&nbsp;&nbsp;- Solve for all equlibrium points symbolically.
 
 Stone-Holmes distribution.  
