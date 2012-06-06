@@ -1,14 +1,13 @@
 SHCTools
 ========
 ######Version 1.0, 6-6-12######
-#####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems  
-Based on Networks of Stable Heteroclinic Channels (SHCs).#####
+#####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems Based on Networks of Stable Heteroclinic Channels (SHCs).#####
 
 
 SHC network creation, modification, and visualization, and conversion.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```buildrho```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create RHO matrix from SHC network structure.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```buildrho```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create RHO matrix from SHC network structure.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```loadnet```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Load SHC network structure from XML or MAT file.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```plotactivity```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Plot simulated SHC network activity.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```plotactivity```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Plot simulated SHC network activity.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```plotnet```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Visualization of SHC network topology.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```savenet```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Save SHC network structure as XML or MAT file.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_addnetwork```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Insert a sub-network into SHC network structure.  
@@ -16,11 +15,11 @@ SHC network creation, modification, and visualization, and conversion.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_deletenetwork```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Remove a sub-network and its children.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_initialize```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create required SHC network structure fields.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_reset```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Reset SHC network structure to default values.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_validatenetwork```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Validate SHC network structure.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_validatenetwork```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Validate SHC network structure.
 
 Lotka-Volterra SHC network tools.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_eigs```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Eigenvalues/vectors of Lotka-Volterra system.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_ic```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Generate initial conditions on the SHC manifold.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_ic```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Generate initial conditions on the SHC manifold.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_integrate```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Solve Lotka-Volterra SDEs numerically.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_jacobian```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Jacobian of N-dimensional Lotka-Volterra system.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;```shc_lv_ode```&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ODEs for N-dimensional Lotka-Volterra system.  
@@ -51,7 +50,7 @@ This version tested with Matlab 7.14.0.739 (R2012a)
 Mac OS X 10.6.8 (Build: 10K549), Java 1.6.0_31-b04-415-10M3635  
 Compatibility maintained back through Matlab 7.4 (R2007a)  
 
-Acknowledgment of support: This material is based upon work supported by the National Science Foundation under Grant No. 1065489. Disclaimer: Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
+Acknowledgment of support: This material is based upon work supported by the National Science Foundation under Grant No.&nbsp;1065489. Disclaimer: Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
 
 Copyright &copy; 2012, Andrew D. Horchler  
 All rights reserved.  
