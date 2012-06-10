@@ -7,7 +7,7 @@ function varargout=shc_lv_passagetime_simulate(varargin)
 %   [...] = SHC_LV_PASSAGETIME_SIMULATE(RHO,ETA,N)
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-28-12
-%   Revision: 1.0, 6-6-12
+%   Revision: 1.0, 6-9-12
 
 
 if nargout > 3
@@ -133,8 +133,8 @@ seed = 0;
 a0 = shc_lv_ic(net,d,tol);
 
 t0 = 0;
-dt = 1e-4;
-tf = 2e2;
+dt = 1e-3;
+tf = 2e3;
 t = t0:dt:tf;
 
 % Simulate SHC using initial conditions to find N periods
@@ -143,6 +143,7 @@ td = cell(1);
 n_total = 0;
 tt = t(ones(n,1),:);
 i = 1;
+waittext(0,'init');
 while n_total < N
     opts = sdeset('RandSeed',seed);
     a = shc_lv_integrate(t,a0,net,eta,opts)';
@@ -168,9 +169,18 @@ while n_total < N
     tp{i} = (ti1(n+2:nt)-ti2(n+1:nt-1))';
     td{i} = (ti2(n+2:nt)-ti1(n+2:nt))';
     
-    n_total = n_total+nt-n-1
+    n_total = n_total+nt-n-1;
     seed = seed+1;
+    waittext(['SHC_LV_PASSAGETIME_SIMULATE: Iteration ' int2str(i) ', ' ...
+        int2str(nt-n-1) ' periods, ' int2str(n_total) ' periods total']);
     i = i+1;
+end
+if i == 2
+    waittext(['SHC_LV_PASSAGETIME_SIMULATE: 1 iteration, ' ...
+         int2str(n_total) ' periods total']);
+else
+    waittext(['SHC_LV_PASSAGETIME_SIMULATE: ' int2str(i-1) ' iterations, ' ...
+         int2str(n_total) ' periods total']);
 end
 tp = [tp{:}];
 tp = tp(1:N);

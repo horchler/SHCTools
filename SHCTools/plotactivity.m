@@ -1,89 +1,140 @@
-function plotactivity(p,a,t,opts)
-%PLOTACTIVITY  Plot simulated SHC network activity.
+function plotactivity(a,t,net,opts)
+%PLOTACTIVITY  Image plot of simulated SHC network activity.
 %
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-8-10
-%   Revision: 1.0, 3-24-12
+%   Revision: 1.0, 6-10-12
 
 
-figure
-axis ij
-n=size(a,1);
-[y yt]=gety(p);
-yy=cumsum(y);
-yvec=[yy-y yy(end)]+0.5;
-yaxis=yy(end)+0.5;
-ytick=yy+0.5*(1-y);
-xtick=0;
-spacerows=0;
-if nargin>3
-    if ~iscell(opts)
-        opts={opts};
+% Check activity data and time
+if ~shc_ismatrix(a) || isempty(a) || ~isfloat(a)
+    error('SHCTools:plotactivity:InvalidA',...
+          'The activity data, A, must be a non-empty floating-point matrix.');
+end
+if ~isreal(a) || ~all(isfinite(a(:)))
+    error('SHCTools:plotactivity:NonFiniteRealA',...
+          'The activity data, A, must be a finite real floating-point matrix.');
+end
+
+if ~isvector(t) || isempty(t) || ~isfloat(t)
+    error('SHCTools:plotactivity:InvalidT',...
+          'The time, T, must be a non-empty floating-point vector.');
+end
+if ~isreal(t) || ~all(isfinite(t))
+    error('SHCTools:plotactivity:NonFiniteRealT',...
+          'The time, T, must be a finite real floating-point vector.');
+end
+
+if length(t) ~= size(a,1)
+    error('SHCTools:plotactivity:DimensionMismatchT',...
+         ['The length of the time vector, T, must be equal to the number of '...
+          'rows of the activity matrix, A.']);
+end
+
+% Validate network structure
+shc_validatenetwork(net);
+
+n = size(a,2);
+if n ~= net.size
+    error('SHCTools:plotactivity:DimensionMismatchNetwork',...
+         ['The number of columns of the the activity matrix, A, must be '...
+          'equal to the ''size'' field of the SHC network.']);
+end
+
+y = 1:n;
+yt = num2cell(sprintf('%d',y));
+xtick = false;
+cmap = jet(256);
+
+% Handle options
+if nargin > 3
+    if ~iscell(opts) || ~(isempty(opts) && isnumeric(opts))
+        if ischar(opts)
+            opts = {opts};
+        else
+            error('SHCTools:plotactivity:NonCellOrStringOptions',...
+                 ['Options argument must be a string or a cell arary of '...
+                  'strings.']);
+        end
     end
-    for i=1:length(opts)
-        switch opts{i}
-            case 'noscaling'
-                yvec=(0:n)+0.5;
-                yaxis=n+0.5;
-                ytick=1:n;
+    for i = 1:length(opts)
+        switch lower(opts{i})
             case 'nodenumbers'
-                yt=1:n;
+                yt = 1:n;
             case 'timescale'
-                xtick=1;
-                set(gca,'XTickLabel',[])
-            case 'spacerows'
-                spacerows=1;
+                xtick = true;
             case 'grayscale'
-                colormap(1-gray)
+                cmap = 1-gray(256);
+            otherwise
+                error('SHCTools:plotactivity:UnknownOption',...
+                      'Unknown option.');
         end
     end
 end
 
-if spacerows
-    hold on
-    %sf=[0 0.1;0.1 0.2;0.2 0.3;0.3 0.4;0 0.1;0.1 0.2;0.2 0.3;0.3 0.4];
-    for i=1:n
-        pcolor(t,yvec(i:i+1)-[0 0.01*(yaxis-0.5)],a([i i],:))
-        %pcolor(t,yvec(i:i+1)-[0 0.01*(yaxis-0.5)]-sf(i,:),a([i i],:))
-    end
-    ytick=ytick-0.005*(yaxis-0.5);%-sf(:,2)'+0.05;
-    yaxis=yaxis-0.01*(yaxis-0.5);%-0.4;
+yht = 0.5*y(end)/(n+1);
+ymin = 0.5+yht/n;
+ymax = y(end)+1-ymin;
+
+% Set units and rescale time if needed
+if t(end) <= 0.005
+    tunits = '\mus';
+    t = 1e6*t;
+elseif t(end) <= 5
+    tunits = 'ms';
+    t = 1e3*t;
 else
-    pcolor(t,yvec,a([1:n n],:))
+    tunits = 'sec.';
 end
+
+% Plot each state as an image
+figure
+hold on
+for i = 1:n
+    imagesc(t,y(i)+[1 -1]*yht,a(:,i)',[0 max(net.beta)])
+end
+
+% Set X-axis scaling and labeling
 if xtick
-    yaxis=1.025*yaxis;
-    h=line([0 0.1*t(end)],[0 0]+0.999*yaxis);
-    set(h,'Color',[0 0 0],'LineWidth',2,'LineSmoothing','on')
-    text(0,1.005*yaxis,[num2str(0.1*t(end)) ' sec.'],'VerticalAlignment','top')
+    axis off
+    set(gca,'XTickLabel',[])
+    tickscale = 1.025;
+    ymax = tickscale*ymax;
+    
+    % Draw time-scale bar
+    taxis = 0.1*t(end);
+    h = line([0 taxis],[0 0]+0.999*ymax);
+    set(h,'Color',[0 0 0],'LineWidth',1.5)
+    
+    % Regex to remove insignificant trailing zeros from decimal values
+    ts = regexprep(num2str(taxis,4),'(\..*[^0])0+|\.0+$()','$1');
+    text(0,1.005*ymax,[ts ' ' tunits],'VerticalAlignment','top')
 else
-    xlabel('Time')
+    set(gca,'Ycolor',[1 1 1],'YTick',y,'YTickLabel',yt)
+    set(gca,'TickDir','out','TickLength',[0.05/(n+1) 0])
+    xlabel(['Time (' tunits ')'])
 end
-axis([t(1) t(end) 0.5 yaxis])
-set(gca,'YTick',ytick,'YTickLabel',yt,'TickLength',[0 0])
+
+% Y-label for each state ID
+for i = 1:n
+    text(-0.035*t(end),y(i),yt(i))
+end
+hy = ylabel('State ID');
+set(hy,'Color',[0 0 0])
+
+axis ij
+axis([t(1) t(end) ymin ymax])
 set(gcf,'Color',[1 1 1])
 box off
-shading flat
-ylabel('State ID')
+colormap(cmap)
 
-function [y yt]=gety(p)
-m=length(p);
-y=zeros(1,m);
-yt=cell(1,m);
-j=1;
-for i=1:m
-    if iscell(p{i,i})
-        [z zt]=gety(p{i,i});
-        lz=length(z);
-        y(j:j+lz-1)=z/length(p{i,i});
-        for k=1:lz
-            yt{j+k-1}=[num2str(i) ',' zt{k}];
-        end
-        j=j+lz;
-    else
-        y(j)=1;
-        yt{j}=num2str(i);
-        j=j+1;
-    end
+% Position colorbar
+hc = colorbar;
+if xtick
+    p = get(gca,'Position');
+    hcp = get(hc,'Position');
+    set(hc,'Position',[hcp(1) p(2)+p(4)*(1-1/tickscale) hcp(3) p(4)/tickscale]);
+    set(gca,'Position',p)
 end
+set(hc,'Box','off','Xcolor',[1 1 1],'TickDir','out')

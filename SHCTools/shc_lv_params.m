@@ -13,10 +13,10 @@ function [alp,bet,gam]=shc_lv_params(tau,tp,varargin)
 %       BUILDRHO, SHC_CREATE, SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_LV_JACOBIAN
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-5-10
-%   Revision: 1.0, 6-5-12
+%   Revision: 1.0, 6-9-12
 
 
-% Check datatypes and handle varibale input
+% Check datatypes and handle variable input
 if nargin == 2
     options = [];
     dtype = superiorfloat(tau,tp);

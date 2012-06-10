@@ -5,52 +5,12 @@ function [tau,tp,td]=shc_lv_passagetime_test(net,eta,N)
 %   [TP,TD] = SHC_LV_PASSAGETIME_TEST(NET,ETA,N)
 %   [TAU,TP,TD] = SHC_LV_PASSAGETIME_TEST(NET,ETA,N)
 %   [...] = SHC_LV_PASSAGETIME_TEST(RHO,ETA,N)
-%   [...] = SHC_LV_PASSAGETIME_TEST(ALPHA,RHO,ETA,N)
-%   [...] = SHC_LV_PASSAGETIME_TEST(ALPHA,BETA,GAMMA,ETA,N)
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-27-12
-%   Revision: 1.0, 5-28-12
+%   Revision: 1.0, 6-6-12
 
 
-% Set optional noise magnitude vector
-if nargin > 1
-    if ~isvector(eta) || isempty(eta) || ~isfloat(eta)
-        error('SHCTools:shc_lv_passagetime:EtaInvalid',...
-             ['The noise magnitude, ETA, must be a non-empty floating-point '...
-              'vector.']);
-    end
-    if ~isreal(eta) || ~all(isfinite(eta)) || any(eta <= 0)
-        error('SHCTools:shc_lv_passagetime:EtaNonFiniteReal',...
-             ['The noise magnitude, ETA, must be a positive finite real '...
-              'floating-point vector.']);
-    end
-    eta = eta(:);
-else
-    eta = 1e-6;
-end
-
-if nargin > 2
-    
-else
-    N = 3e2;
-end
-
-% Set optional seed
-if nargin > 3
-    if ~isscalar(seed) || isempty(seed) || ~isnumeric(seed)
-        error('SHCTools:shc_lv_passagetime:SeedInvalidType',...
-              'The random seed must be a non-empty scalar numeric value.');
-    end
-    if ~isreal(seed) || ~isfinite(seed) || seed < 0 || seed >= 2^32 ...
-            || seed-floor(seed) ~= 0
-         error('SHCTools:shc_lv_passagetime:SeedInvalid',...
-             ['The random seed must be a finite real integer greater than '...
-              'or equal to zero and less than 2^32.']);
-    end
-else
-    seed = 0;
-end
-
+% Check inputs and simulate network to find passage times
 [tau,tp,td] = shc_lv_passagetime_simulate(net,eta,N);
 
 mean_tau = mean(tau);

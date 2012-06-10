@@ -1,4 +1,4 @@
-function a0=shc_lv_ic(net,a20,tol)
+function a0=shc_lv_ic(net,a0,tol)
 %SHC_LV_IC  
 %
 %
@@ -22,70 +22,64 @@ if isstruct(net) && isfield(net,'rho')
     end
     
     if isfield(net,'alpha')
-        alpv = net.alpha;
+        alp = net.alpha;
     else
-        alpv = diag(net.rho);
+        alp = diag(net.rho);
     end
-    if ~isvector(alpv) || isempty(alpv) || ~isfloat(alpv)
+    if ~isvector(alp) || isempty(alp) || ~isfloat(alp)
         error('SHCTools:shc_lv_ic:AlphaVectorInvalid',...
              ['The ''alpha'' field of the SHC network structure must be a '...
               'non-empty floating-point vector.']);
     end
-    if ~isreal(alpv) || any(abs(alpv) == Inf) || any(isnan(alpv))
+    if ~isreal(alp) || ~all(isfinite(alp))
         error('SHCTools:shc_lv_ic:AlphaVectorNonFiniteReal',...
              ['The ''alpha'' field of the SHC network structure must be a '...
               'finite real floating-point vector.']);
     end
-    if length(alpv) ~= sz
+    if length(alp) ~= sz
         error('SHCTools:shc_lv_ic:AlphaVectorDimensionMismatch',...
              ['The ''alpha'' field of the SHC network structure must be a '...
               'vector the length as the dimension of the rho matrix.']);
     end
-    alp1 = alpv(1);
-    alp2 = alpv(2);
     
     if isfield(net,'beta')
-        betv = net.beta;
-        if ~isvector(betv) || isempty(betv) || ~isfloat(betv)
+        bet = net.beta;
+        if ~isvector(bet) || isempty(bet) || ~isfloat(bet)
             error('SHCTools:shc_lv_ic:BetaVectorInvalid',...
                  ['The ''beta'' field of the SHC network structure must be '...
                   'a non-empty floating-point vector.']);
         end
-        if ~isreal(betv) || any(abs(betv) == Inf) || any(isnan(betv))
+        if ~isreal(bet) || ~all(isfinite(bet))
             error('SHCTools:shc_lv_ic:BetaVectorNonFiniteReal',...
                  ['The ''beta'' field of the SHC network structure must be '...
                   'a finite real floating-point vector.']);
         end
-        if length(betv) ~= sz
+        if length(bet) ~= sz
             error('SHCTools:shc_lv_ic:BetaVectorDimensionMismatch',...
                  ['The ''beta'' field of the SHC network structure must be '...
                   'a vector the length as the dimension of the rho matrix.']);
         end
-        bet1 = betv(1);
-        bet2 = betv(2);
     else
-        bet1 = 1;
-        bet2 = 1;
+        bet = 1;
     end
     
     if isfield(net,'gamma')
-        gamv = net.gamma;
-        if ~isvector(gamv) || isempty(gamv) || ~isfloat(gamv)
+        gam = net.gamma;
+        if ~isvector(gam) || isempty(gam) || ~isfloat(gam)
             error('SHCTools:shc_lv_ic:GammaVectorInvalid',...
                  ['The ''gamma'' field of the SHC network structure must be '...
                   'a non-empty symbolic or floating-point vector.']);
         end
-        if ~isreal(gamv) || any(abs(gamv) == Inf) || any(isnan(gamv))
+        if ~isreal(gam) || ~all(isfinite(gam))
             error('SHCTools:shc_lv_ic:GammaVectorNonFiniteReal',...
                  ['The ''gamma'' field of the SHC network structure must be '...
                   'a finite real floating-point vector.']);
         end
-        if length(gamv) ~= sz
+        if length(gam) ~= sz
             error('SHCTools:shc_lv_ic:BetaVectorDimensionMismatch',...
                  ['The ''gamma'' field of the SHC network structure must be '...
-                  'a vector the length as the dimension of the rho matrix.']);
+                  'a vector the length as the dimension of the Rho matrix.']);
         end
-        gam1 = gamv(1);
     else
         error('SHCTools:shc_lv_ic:GammaVectorMissing',...
               'The ''gamma'' field of the SHC network structure is required.');
@@ -93,24 +87,34 @@ if isstruct(net) && isfield(net,'rho')
 else
     error('SHCTools:shc_lv_ic:NetworkStructInvalid',...
          ['Input must be a valid SHC network structure with ''rho'', '...
-          '''alpha'' (optional, default: diag(rho)), ''beta'' (otional, '...
+          '''alpha'' (optional, default: diag(rho)), ''beta'' (optional, '...
           'default: 1), and ''gamma'' fields.']);
 end
 
 if nargin > 1
-    if ~isscalar(a20) || isempty(a20) || ~isfloat(a20)
-        error('SHCTools:shc_lv_ic:A20Invalid',...
+    if ~isvector(a0) || isempty(a0) || ~isfloat(a0)
+        error('SHCTools:shc_lv_ic:A0Invalid',...
              ['The initial condition must be a non-empty floating-point '...
-              'scalar value.']);
+              'vector.']);
     end
-    if ~isreal(a20) || ~isfinite(a20) || a20 < 0 || a20 > bet1
-        error('SHCTools:shc_lv_ic:A20NonFiniteReal',...
-             ['The initial condition must be a positive finite real '...
-              'floating-point scalar value less than or equal to the beta '...
-              'value of the first node of the netork rho matrix.']);
+    if ~isreal(a0) || ~all(isfinite(a0))
+        error('SHCTools:shc_lv_ic:A0NonFiniteReal',...
+             ['The initial condition must be a finite real floating-point '...
+              'vector.']);
+    end
+    if ~any(length(a0) == [1 sz])
+        error('SHCTools:shc_lv_ic:A0DimensionMismatch',...
+             ['The initial condition must be a scalar or a vector the same '...
+              'dimension as the SHC network Rho matrix.']);
+    end
+    if any(a0 < 0) || any(a0 >= min(bet)) || length(a0(a0 > 0)) ~= 1
+        error('SHCTools:shc_lv_ic:A0InvalidFormat',...
+             ['The initial condition must be a positive scalar or a vector '...
+              'with exactly one non-zero value less then the smallest Beta '...
+              'value of the SHC network.']);
     end
 else
-    a20 = 16*eps(bet1);
+    a0 = 16*eps(bet(1));
 end
 
 if nargin > 2
@@ -123,8 +127,8 @@ if nargin > 2
              ['The tolerance must be a positive finite real floating-point '...
               'scalar value.']);
     end
-    if tol < 16*eps(alp1/bet1)
-        tol = 16*eps(alp1/bet1);
+    if tol < 16*eps(min(alp./bet))
+        tol = 16*eps(min(alp./bet));
     end
 else
     tol = 1e-4;
@@ -139,6 +143,15 @@ eq = shc_lv_ode(0,sym('[a10;a20]'),net);
 a10 = solve([char(eq(2)/eq(1)-V(2,1)/V(1,1)) '=0'],'a10');
 % Result is two equations (quadratic solution arises in a10), simplified below:
 %}
+
+i = find(a0 > 0);
+j = mod(i,sz)+1;
+alp1 = alp(i);
+alp2 = alp(j);
+bet1 = bet(i);
+bet2 = bet(j);
+gam1 = gam(i);
+a20 = a0(i);
 
 % Estimate a1(0) by assuming slope parallel to a1 eigenvector
 aab = alp1+alp2*bet1;
@@ -156,6 +169,7 @@ a10 = rkfind(a10,a20,alpv,rho,tol);
 
 % Output initial condition vector with non-zero states for deterministic case
 a0 = [a10;a20;zeros(sz-2,1)+eps];
+a0 = circshift(a0,i-1);
 
 
 function a10=rkfind(a10,a20,alpv,rho,tol)

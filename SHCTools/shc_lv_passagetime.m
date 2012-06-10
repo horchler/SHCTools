@@ -197,7 +197,7 @@ d_etalambda_u = d_eta.^2.*lambda_u;
 % Stone-Holmes first passage time using quadrature integration
 q = zeros(n,1);
 for i = 1:n
-    q(i) = quad(@(x)log1p(d_etalambda_u./x.^2).*exp(-x.^2),0,lim(i));
+    q(i) = quad(@(x)log1p(d_etalambda_u(i)./x.^2).*exp(-x.^2),0,lim(i));
 end
 tp = ((2/sqrt(pi))*q-erf(lim).*log1p(lambda_u./lambda_s))./(2*lambda_u);
 
