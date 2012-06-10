@@ -2,7 +2,7 @@ SHCTools
 ========
 #####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems Based&nbsp;on&nbsp;Networks&nbsp;of&nbsp;Stable&nbsp;Heteroclinic&nbsp;Channels&nbsp;(SHCs).#####
 ######Version 1.0, 6-10-12######
-    &nbsp;
+    
 
 SHC network creation, modification, and visualization, and conversion.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```buildrho```](https://github.com/horchler/SHCTools/blob/master/SHCTools/buildrho.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create RHO matrix from SHC network structure.  
@@ -41,7 +41,7 @@ Stone-Holmes distribution.
 XML validation files.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc.dtd```](https://github.com/horchler/SHCTools/blob/master/SHCTools/xml/shc.dtd)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Document Type Definition.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc.xsd```](https://github.com/horchler/SHCTools/blob/master/SHCTools/xml/shc.xsd)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- XML Schema.
-    &nbsp;
+    
 
 --------
 
@@ -51,13 +51,13 @@ Created: 1-4-12, Revision: 1.0, 6-10-12
 This version tested with Matlab 7.14.0.739 (R2012a)  
 Mac OS X 10.6.8 (Build: 10K549), Java 1.6.0_31-b04-415-10M3635  
 Compatibility maintained back through Matlab 7.4 (R2007a)  
-    &nbsp;
+    
 
 --------
 
 Acknowledgment of support: This material is based upon work supported by the [National Science Foundation](http://www.nsf.gov/) under  
 [Grant No.&nbsp;1065489](http://www.nsf.gov/awardsearch/showAward.do?AwardNumber=1065489). Disclaimer: Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
-    &nbsp;
+    
 
 Copyright &copy; 2012, Andrew D. Horchler  
 All rights reserved.  
