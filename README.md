@@ -29,7 +29,7 @@ Lotka-Volterra SHC network tools.
 
 Stone-Holmes distribution.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmescdf```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmescdf.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Cummulative distribution function.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmesdemo```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmesdemo.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Demonstrate Stone-Holmes distribution functions.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmesdemo```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmesdemo.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Demonstrate Stone-Holmes distribution functions.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmesfit```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmesfit.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Parameter estimates from data.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmesinv```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmesinv.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Inverse cummulative distribution.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmeslike```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmeslike.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Negative log-likelihood.  
