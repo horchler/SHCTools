@@ -1,14 +1,29 @@
 function bounds=bracketroot(fun,x0,rng)
-%BRACKETROOT  
+%BRACKETROOT  Find upper and lower bounds around zero of a monotonic function.
+%   BOUNDS = BRACKETROOT(FUN,X0,RNG) brackets the zero of the monotonically
+%   increasing or decreasing function returned by the function handle FUN. X0 is
+%   a scalar initial guess and RNG is a two element vector containing the
+%   minimum and maximum bounds on the zero of FUN. BOUNDS is a two element
+%   vector containing the upper and lower bounds on the zero.
 %
+%   BOUNDS = BRACKETROOT(FUN,X0) uses RNG = [-1 1]*realmax(class(X0)), which can
+%   be very computationaly expensive.
+%
+%   Using BRACKETROOT to find bounds on a monotonic function's zero and calling
+%   FZERO with a finite interval speed convergence and guarantees that FZERO
+%   will return a value near a point where FUN changes sign.
+%
+%   Note: BRACKETROOT returns BOUNDS as a double precision floating point vector
+%   regardless of the input datatypes because FZERO only accepts double
+%   precision input.
 %
 %   See also:
 %       STONEHOLMESFIT, SHC_LV_PARAMS, FZERO, FUNCTION_HANDLE
 
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
-%   Andrew D. Horchler, adh9@case.edu, Created 4-20-12
-%   Revision: 1.0, 4-20-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 4-20-12
+%   Revision: 1.0, 6-21-12
 
 
 % Check inputs

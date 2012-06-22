@@ -41,7 +41,7 @@ function varargout=stoneholmesfit(x,varargin)
 %       bar(edges+binx/2,nc/(binx*n),1); shading flat; hold on;
 %       plot(x,y,'r'); xlabel('x'); ylabel('f(x)');
 %       title(['Stone-Holmes Fit: \epsilon = ' num2str(ephat) ...
-%              ', \lambda_u = ' num2str(lamhat)]);
+%           ', \lambda_u = ' num2str(lamhat)]);
 %   
 %   See also:
 %       STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESINV, STONEHOLMESLIKE,
@@ -61,8 +61,8 @@ function varargout=stoneholmesfit(x,varargin)
 
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
-%   Andrew D. Horchler, adh9@case.edu, Created 3-11-12
-%   Revision: 1.0, 4-24-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
+%   Revision: 1.0, 6-21-12
 
 
 % Check number of input and output arguments

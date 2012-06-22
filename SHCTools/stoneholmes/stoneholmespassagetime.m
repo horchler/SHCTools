@@ -16,29 +16,44 @@ function tau=stoneholmespassagetime(varargin)
 %   of the parameters are scalars or column vectors, the size of TAU is the size
 %   of the other parameter(s).
 %
-%   Y = STONEHOLMESPASSAGETIME(THETA,LAMBDA_U,LAMBDA_S) returns mean passage
-%   time of the Stone-Holmes distribution for the two parameter case, where
+%   TAU = STONEHOLMESPASSAGETIME(THETA,LAMBDA_U,LAMBDA_S) returns mean passage
+%   time of the Stone-Holmes distribution for the three parameter case, where
 %   Theta = Epsilon/Delta (0 <= Theta << 1) is the size of the noise relative to
 %   that of the neighborhood. NaN is returned if Theta = Inf, Theta < 0,
 %   Lambda_U <= 0, Lambda_U = Inf, Lambda_S <= 0, or Lambda_S = Inf.
 %
-%   Y = STONEHOLMESPASSAGETIME(DELTA,EPSILON,LAMBDA_U,LAMBDA_S,TOL) uses an
+%   TAU = STONEHOLMESPASSAGETIME(DELTA,EPSILON,LAMBDA_U,LAMBDA_S,TOL) uses an
 %   absolute error tolerance of TOL instead of the default, 1e-6, for the
 %   adaptive Simpson quadrature that is used to numerically compute a portion of
 %   the mean passage time. Larger values of TOL result in fewer function
 %   evaluations and faster computation, but less accurate results.
+%
+%   Example:
+%       % Generate plot similar to Fig. 3a in Stone & Holmes, 1990
+%       delta = 1; lambda_u = 0.5; lambda_s = 1;
+%       epsilon = [0.0005 0.001:0.001:0.01 0.015:0.005:0.05];
+%       tau = stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
+%       plot(epsilon,tau,'.-',epsilon,log(delta./epsilon)/lambda_u,'.-')
+%       title(['Stone-Holmes Passage Time: $\delta$ = ' num2str(delta)...
+%           ', $\lambda_u$ = ' num2str(lambda_u) ', $\lambda_s$ = '...
+%           num2str(lambda_s) '$~~~~~~~~~~~~~~$'],'Interpreter','latex');
+%       xlabel('\epsilon'); ylabel('\tau_p'); grid on; axis([0 0.06 0 20]);
+%       h = legend(' $\tau_p$, Theoretical (Eq. 2.28, Stone \& Holmes, 1990)',...
+%           ' $\tau_p \approx $ ln$(\delta/\epsilon)/\lambda_u$',2);
+%       set(h,'Interpreter','latex','EdgeColor',[1 1 1]);
+%       p = get(h,'Position'); set(h,'Position',[p(1:2) 1.25*p(3) p(4)]);
 %   
 %   See also:
 %       STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESRND, STONEHOLMESINV,
 %       STONEHOLMESFIT, STONEHOLMESLIKE, STONEHOLMESMODE, STONEHOLMESMEDIAN,
 %       QUAD, QUADV
 
-%   Based on Eq. (2.28) in: Emily Stone and Philip Holmes, "Random Perturbations
-%   of Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50, No. 3,
-%   pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
+%   Based on Eqs. (2.28) and (2.30) in: Emily Stone and Philip Holmes, "Random
+%   Perturbations of Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50,
+%   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
-%   Andrew D. Horchler, adh9@case.edu, Created 4-22-12
-%   Revision: 1.0, 4-25-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 4-22-12
+%   Revision: 1.0, 6-21-12
 
 
 % Check variable inputs
@@ -51,20 +66,20 @@ if nargin > 5
           'Too many input arguments.')
 end
 
-tol=1e-6;
+tol = 1e-6;
 if nargin >= 4
-    delta=varargin{1};
-    epsilon=varargin{2};
-    lambda_u=varargin{3};
-    lambda_s=varargin{4};
+    delta = varargin{1};
+    epsilon = varargin{2};
+    lambda_u = varargin{3};
+    lambda_s = varargin{4};
     if nargin == 5
-        tol=varargin{5};
+        tol = varargin{5};
     end
 elseif nargin == 3
-    delta=1;
-    epsilon=varargin{1};
-    lambda_u=varargin{2};
-    lambda_s=varargin{3};
+    delta = 1;
+    epsilon = varargin{1};
+    lambda_u = varargin{2};
+    lambda_s = varargin{3};
 end
 
 % Check X and three parameters
@@ -107,48 +122,48 @@ end
 
 % Column vector expansion
 if any(expansion)
-    z=ones(prod(szt(2:end)),1);
+    z = ones(prod(szt(2:end)),1);
     if expansion(1)
-        delta=delta(:,z);
+        delta = delta(:,z);
     end
     if expansion(2)
-        epsilon=epsilon(:,z);
+        epsilon = epsilon(:,z);
     end
     if expansion(3)
-        lambda_u=lambda_u(:,z);
+        lambda_u = lambda_u(:,z);
     end
     if expansion(4)
-        lambda_s=lambda_s(:,z);
+        lambda_s = lambda_s(:,z);
     end
 end
 
 % Use linear indices, everything is a scalar or equal length vector after here
-delta=delta(:);
-epsilon=epsilon(:);
-lambda_u=lambda_u(:);
-lambda_s=lambda_s(:);
+delta = delta(:);
+epsilon = epsilon(:);
+lambda_u = lambda_u(:);
+lambda_s = lambda_s(:);
 
 % Logical linear indices for out-of-range parameters
-idelta=(delta <= 0 | isnan(delta));                     % Delta:    (0, Inf]
-iepsilon=(epsilon < 0 | isnan(epsilon));                % Epsilon:  [0, Inf)
-ilambda_u=(lambda_u <= 0 | isnan(lambda_u));            % Lambda_U: (0, Inf)
-ilambda_s=(lambda_s <= 0 | isnan(lambda_s));            % Lambda_S: (0, Inf)
-i=(idelta | iepsilon | ilambda_u | ilambda_s);
+idelta = (delta <= 0 | isnan(delta));             	% Delta:    (0, Inf]
+iepsilon = (epsilon < 0 | isnan(epsilon));        	% Epsilon:  [0, Inf)
+ilambda_u = (lambda_u <= 0 | isnan(lambda_u));     	% Lambda_U: (0, Inf)
+ilambda_s = (lambda_s <= 0 | isnan(lambda_s));      % Lambda_S: (0, Inf)
+i = (idelta | iepsilon | ilambda_u | ilambda_s);
 
 % Check for empty output or if all values of any parameter is out-of-range
-dtype=superiorfloat(delta,epsilon,lambda_u,lambda_s);
+dtype = superiorfloat(delta,epsilon,lambda_u,lambda_s);
 if any(szt == 0) || all(i)
     % Return empty array or NaN array for out-of-range parameters
-    tau=NaN(szt,dtype);
+    tau = NaN(szt,dtype);
 else
     % Initialize Tau to zero
-    tau=zeros(szt,dtype);
+    tau = zeros(szt,dtype);
     
     % Set out-of-range parameters to NaN
-    tau(i)=NaN;
+    tau(i) = NaN;
     
     % Logical linear indices for in-range parameters
-    i=(~i & epsilon < Inf & lambda_u < Inf & lambda_s < Inf);
+    i = (~i & epsilon < Inf & lambda_u < Inf & lambda_s < Inf);
     
     % If any values in-range
     if any(i)
@@ -182,60 +197,64 @@ else
         end
         
         % Compute mean passage time of Stone-Holmes distribution in-range values
-        de=delta./epsilon;
-        desl=de.*sqrt(lambda_s);
-        lude2=lambda_u.*de.^2;
+        de = delta./epsilon;
+        desl = de.*sqrt(lambda_s);
+        lude2 = lambda_u.*de.^2;
         
         if isscalar(desl) || all(desl == desl(1))
             % Start try-catch of warnings in quadv function
-            me=trywarning({'MATLAB:quadv:MinStepSize',...
-                           'MATLAB:quadv:MaxFcnCount'...
-                           'MATLAB:quadv:ImproperFcnValue'});
+            quadvWarnings = {'MATLAB:quadv:MinStepSize',...
+                          	 'MATLAB:quadv:MaxFcnCount'...
+                         	 'MATLAB:quadv:ImproperFcnValue'};
+            TryWarningObj = trywarning(quadvWarnings);
                                
-            q=quadv(@(x)log1p(lude2./x.^2).*exp(-x.^2),0,desl(1),tol);
-            tau(i)=((2/sqrt(pi))*q-erf(desl(1)).*log1p(lambda_u./lambda_s))./(2*lambda_u);
+            q = quadv(@(x)log1p(lude2./x.^2).*exp(-x.^2),0,desl(1),tol);
+            tau(i) = ((2/sqrt(pi))*q-...
+                erf(desl(1)).*log1p(lambda_u./lambda_s))./(2*lambda_u);
             
             % Catch warnings
-            [msg,id]=catchwarning(me);	%#ok<ASGLU>
+            [msg,id] = TryWarningObj.catchwarning(quadvWarnings);	%#ok<ASGLU>
             
             if any(q <= 0) || any(tau(i) <= 0)
                 warning('SHCTools:stoneholmespassagetime:IllconditionedVec',...
                        ['Unable to solve for one or more mean passage '...
                         'times. Input specifications are illconditioned.']);
-            elseif any(strcmp(id,{'MATLAB:quadv:MinStepSize',...
-                                  'MATLAB:quadv:MaxFcnCount'}))
+            elseif any(strcmp(id,quadvWarnings(1:2)))
                 warning('SHCTools:stoneholmespassagetime:InaccurateVec',...
                        ['One or more mean passage times may be inaccurate. '...
                         'Input specifications are illconditioned.']);
             end
         else
             % Start try-catch of warnings in quad function
-            me=trywarning({'MATLAB:quad:MinStepSize',...
-                           'MATLAB:quad:MaxFcnCount'...
-                           'MATLAB:quad:ImproperFcnValue'});
+            quadWarnings = {'MATLAB:quad:MinStepSize',...
+                            'MATLAB:quad:MaxFcnCount'...
+                         	'MATLAB:quad:ImproperFcnValue'};
+            TryWarningObj = trywarning(quadWarnings);
             
-            len=numel(desl);
-            q=zeros(len,1,dtype);
+            len = numel(desl);
+            q = zeros(len,1,dtype);
             if isscalar(lude2)
-                for j=1:len
-                    q(j)=quad(@(x)log1p(lude2./x.^2).*exp(-x.^2),0,desl(j),tol);
+                for j = 1:len
+                    q(j) = quad(@(x)log1p(lude2./x.^2).*exp(-x.^2),0,desl(j),...
+                        tol);
                 end
             else
-                for j=1:len
-                    q(j)=quad(@(x)log1p(lude2(j)./x.^2).*exp(-x.^2),0,desl(j),tol);
+                for j = 1:len
+                    q(j) = quad(@(x)log1p(lude2(j)./x.^2).*exp(-x.^2),0,...
+                        desl(j),tol);
                 end
             end
-            tau(i)=((2/sqrt(pi))*q-erf(desl).*log1p(lambda_u./lambda_s))./(2*lambda_u);
+            tau(i) = ((2/sqrt(pi))*q-...
+                erf(desl).*log1p(lambda_u./lambda_s))./(2*lambda_u);
             
             % Catch warnings
-            [msg,id]=catchwarning(me);	%#ok<ASGLU>
+            [msg,id] = TryWarningObj.catchwarning(quadWarnings);	%#ok<ASGLU>
             
             if any(q <= 0) || any(tau(i) <= 0)
                 warning('SHCTools:stoneholmespassagetime:Illconditioned',...
                        ['Unable to solve for one or more mean passage '...
                         'times. Input specifications are illconditioned.']);
-            elseif any(strcmp(id,{'MATLAB:quad:MinStepSize',...
-                                  'MATLAB:quad:MaxFcnCount'}))
+            elseif any(strcmp(id,quadWarnings(1:2)))
                 warning('SHCTools:stoneholmespassagetime:Inaccurate',...
                        ['One or more mean passage times may be inaccurate. '...
                         'Input specifications are illconditioned.']);
@@ -243,7 +262,7 @@ else
         end
         
         % Resolve underflow and error conditions
-        tau(i & isnan(tau(:)))=Inf;
-        tau(i & tau(:) <= 0)=NaN;
+        tau(i & isnan(tau(:))) = Inf;
+        tau(i & tau(:) <= 0) = NaN;
     end
 end
