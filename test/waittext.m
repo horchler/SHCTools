@@ -64,14 +64,14 @@ function varargout=waittext(varargin)
 %   See also WAITBAR, FPRINTF, ISSTRPROP, DISP.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-8-12
-%   Revision: 1.0, 6-14-12
+%   Revision: 1.0, 6-21-12
 
 % Inspired by:
 % blogs.mathworks.com/loren/2007/08/01/monitoring-progress-of-a-calculation/#7
 
 % Note: WAITTEXT resets the LASTWARN function so that it will return an empty
 % string matrix for both the last warning message and last message identifier in
-% order to catch warnings that may ocurr between calls. When a warning is
+% order to catch warnings that may occur between calls. When a warning is
 % caught, an empty line of text is printed (equivalent to WAITTEXT being
 % initialized) and LASTWARN is again reset.
 

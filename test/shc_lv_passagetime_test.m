@@ -6,8 +6,8 @@ function [tau,tp,td]=shc_lv_passagetime_test(net,eta,N)
 %   [TAU,TP,TD] = SHC_LV_PASSAGETIME_TEST(NET,ETA,N)
 %   [...] = SHC_LV_PASSAGETIME_TEST(RHO,ETA,N)
 
-%   Andrew D. Horchler, adh9@case.edu, Created 5-27-12
-%   Revision: 1.0, 6-6-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 5-27-12
+%   Revision: 1.0, 6-21-12
 
 
 % Check inputs and simulate network to find passage times

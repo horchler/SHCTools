@@ -4,8 +4,8 @@ function shc_lv_decaytime_test(net,eta)
 %   SHC_LV_DECAYTIME_TEST(NET,ETA)
 %   SHC_LV_DECAYTIME_TEST(RHO,ETA)
 
-%   Andrew D. Horchler, adh9@case.edu, Created 5-15-10
-%   Revision: 1.0, 6-7-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 5-15-10
+%   Revision: 1.0, 6-21-12
 
 
 % Check inputs and find passage times

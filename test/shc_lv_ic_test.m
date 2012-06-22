@@ -3,8 +3,8 @@ function varargout=shc_lv_ic_test(net,eta,tol,seed)
 %
 %
 
-%   Andrew D. Horchler, adh9@case.edu, Created 5-25-12
-%   Revision: 1.0, 6-6-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 5-25-12
+%   Revision: 1.0, 6-21-12
 
 
 % Check network structure, shc_lv_ic will perform further checks

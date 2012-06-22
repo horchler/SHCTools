@@ -3,8 +3,8 @@ function bool=shc_ismatrix(V)
 %
 %
 
-%   Andrew D. Horchler, adh9@case.edu, Created 5-9-12
-%   Revision: 1.0, 5-9-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 5-9-12
+%   Revision: 1.0, 6-21-12
 
 try
     bool = ismatrix(V);
