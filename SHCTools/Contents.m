@@ -26,6 +26,7 @@
 %
 %  Stone-Holmes distribution.
 %      stoneholmescdf    	  - Cummulative distribution function.
+%      stoneholmesdemo        - Demonstrate Stone-Holmes distribution functions.
 %      stoneholmesfit         - Parameter estimates from data.
 %      stoneholmesinv         - Inverse cummulative distribution.
 %      stoneholmeslike   	  - Negative log-likelihood.
@@ -40,11 +41,11 @@
 %      shc.xsd                - XML Schema.
 
 %  This version tested with Matlab 7.14.0.739 (R2012a)
-%  Mac OS X 10.6.8 (Build: 10K549), Java 1.6.0_31-b04-415-10M3635
+%  Mac OS X 10.6.8 (Build: 10K549), Java 1.6.0_33-b03-424-10M3720
 %  Compatibility maintained back through Matlab 7.4 (R2007a)
 
 %  Andrew D. Horchler, adh9 @ case . edu
-%  Created: 1-4-12, Revision: 1.0, 6-6-12
+%  Created: 1-4-12, Revision: 1.0, 6-21-12
 
 
 %  Acknowledgment of support: This material is based upon work supported by the

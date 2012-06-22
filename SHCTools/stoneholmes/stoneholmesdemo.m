@@ -1,5 +1,5 @@
 function stoneholmesdemo(varargin)
-%STONEHOLMESDEMO  
+%STONEHOLMESDEMO  Simulation to demonstrate Stone-Holmes distribution functions.
 %   STONEHOLMESDEMO runs N = 800 simulations of two independent stochastic
 %   differential equations that have a single isolated saddle equilibrium point
 %   (Eq. 2.10 in Stone & Holmes, 1990) using default parameters of Delta = 1,

@@ -6,8 +6,8 @@ function varargout=shc_lv_passagetime(varargin)
 %   [TAU,TP,TD] = SHC_LV_PASSAGETIME(NET,ETA)
 %   [...] = SHC_LV_PASSAGETIME(RHO,ETA)
 
-%   Andrew D. Horchler, adh9@case.edu, Created 5-28-12
-%   Revision: 1.0, 6-6-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 5-28-12
+%   Revision: 1.0, 6-21-12
 
 
 if nargout > 3
@@ -143,14 +143,13 @@ end
 d = shc_lv_neighborhood(bet);
 
 % Start try-catch of warning in quad function
-me = trywarning('MATLAB:quad:MinStepSize');
+TryWarningObj = trywarning('MATLAB:quad:MinStepSize');
 
 % Stone-Holmes first passage time
 tp = stoneholmes_passagetime(alp,gam,eta,d,n);
 
 % Catch possible warning in quad function
-warn = catchwarning(me);
-if warn
+if ~isempty(TryWarningObj.catchwarning('MATLAB:quad:MinStepSize'))
     if n == 1
         warning('SHCTools:shc_lv_passagetime:PossibleIllconditioned1D',...
                ['TP may not meet tolerances. Input specifications may be '...

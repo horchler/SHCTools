@@ -52,7 +52,7 @@ else
         tf = td;
         t = t0:dt:tf;
         
-        a0 = shc_lv_ic(net,circshift([d;0;0],i-1),1e-6);
+        a0 = shc_lv_ic(net,circshift([d;zeros(n-1,1)],i-1),1e-6);
         a = shc_lv_integrate(t,a0,net,eta,opts);
         
         [V,D] = shc_lv_eigs(net,i);

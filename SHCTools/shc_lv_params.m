@@ -12,8 +12,8 @@ function [alp,bet,gam]=shc_lv_params(tau,tp,varargin)
 %   See also:
 %       BUILDRHO, SHC_CREATE, SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_LV_JACOBIAN
 
-%   Andrew D. Horchler, adh9@case.edu, Created 4-5-10
-%   Revision: 1.0, 6-9-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
+%   Revision: 1.0, 6-21-12
 
 
 % Check datatypes and handle variable input
@@ -227,14 +227,14 @@ if n == 1
     alpfun = @(alp)alproot1d(alp,bet,d_eta,tp,gamfun);
     
     % Start try-catch of warning in quad function
-    me = trywarning('MATLAB:quad:MinStepSize');
+    TryWarningObj = trywarning('MATLAB:quad:MinStepSize');
     
     % Find root of Stone-Holmes first passage time in terms of alpha
     bounds = bracket(alpfun,alp0,eps,0.5*realmax*eps);
     [alp,fval,exitflag] = fzero(alpfun,bounds,options);
     
     % Catch possible warning in quad function
-    warn = catchwarning(me);
+    msg = TryWarningObj.catchwarning('MATLAB:quad:MinStepSize');
     
     % Check output from fzero
     if exitflag < 0
@@ -250,7 +250,7 @@ if n == 1
                    ['Tolerances not met for Alpha. Input specifications may '...
                     'be illconditioned.']);
         end
-    elseif warn
+    elseif ~isempty(msg)
         if n ~= N
             warning('SHCTools:shc_lv_params:PossibleIllconditionedAllAlpha1D',...
                    ['Alpha values may not meet tolerances. Input '...
@@ -287,13 +287,13 @@ else
     alp0 = alp0([end 1:end-1]);
 
     % Start try-catch of warning in quad function
-    me = trywarning('MATLAB:quad:MinStepSize');
+    TryWarningObj = trywarning('MATLAB:quad:MinStepSize');
     
     % Find root of Stone-Holmes first passage time in terms of alpha
     [alp,fval,exitflag] = fsolve(alpfun,alp0,options);
     
     % Catch possible warning in quad function
-    warn = catchwarning(me);
+    msg = TryWarningObj.catchwarning('MATLAB:quad:MinStepSize');
     
     % Check output from fsolve
     if exitflag < 0
@@ -323,7 +323,7 @@ else
         warning('SHCTools:shc_lv_params:IllconditionedAlpha',...
                ['Tolerances not met for Alpha values. Input specifications '...
                 'may be illconditioned.']);
-    elseif warn
+    elseif ~isempty(msg)
         warning('SHCTools:shc_lv_params:PossibleIllconditionedAlpha',...
                ['Alpha values may not meet tolerances. Input specifications '...
                 'may be illconditioned.']);
