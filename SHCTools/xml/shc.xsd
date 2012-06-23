@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-<!-- SHCTools for Matlab, Andrew D. Horchler, adh9@case.edu -->
-<!-- Created 1-16-12, Revision: 1.0, 5-29-12 -->
+<!-- SHCTools for Matlab, Andrew D. Horchler, adh9 @ case . edu -->
+<!-- Created 1-16-12, Revision: 1.0, 6-21-12 -->
 
 <!-- Restricted values -->
 <xs:simpleType name="parenttype">

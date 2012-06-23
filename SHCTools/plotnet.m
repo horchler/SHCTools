@@ -1,10 +1,10 @@
 function plotnet(p,opts)
 %PLOTNET  Visualization of SHC network topology.
 %
-%
+%   Not currently functional.
 
-%   Andrew D. Horchler, adh9@case.edu, Created 4-2-10
-%   Revision: 1.0, 3-24-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 4-2-10
+%   Revision: 1.0, 6-21-12
 
 
 grayscale=0;

@@ -3,8 +3,8 @@ function net=buildrho(net)
 %
 %
 
-%   Andrew D. Horchler, adh9@case.edu, Created 4-21-10
-%   Revision: 1.0, 5-29-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 4-21-10
+%   Revision: 1.0, 6-21-12
 
 
 % Convert from XML file to structure if necessary

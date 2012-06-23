@@ -3,8 +3,8 @@ function plotactivity(a,t,net,opts)
 %
 %
 
-%   Andrew D. Horchler, adh9@case.edu, Created 4-8-10
-%   Revision: 1.0, 6-10-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 4-8-10
+%   Revision: 1.0, 6-21-12
 
 
 % Check activity data and time

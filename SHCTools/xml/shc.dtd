@@ -1,5 +1,5 @@
-<!-- SHCTools for Matlab, Andrew D. Horchler, adh9@case.edu -->
-<!-- Created 1-8-12, Revision: 1.0, 5-29-12 -->
+<!-- SHCTools for Matlab, Andrew D. Horchler, adh9 @ case . edu -->
+<!-- Created 1-8-12, Revision: 1.0, 6-21-12 -->
 <!ELEMENT net (contour|channel|cluster)>
 <!ELEMENT contour (contourfields,subnets?)>
 <!ELEMENT channel (channelfields,subnets?)>

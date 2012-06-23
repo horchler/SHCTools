@@ -3,29 +3,29 @@ function dom=shc_xml2dom(filename,options)
 %
 %
 
-%   Andrew D. Horchler, adh9@case.edu, Created 1-11-12
-%   Revision: 1.0, 3-24-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 1-11-12
+%   Revision: 1.0, 6-22-12
 
 
 if nargin < 2
     options = [];
 else
     if ~isempty(options) && ~isstruct(options)
-        error(  'SHCTools:shc_xml2dom:InavalidOptions',...
-                'Options argument must be a strcture or empty array, [].');
+        error('SHCTools:shc_xml2dom:InavalidOptions',...
+              'Options argument must be a strcture or empty array, [].');
     end
 end
 
 if isempty(filename) || ~ischar(filename)
-    error(  'SHCTools:shc_xml2dom:InvalidFileName',...
-            'The file name must be a non-empty string.');
+    error('SHCTools:shc_xml2dom:InvalidFileName',...
+          'The file name must be a non-empty string.');
 end
 
 % Make sure that we have access to Java
 if ~usejava('jvm')
-    error(  'SHCTools:shc_xml2dom:NoJVM',...
-           ['Matlab was launched with the ''-nojvm'' option, but this '...
-            'function requires Java.']);
+    error('SHCTools:shc_xml2dom:NoJVM',...
+         ['Matlab was launched with the ''-nojvm'' option, but this '...
+          'function requires Java.']);
 end
 
 % Go through options structure, if present, and check and set options
@@ -40,8 +40,8 @@ compareFields = strcmpi('validate',fields);
 if any(compareFields)
     validate = options.(fields{compareFields});
     if ~ischar(validate)
-        error(  'SHCTools:shc_xml2dom:ValidateNotAString',...
-                'Validate option must be a string, either ''yes'', or ''no''.');
+        error('SHCTools:shc_xml2dom:ValidateNotAString',...
+              'Validate option must be a string, either ''yes'', or ''no''.');
     end
     
     if strcmpi(validate,'yes')
@@ -49,8 +49,8 @@ if any(compareFields)
     elseif strcmpi(validate,'no')
         validate = false;
     else
-        error(  'SHCTools:shc_xml2dom:InavalidValidateOption',...
-                'Validate option must be a string, either ''yes'', or ''no''.');
+        error('SHCTools:shc_xml2dom:InavalidValidateOption',...
+              'Validate option must be a string, either ''yes'', or ''no''.');
     end
 else
     validate = true;
@@ -65,10 +65,10 @@ if validate
         % Check that alternate Schema file exists
         xsd = validatefilepath(xsd,'.xsd');
         if exist(xsd,'file') ~= 2
-            error(  'SHCTools:shc_xml2dom:NonexistentSchemaFile',...
-                   ['Schema validation is enabled, but the the specified '...
-                    'alternate schema file does not exist at the indicated '...
-                    'location: %s.'],xsd);
+            error('SHCTools:shc_xml2dom:NonexistentSchemaFile',...
+                 ['Schema validation is enabled, but the the specified '...
+                  'alternate schema file does not exist at the indicated '...
+                  'location: %s.'],xsd);
         end
     else
         xsd = [fileparts(which('loadnet')) '/xml/shc.xsd'];
@@ -76,10 +76,9 @@ if validate
         % Check that default file is where it should be
         xsd = validatefilepath(xsd);
         if exist(xsd,'file') ~= 2
-            error(  'SHCTools:shc_xml2dom:MissingDefaultSchemaFile',...
-                   ['Schema validation is enabled, but the default schema '...
-                    'file is missing or not in the expected location: '...
-                    '%s.'],xsd);
+            error('SHCTools:shc_xml2dom:MissingDefaultSchemaFile',...
+                 ['Schema validation is enabled, but the default schema '...
+                  'file is missing or not in the expected location: %s.'],xsd);
         end
     end
 end
@@ -102,7 +101,7 @@ while true
 end
 reader.close();
 
-% Set up XML parser with appriate validation options
+% Set up XML parser with appropriate validation options
 factory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
 factory.setValidating(hasDoctype);                  % DTD validation
 factory.setIgnoringComments(true);
