@@ -26,7 +26,7 @@ function stoneholmesdemo(varargin)
 %   http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-25-12
-%   Revision: 1.0, 6-21-12
+%   Revision: 1.0, 6-29-12
 
 
 if nargin == 0
@@ -169,8 +169,8 @@ a = NaN(lt,2);
 RandStream.setGlobalStream(RandStream('mt19937ar','Seed',0));
 lamdt = [-lambda_s lambda_u]*dt;
 eta = epsilon;
-tp = zeros(Np,1);
-px = zeros(Ne,1);
+tp(Np,1) = 0;
+px(Ne,1) = 0;
 
 % Simulation loop, draw first two subplots
 waittext(0,'init')

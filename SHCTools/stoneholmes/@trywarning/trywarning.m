@@ -27,13 +27,13 @@ classdef (Sealed) trywarning < handle
     %       obj = trywarning('all');
     %       warning('trywarning:Example1','Example warning message 1.');
     %       warning('trywarning:Example2','Example warning message 2.');
-    %       obj.catchwarning;
+    %       catchwarning(obj);
     %
     %       % Example1 warning will not be matched, no warning caught
     %       obj = trywarning('all');
     %       warning('trywarning:Example1','Example warning message 1.');
     %       warning('trywarning:Example2','Example warning message 2.');
-    %       obj.catchwarning('trywarning:Example1')
+    %       catchwarning(obj,'trywarning:Example1')
     %
     %       % Specific warning disabled and matched with handler function
     %      	str = 'Iteration %d: Caught warning ID %s\n  "%s"\n ';
@@ -52,13 +52,13 @@ classdef (Sealed) trywarning < handle
     %           end
     %           % Handler funtion to match Example2 and print details
     %           fun = @(msg,msgid)fprintf(1,matchfun(msgid),i,msgid,msg);
-    %           obj.catchwarning(fun);
+    %           catchwarning(obj,fun);
     %       end
     %
     %   See also TRYWARNING/CATCHWARNING, TRYWARNING/DELETE, LASTWARN, WARNING.
     
 	%   Andrew D. Horchler, adh9 @ case . edu
-    %   Created: 4-24-12, Revision: 1.1, 6-21-12
+    %   Created: 4-24-12, Revision: 1.1, 6-27-12
     
     
     properties (SetAccess=private,Hidden)
@@ -156,20 +156,20 @@ classdef (Sealed) trywarning < handle
             %       obj = trywarning('all');
             %       warning('trywarning:Example1','Example warning message 1.');
             %       warning('trywarning:Example2','Example warning message 2.');
-            %       obj.catchwarning;
+            %       catchwarning(obj);
             %
             %       % Example1 warning will not be matched, no warning caught
             %       obj = trywarning('all');
             %       warning('trywarning:Example1','Example warning message 1.');
             %       warning('trywarning:Example2','Example warning message 2.');
-            %       obj.catchwarning('trywarning:Example1')
+            %       catchwarning(obj,'trywarning:Example1')
             %
             %       % Example2 is caught and handled by function
             %       obj = trywarning('trywarning:Example2');
             %       warning('trywarning:Example1','Example warning message 1.');
             %       warning('trywarning:Example2','Example warning message 2.');
             %       fun = @(msg,msgid)fprintf(1,'ID: %s\nMSG: %s\n',msgid,msg);
-            %       obj.catchwarning(fun);
+            %       catchwarning(obj,fun);
             %
             %   See also TRYWARNING, TRYWARNING/DELETE, FUNCTION_HANDLE,
             %            LASTWARN, WARNING.

@@ -34,7 +34,7 @@ function varargout=shc_lv_eigs(rho,M)
 %       SHC_LV_JACOBIAN, SHC_LV_SYMEQUILIBRIA, BUILDRHO, SHC_CREATE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-6-12
-%   Revision: 1.0, 4-21-12
+%   Revision: 1.0, 6-29-12
 
 
 if nargout > 2
@@ -128,7 +128,7 @@ if nargin == 2 && ~ischar(M)
               'M must be a finite real integer greater than or equal to one.');
     end
     
-    eqpt = zeros(m,1);
+    eqpt(m,1) = 0;
     if isSym
         eqpt = sym(eqpt);
     end
@@ -165,17 +165,7 @@ else
     end
     
     z = ones(1,m);
-    if nargout == 2
-        V = cell(1,n);
-        D = cell(1,n);
-    else
-        E = zeros(m,n);
-        if isSym
-            E = sym(E);
-        end
-    end
-    
-    for i = 1:n
+    for i = n:-1:1
         % Calculate Jacobian
         v = eqpt(:,i);
         J = p.*v(:,z);

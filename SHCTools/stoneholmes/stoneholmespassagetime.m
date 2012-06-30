@@ -53,7 +53,7 @@ function tau=stoneholmespassagetime(varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-22-12
-%   Revision: 1.0, 6-21-12
+%   Revision: 1.0, 6-29-12
 
 
 % Check variable inputs
@@ -213,7 +213,7 @@ else
                 erf(desl(1)).*log1p(lambda_u./lambda_s))./(2*lambda_u);
             
             % Catch warnings
-            [msg,id] = TryWarningObj.catchwarning(quadvWarnings);	%#ok<ASGLU>
+            [msg,id] = catchwarning(TryWarningObj,quadvWarnings);	%#ok<ASGLU>
             
             if any(q <= 0) || any(tau(i) <= 0)
                 warning('SHCTools:stoneholmespassagetime:IllconditionedVec',...
@@ -232,14 +232,13 @@ else
             TryWarningObj = trywarning(quadWarnings);
             
             len = numel(desl);
-            q = zeros(len,1,dtype);
             if isscalar(lude2)
-                for j = 1:len
+                for j = len:-1:1
                     q(j) = quad(@(x)log1p(lude2./x.^2).*exp(-x.^2),0,desl(j),...
                         tol);
                 end
             else
-                for j = 1:len
+                for j = len:-1:1
                     q(j) = quad(@(x)log1p(lude2(j)./x.^2).*exp(-x.^2),0,...
                         desl(j),tol);
                 end
@@ -248,7 +247,7 @@ else
                 erf(desl).*log1p(lambda_u./lambda_s))./(2*lambda_u);
             
             % Catch warnings
-            [msg,id] = TryWarningObj.catchwarning(quadWarnings);	%#ok<ASGLU>
+            [msg,id] = catchwarning(TryWarningObj,quadWarnings);	%#ok<ASGLU>
             
             if any(q <= 0) || any(tau(i) <= 0)
                 warning('SHCTools:stoneholmespassagetime:Illconditioned',...

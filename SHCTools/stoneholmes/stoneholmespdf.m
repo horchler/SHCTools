@@ -26,7 +26,7 @@ function y=stoneholmespdf(x,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-5-12
-%   Revision: 1.0, 6-21-12
+%   Revision: 1.0, 6-29-12
 
 
 % Check variable inputs

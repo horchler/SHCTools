@@ -4,7 +4,7 @@ function net=shc_initialize(net,reinit)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-14-12
-%   Revision: 1.0, 5-29-12
+%   Revision: 1.0, 6-29-12
 
 
 % Check for 'reset' mode to clear and reset 'children', 'index,' and 'T' fields
@@ -107,7 +107,7 @@ for i = 1:nnets
     
     % Calculate 'T' field Boolean matrix
     if ~isfield(s,'T')
-        s.T = false(s.size);
+        s.T(s.size,s.size) = false;
 
         if ~strcmp(s.type,'cluster')
             % Direction is optional, but then set to 1 for contours and channels

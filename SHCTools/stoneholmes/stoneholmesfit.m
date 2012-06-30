@@ -62,7 +62,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 6-21-12
+%   Revision: 1.0, 6-29-12
 
 
 % Check number of input and output arguments
@@ -86,6 +86,7 @@ deltaset=true;
 censoringset=true;
 freqset=true;
 optsset=true;
+options=[];
 for i=1:nargin-1
     v=varargin{i};
     if  i == 1 && isscalar(v)
@@ -127,7 +128,7 @@ for i=1:nargin-1
         freqset=false;
     elseif optsset && (isstruct(v) || (isnumeric(v) || iscell(v))...
             && all(size(v) == 0))
-        opts=v;
+        options=v;
         optsset=false;
     else
         error('SHCTools:stoneholmesfit:UnknownArgument',...
@@ -165,9 +166,20 @@ if ~isNoCensoring
         n=sum(frequncensored);
     end
 end
-options=optimset('Display','off','TolX',1e-9,'FunValCheck','off');
-if ~optsset && ~isempty(opts)
-	options=optimset(options,opts);
+
+% Generate options structure for fzero
+if isempty(options)
+    options=struct('Display','off','TolX',1e-9,'FunValCheck','off');
+else
+    if ~isfield(options,'Display')
+        options.('Display')='off';
+    end
+    if ~isfield(options,'TolX')
+        options.('TolX')=1e-9;
+    end
+    if ~isfield(options,'FunValCheck')
+        options.('FunValCheck')='off';
+    end
 end
 
 % Check for edge cases
@@ -221,7 +233,8 @@ end
 likelihood=@(lambda_u)likeeq(lambda_u,x,6/n,2*wtx,freq);
 
 % Bracket the root of the Lambda_U likelihood equation
-bnds=bracketroot(likelihood,lambda_uhat,[eps(realmin(classX)) realmax(classX)]);
+bnds=bracketroot(likelihood,lambda_uhat,...
+    [realmin(classX) eps(realmax(classX))],'+');
 
 % Find root of of the likelihood equation, MLE for Lambda_U
 [lambda_uhat,likelihoodval,err]=fzero(likelihood,bnds,options);
@@ -254,7 +267,7 @@ else
 end
 
 
-% Likelihood equation for Lambda_U, actually negative of it for bracketroot()
+% Likelihood equation for Lambda_U, actually negative of it
 function z=likeeq(lambda_u,x,n,wtx,freq)
 
 lam2x=2*lambda_u*x;

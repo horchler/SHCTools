@@ -4,7 +4,7 @@ function net=shc_mat2net(filename,options)
 %
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 1-23-12
-%   Revision: 1.0, 6-21-12
+%   Revision: 1.0, 6-29-12
 
 
 if nargin == 2 && ~isempty(options) && ~isstruct(options)
@@ -28,7 +28,7 @@ TryWarningObj = trywarning('MATLAB:load:variableNotFound');
 S = load(filename,'net');
 
 % Catch warning
-if ~isempty(TryWarningObj.catchwarning('MATLAB:load:variableNotFound'))
+if ~isempty(catchwarning(TryWarningObj,'MATLAB:load:variableNotFound'))
     error('SHCTools:shc_mat2net:VariableNotFound',...
           'Network structure not found in file.');
 end

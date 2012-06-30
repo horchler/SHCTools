@@ -37,7 +37,7 @@ function [A W]=shc_lv_integrate(tspan,a0,rho,eta,varargin)
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-30-12
-%   Revision: 1.0, 4-21-12
+%   Revision: 1.0, 6-29-12
 
 
 % Check inputs and outputs
@@ -192,8 +192,14 @@ else
     end
     dataType = superiorfloat(t0,a0,rho,eta,mu);
 end
+isDouble = strcmp(dataType,'double');
 
-A = zeros(lt,N,dataType);   % State array
+% State array
+if isDouble
+    A(lt,N) = 0;
+else
+    A(lt,N) = single(0);
+end
 
 % Generate Wiener increments if not all eta values are zero
 if any(eta ~= 0)
@@ -300,7 +306,11 @@ if any(eta ~= 0)
 else
     % Only allocate W matrix if requested as output
     if nargout == 2
-        W = zeros(lt,N,datatype);
+        if isDouble
+            W(lt,N) = 0;
+        else
+            W(lt,N) = single(0);
+        end
     end
     
     % Integration loop

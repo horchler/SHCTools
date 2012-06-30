@@ -6,7 +6,7 @@ function net=shc_createnetwork(nettype,params,varargin)
 %   NET = SHC_CREATENETWORK('custom',PARAMS,T)
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-28-12
-%   Revision: 1.0, 6-5-12
+%   Revision: 1.0, 6-29-12
 
 
 % Handle network type
@@ -231,26 +231,26 @@ end
 % Build network structure
 net = struct;
 if isCustom
-    net.s{1} = struct('type','custom','size',N,'alpha',alp(1),'beta',bet(1),...
-                      'gamma',gam(1),'delta',del(1),'T',logical(T));
-    for i = 2:n
+    for i = n:-1:2
         net.s{i} = struct('type','custom','size',1,'alpha',alp(i),...
                           'beta',bet(i),'gamma',gam(i),'delta',del(i),...
                           'parent',1,'node',i);
     end
+    net.s{1} = struct('type','custom','size',N,'alpha',alp(1),'beta',bet(1),...
+                      'gamma',gam(1),'delta',del(1),'T',logical(T));
 elseif isCluster
-    net.s{1} = struct('type','cluster','size',N,'alpha',alp(1),'beta',bet(1),...
-                      'gamma',gam(1));
-    for i = 2:n
+    for i = n:-1:2
         net.s{i} = struct('type','cluster','size',1,'alpha',alp(i),...
                           'beta',bet(i),'gamma',gam(i),'parent',1,'node',i);
     end
+    net.s{1} = struct('type','cluster','size',N,'alpha',alp(1),'beta',bet(1),...
+                      'gamma',gam(1));
 else
-    net.s{1} = struct('type',nettype,'size',N,'alpha',alp(1),'beta',bet(1),...
-                      'gamma',gam(1),'delta',del(1),'direction',netdir);
-    for i = 2:n
+    for i = n:-1:2
         net.s{i} = struct('type','channel','size',1,'alpha',alp(i),...
                           'beta',bet(i),'gamma',gam(i),'delta',del(i),...
                           'direction',netdir,'parent',1,'node',i);
     end
+    net.s{1} = struct('type',nettype,'size',N,'alpha',alp(1),'beta',bet(1),...
+                      'gamma',gam(1),'delta',del(1),'direction',netdir);
 end

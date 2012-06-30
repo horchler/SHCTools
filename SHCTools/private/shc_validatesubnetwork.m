@@ -8,7 +8,7 @@ function shc_validatesubnetwork(s,varargin)
 %shc_validatesubnetwork(s,num,'strict')
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-15-12
-%   Revision: 1.0, 5-29-12
+%   Revision: 1.0, 6-29-12
 
 
 if nargin > 1 && ~ischar(varargin{1})
@@ -337,7 +337,7 @@ if isfield(s,'T')
 
     % Create test T matrix to compare
     if ~strcmp(s.type,'custom')
-        t = false(s.size);
+        t(s.size,s.size) = false;
         if ~strcmp(s.type,'cluster')
             j=0.5*(s.size-1)*(1-s.direction)+1;
             t(j+1:s.size+1:end) = true;

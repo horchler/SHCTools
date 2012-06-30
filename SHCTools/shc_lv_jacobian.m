@@ -16,7 +16,7 @@ function J=shc_lv_jacobian(rho,eqpt)
 %       SHC_LV_EIGS, BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA
 
 %   Andrew D. Horchler, adh9@case.edu, Created 12-1-10
-%   Revision: 1.0, 4-21-12
+%   Revision: 1.0, 6-29-12
 
 
 % Check Rho matrix
@@ -123,10 +123,9 @@ else
         eqpt = -eye(n);
     end
     
-    J = cell(1,n);
     isSym = (isa(p,'sym') || isa(alpv,'sym') || isa(eqpt,'sym'));
     z = ones(1,n);
-    for i = 1:n
+    for i = n:-1:1
         % Calculate Jacobian
         v = eqpt(:,i);
         J{i} = p.*v(:,z);
