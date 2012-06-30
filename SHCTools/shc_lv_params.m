@@ -4,27 +4,54 @@ function [alp,bet,gam]=shc_lv_params(tau,tp,varargin)
 %   [...] = SHC_LV_PARAMS(TAU,TP,ETA)
 %   [...] = SHC_LV_PARAMS(TAU,TP,ETA,MAG)
 %
-%   [...] = SHC_LV_PARAMS(TAU,TP,...,OPTIONS)
+%   [...] = SHC_LV_PARAMS(TAU,TP,...,METHOD)
+%   [...] = SHC_LV_PARAMS(...,OPTIONS)
 %
 %   Class support for inputs TAU, TP, ETA, and MAG:
 %       float: double, single
 %
 %   See also:
 %       BUILDRHO, SHC_CREATE, SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_LV_JACOBIAN
+%       FZERO, FSOLVE, QUAD, INTEGRAL, PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
-%   Revision: 1.0, 6-21-12
+%   Revision: 1.0, 6-29-12
 
 
 % Check datatypes and handle variable input
 if nargin == 2
+    method = 'default';
     options = [];
     dtype = superiorfloat(tau,tp);
 elseif nargin > 2
     v = varargin{end};
     if isstruct(v) || isempty(v) && isnumeric(v) && all(size(v) == 0)
         options = v;
-        if nargin == 4
+        if nargin == 3
+            method = 'default';
+            dtype = superiorfloat(tau,tp);
+        elseif nargin == 4
+            eta = varargin{1};
+            dtype = superiorfloat(tau,tp,eta);
+        elseif nargin == 5
+            eta = varargin{1};
+            mag = varargin{2};
+            dtype = superiorfloat(tau,tp,eta,mag);
+        elseif nargin == 6
+            eta = varargin{1};
+            mag = varargin{2};
+            dtype = superiorfloat(tau,tp,eta,mag);
+            method = varargin{3};
+        else
+            error('SHCTools:shc_lv_params:TooManyInputsOptions',...
+                  'Too many input arguments.');
+        end
+    elseif ischar(v)
+        method = v;
+        options = [];
+        if nargin == 3
+            dtype = superiorfloat(tau,tp);
+        elseif nargin == 4
             eta = varargin{1};
             dtype = superiorfloat(tau,tp,eta);
         elseif nargin == 5
@@ -32,10 +59,11 @@ elseif nargin > 2
             mag = varargin{2};
             dtype = superiorfloat(tau,tp,eta,mag);
         else
-            error('SHCTools:shc_lv_params:TooManyInputsOptions',...
+            error('SHCTools:shc_lv_params:TooManyInputsMethod',...
                   'Too many input arguments.');
         end
     else
+        method = 'default';
         options = [];
         if nargin == 3
             eta = varargin{1};
@@ -217,24 +245,57 @@ end
 
 % Generate options structure for fzero/fsolve
 if isempty(options)
-    options = optimset('Display','off','TolX',1e-6);
+    options = struct('Display','off','TolX',1e-6);
+else
+    if ~isfield(options,'Display')
+        options.('Display') = 'off';
+    end
+    if ~isfield(options,'TolX')
+        options.('TolX') = 1e-6;
+    end
 end
-gamopts = optimset('Display','off','TolX',min(options.TolX^(2/3),1e-2));
+gamopts = struct('Display','off','TolX',min(options.TolX^(2/3),1e-2));
+
+% Create function handles, specify integration method
+if n == 1
+    gamfun = @(alp)gamroot1d(alp,bet,d,td,gamopts,false);
+else
+    gamfun = @(alp)gamroot(alp,bet,d,td,n,gamopts,false);
+end
+switch lower(method)
+    case {'default','quad'}
+        if n == 1
+            alpfun = @(alp)alproot1d(alp,bet,d_eta,tp,gamfun,options.TolX);
+        else
+            alpfun = @(alp)alproot(alp,d_eta,tp,n,gamfun,options.TolX);
+        end
+        msgid = 'MATLAB:quad:MinStepSize';
+    case {'quadgk','integral'}
+        alpfun = @(alp)alprootgk(alp,d_eta,tp,gamfun,(n ~= 1),options.TolX);
+        msgid = 'MATLAB:quadgk:MinStepSize';
+    case {'pchip','fast','quick','interp'}
+        alpfun = @(alp)alprootq(alp,d_eta,tp,gamfun);
+        msgid = '';
+    otherwise
+        error('SHCTools:shc_lv_params:UnknownMethod',...
+             ['Unknown method. Valid methods are: ''quad'' (default), '...
+              '''quadgk'', and ''pchip''.']);
+end
+
+% Start try-catch of warning in quad/quadgk function
+if ~isempty(msgid)
+	TryWarningObj = trywarning(msgid);
+end
 
 if n == 1
-    % Create function handles
-    gamfun = @(alp)gamroot1d(alp,bet,d,td,gamopts,false);
-    alpfun = @(alp)alproot1d(alp,bet,d_eta,tp,gamfun);
-    
-    % Start try-catch of warning in quad function
-    TryWarningObj = trywarning('MATLAB:quad:MinStepSize');
-    
     % Find root of Stone-Holmes first passage time in terms of alpha
-    bounds = bracket(alpfun,alp0,eps,0.5*realmax*eps);
+    bounds = bracket(alpfun,alp0,eps,eps(realmax));
     [alp,fval,exitflag] = fzero(alpfun,bounds,options);
     
-    % Catch possible warning in quad function
-    msg = TryWarningObj.catchwarning('MATLAB:quad:MinStepSize');
+    % Catch possible warning in quad/quadgk function
+    if ~isempty(msgid)
+        msg = catchwarning(TryWarningObj,msgid);
+    end
     
     % Check output from fzero
     if exitflag < 0
@@ -250,7 +311,7 @@ if n == 1
                    ['Tolerances not met for Alpha. Input specifications may '...
                     'be illconditioned.']);
         end
-    elseif ~isempty(msg)
+    elseif ~isempty(msgid) && ~isempty(msg)
         if n ~= N
             warning('SHCTools:shc_lv_params:PossibleIllconditionedAllAlpha1D',...
                    ['Alpha values may not meet tolerances. Input '...
@@ -263,7 +324,7 @@ if n == 1
     end
     
     % Find gamma as function of alpha
-    gamopts = optimset(gamopts,'TolX',min(options.TolX,1e-2));
+    gamopts.TolX = min(options.TolX,1e-2);
     gam = gamroot1d(alp,bet,d,td,gamopts,true);
     
     % Check Reyn stability criterion
@@ -280,20 +341,13 @@ if n == 1
         gam(z,1) = gam;
     end
 else
-    % Create function handles
-    gamfun = @(alp)gamroot(alp,bet,d,td,n,gamopts,false);
-    alpfun = @(alp)alproot(alp,d_eta,tp,n,gamfun);
-    
-    alp0 = alp0([end 1:end-1]);
-
-    % Start try-catch of warning in quad function
-    TryWarningObj = trywarning('MATLAB:quad:MinStepSize');
-    
     % Find root of Stone-Holmes first passage time in terms of alpha
-    [alp,fval,exitflag] = fsolve(alpfun,alp0,options);
+    [alp,fval,exitflag] = fsolve(alpfun,alp0([end 1:end-1]),options);
     
     % Catch possible warning in quad function
-    msg = TryWarningObj.catchwarning('MATLAB:quad:MinStepSize');
+    if ~isempty(msgid)
+        msg = catchwarning(TryWarningObj,msgid);
+    end
     
     % Check output from fsolve
     if exitflag < 0
@@ -323,14 +377,14 @@ else
         warning('SHCTools:shc_lv_params:IllconditionedAlpha',...
                ['Tolerances not met for Alpha values. Input specifications '...
                 'may be illconditioned.']);
-    elseif ~isempty(msg)
+    elseif ~isempty(msgid) && ~isempty(msg)
         warning('SHCTools:shc_lv_params:PossibleIllconditionedAlpha',...
                ['Alpha values may not meet tolerances. Input specifications '...
                 'may be illconditioned.']);
     end
 
     % Find gamma as function of alpha
-    gamopts = optimset(gamopts,'TolX',min(options.TolX,1e-2));
+    gamopts.TolX = min(options.TolX,1e-2);
     gam = gamroot(alp,bet,d,td,n,gamopts,true);
     
     % Check Reyn stability criterion
@@ -354,7 +408,7 @@ end
 
 
 
-function z=alproot(alp,d_eta,tp,n,gamfun)
+function z=alproot(alp,d_eta,tp,n,gamfun,tol)
 % Stable and unstable eigenvalues
 gam = gamfun(alp);
 lambda_s = abs(alp([end 1:end-1])-gam([end 1:end-1]));
@@ -362,27 +416,57 @@ lambda_u = alp([2:end 1]);
 lim = d_eta.*sqrt(lambda_s);
 
 % Zero of Stone-Holmes first passage time using quadrature integration
-q = zeros(n,1);
-for i = 1:n
-    q(i) = quad(@(x)f(x,d_eta(i)^2*lambda_u(i)),0,lim(i));
+for i = n:-1:1
+    q(i) = quad(@(x)f(x,d_eta(i)^2*lambda_u(i)),0,lim(i),tol);
 end
 z = tp+(erf(lim).*log1p(lambda_u./lambda_s)-(2/sqrt(pi))*q)./(2*lambda_u);
 
 
-function z=alproot1d(alp,bet,d_eta,tp,gamfun)
+function z=alproot1d(alp,bet,d_eta,tp,gamfun,tol)
 % Stable and unstable eigenvalues
 lambda_s = abs(alp-bet*gamfun(alp));
 lambda_u = alp;
 lim = d_eta*sqrt(lambda_s);
 
 % Zero of Stone-Holmes first passage time using quadrature integration
-q = (2/sqrt(pi))*quad(@(x)f(x,d_eta^2*lambda_u),0,lim);
+q = (2/sqrt(pi))*quad(@(x)f(x,d_eta^2*lambda_u),0,lim,tol);
 z = tp+(erf(lim)*log1p(lambda_u/lambda_s)-q)/(2*lambda_u);
 
 
+function z=alprootgk(alp,d_eta,tp,gamfun,nd,tol)
+% Stable and unstable eigenvalues
+gam = gamfun(alp);
+lambda_s = abs(alp([end 1:end-1])-gam([end 1:end-1]));
+lambda_u = alp([2:end 1]);
+
+% Zero of Stone-Holmes first passage time using quadrature integration
+q = (2/sqrt(pi))*integral(@(x)f(x,d_eta.^2.*lambda_u),0,Inf,...
+    'ArrayValued',nd,'RelTol',tol,'AbsTol',tol^1.5);
+z = tp+(erf(d_eta.*sqrt(lambda_s)).*log1p(lambda_u./lambda_s)-q)./(2*lambda_u);
+
+
 function y=f(x,d_etalambda_u)
-% Integrand for quadrature integration used by alproot() and alproot1d()
-y = log1p(d_etalambda_u./x.^2).*exp(-x.^2);
+% Quadrature integration integrand for alproot(), alproot1d(), and alprootgk()
+y = log1p(d_etalambda_u.*x.^-2).*exp(-x.^2);
+
+
+function z=alprootq(alp,d_eta,tp,gamfun)
+% Stable and unstable eigenvalues
+gam = gamfun(alp);
+lambda_s = abs(alp([end 1:end-1])-gam([end 1:end-1]));
+lambda_u = alp([2:end 1]);
+
+% Zero of Stone-Holmes first passage time using PCHIP interpolation
+xs = log2(lambda_u.*d_eta.^2);
+fxs = floor(xs);
+xs = xs-fxs;
+c = stoneholmespassagetimelookuptable(min(max(fxs+53,1),959));
+f = c(:,1);
+for i = 2:4
+	f = xs(:).*f+c(:,i);
+end
+z = tp+(erf(d_eta.*sqrt(lambda_s)).*log1p(lambda_u./lambda_s)...
+    -(2/sqrt(pi))*f)./(2*lambda_u);
 
 
 function gam=gamroot(alp1,bet1,d,td,n,options,islast)
@@ -393,13 +477,12 @@ bet2 = bet1([2:end 1]);
 tol = options.TolX;
 gam0 = 2*max(alp2./bet2,alp1./bet1);
 
-gam = zeros(n,1);
-for i = 1:n
+for i = n:-1:1
     dt = 0.1*max(td);
     
     % Create function handle for gamma root equation, bracket root for gamma
     gfun = @(gam)g2(gam,alp1(i),alp2(i),bet1(i),bet2(i),d,td(i),tol);
-    bounds = bracket(gfun,gam0(i),alp1(i)/bet1(i),realmax*eps);
+    bounds = bracket(gfun,gam0(i),alp1(i)/bet1(i),eps(realmax));
     
     % Find root of gamma for a given alpha1 and alpha2
     gam(i) = fzero(gfun,bounds,options);
@@ -407,7 +490,7 @@ for i = 1:n
     if (alp2(i)+alp1(i)*bet1(i))/(bet1(i)*gam(i)) < 0.25 || islast
         % Create function handle for gamma root equation, bracket root for gamma
         gfun = @(gam)g1(gam,alp1(i),alp2(i),bet1(i),bet2(i),d,td(i),tol);
-        bounds = bracket(gfun,gam(i),alp1(i)/bet1(i),realmax*eps);
+        bounds = bracket(gfun,gam(i),alp1(i)/bet1(i),eps(realmax));
         
         % Find root of gamma for a given alpha1 and alpha2
         if islast
@@ -435,7 +518,7 @@ gam0 = 2*alp/bet;
 
 % Create function handle for gamma root equation, bracket root for gamma
 gfun = @(gam)g2(gam,alp,alp,bet,bet,d,td,tol);
-bounds = bracket(gfun,gam0,alp/bet,realmax*eps);
+bounds = bracket(gfun,gam0,alp/bet,eps(realmax));
 
 % Find root of gamma for a given alpha
 gam = fzero(gfun,bounds,options);
@@ -443,7 +526,7 @@ gam = fzero(gfun,bounds,options);
 if alp*(bet+1)/(bet*gam) < 0.25 || islast
     % Create function handle for gamma root equation, bracket root for gamma
     gfun = @(gam)g1(gam,alp,alp,bet,bet,d,td,tol);
-    bounds = bracket(gfun,gam,alp/bet,realmax*eps);
+    bounds = bracket(gfun,gam,alp/bet,eps(realmax));
 
     % Find root of gamma for a given alpha
     if islast
@@ -510,7 +593,7 @@ B5 = [9017/3168;-355/33;46732/5247;49/176;-5103/18656;0;0];
 B6 = [35/384;0;500/1113;125/192;-2187/6784;11/84;0];
 E = [71/57600;0;-71/16695;71/1920;-17253/339200;22/525;-1/40];
 
-f = zeros(3,7);
+f(3,7) = 0;
 y = [a10;d;tol^1.5];
 f(:,1) = y.*(alpv-rho*y);
 

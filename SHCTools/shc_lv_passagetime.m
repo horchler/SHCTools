@@ -1,13 +1,16 @@
-function varargout=shc_lv_passagetime(varargin)
+function varargout=shc_lv_passagetime(net,eta,method)
 %SHC_LV_PASSAGETIME  
 %
 %   TAU = SHC_LV_PASSAGETIME(NET,ETA)
 %   [TP,TD] = SHC_LV_PASSAGETIME(NET,ETA)
 %   [TAU,TP,TD] = SHC_LV_PASSAGETIME(NET,ETA)
-%   [...] = SHC_LV_PASSAGETIME(RHO,ETA)
+%   [...] = SHC_LV_PASSAGETIME(NET,ETA,METHOD)
+%
+%   See also:
+%       QUAD, INTEGRAL, PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-28-12
-%   Revision: 1.0, 6-21-12
+%   Revision: 1.0, 6-29-12
 
 
 if nargout > 3
@@ -15,29 +18,21 @@ if nargout > 3
           'Too many output arguments.');
 end
 
-% Handle variable inputs to get Alpha, Beta, Gamma, and Eta
-if nargin == 2
-    v = varargin{1};
-    if isstruct(v) && isfield(v,'rho')
-        net = v;
-        if isfield(net,'alpha')
-            alp = net.alpha;
-            if isfield(net,'beta')
-                bet = net.beta;
-            else
-                bet = alp./diag(net.rho);
-            end
-        else
-            alp = diag(net.rho);
-            bet = 1;
-        end
-        if isfield(net,'gamma')
-            gam = net.gamma;
-        else
-            error('SHCTools:shc_lv_passagetime:GammaFieldMissing',...
-                 ['The ''gamma'' field of the SHC network structure is '...
-                  'required.']);
-        end
+% Handle inputs to get Alpha, Beta, Gamma, and Method
+if nargin < 2
+    error('SHCTools:shc_lv_passagetime:TooFewInputs',...
+	      'Not enough input arguments.');
+elseif nargin > 3
+    error('SHCTools:shc_lv_passagetime:TooManyInputs',...
+    	  'Too many input arguments.');
+else
+    if nargin == 2
+        method = 'default';
+    end
+    if isstruct(net) && isfield(net,'rho')
+        alp = net.alpha;
+        bet = net.beta;
+        gam = net.gamma;
         
         if isfield(net,'delta') && any(net.delta ~= 0)
             warning('SHCTools:shc_lv_passagetime:DeltaFieldNonZero',...
@@ -45,31 +40,11 @@ if nargin == 2
                     'appears to have non-zero values, but the passage time '...
                     'analysis assumes all Delta are zero.']);
         end
-    elseif isfloat(v) && shc_ismatrix(v) && size(v,1) == size(v,2)
-        rho = v;
-        alp = diag(rho);
-        bet = 1;
-        gam = diag(circshift(rho',-1));
-        
-        if any(diag(circshift(rho',1)) ~= 0)
-            warning('SHCTools:shc_lv_passagetime:DeltaNonZero',...
-                   ['RHO matrix appears to have non-zero Delta values, but '...
-                    'the passage time analysis assumes all Delta are zero.']);
-        end
     else
         error('SHCTools:shc_lv_passagetime:NetworkStructOrRhoInvalid',...
               'Input must be a valid SHC network structure or RHO matrix.');
     end
-else
-    if nargin < 2
-        error('SHCTools:shc_lv_passagetime:TooFewInputs',...
-              'Not enough input arguments.');
-    else
-        error('SHCTools:shc_lv_passagetime:TooManyInputs',...
-              'Too many input arguments.');
-    end
 end
-eta = varargin{end};
 
 % Check types
 if ~isvector(alp) || isempty(alp) || ~isfloat(alp)
@@ -141,15 +116,40 @@ end
 
 % Neighborhood size
 d = shc_lv_neighborhood(bet);
+tol = 1e-6;
 
-% Start try-catch of warning in quad function
-TryWarningObj = trywarning('MATLAB:quad:MinStepSize');
+% Create function handles, specify integration method
+switch lower(method)
+    case {'default','quad'}
+        % Start try-catch of warning in quad function
+        TryWarningObj = trywarning('MATLAB:quad:MinStepSize');
 
-% Stone-Holmes first passage time
-tp = stoneholmes_passagetime(alp,gam,eta,d,n);
+        % Stone-Holmes first passage time
+        tp = stoneholmes_passagetime(alp,gam,eta,d,n,tol);
+        
+        % Catch possible warning in quad function
+        msg = catchwarning(TryWarningObj,'MATLAB:quad:MinStepSize');
+    case {'quadgk','integral'}
+        % Start try-catch of warning in quad function
+        TryWarningObj = trywarning('MATLAB:quadgk:MinStepSize');
 
-% Catch possible warning in quad function
-if ~isempty(TryWarningObj.catchwarning('MATLAB:quad:MinStepSize'))
+        % Stone-Holmes first passage time
+        tp = stoneholmes_passagetimegk(alp,gam,eta,d,(n ~= 1),tol);
+        
+        % Catch possible warning in quadgk function
+        msg = catchwarning(TryWarningObj,'MATLAB:quadgk:MinStepSize');
+    case {'pchip','fast','quick','interp'}
+        % Stone-Holmes first passage time
+        tp = stoneholmes_passagetimeq(alp,gam,eta,d);
+        msg = '';
+    otherwise
+        error('SHCTools:shc_lv_params:UnknownMethod',...
+             ['Unknown method. Valid methods are: ''quad'' (default), '...
+              '''quadgk'', and ''pchip''.']);
+end
+
+% Handle any caught warning
+if ~isempty(msg)
     if n == 1
         warning('SHCTools:shc_lv_passagetime:PossibleIllconditioned1D',...
                ['TP may not meet tolerances. Input specifications may be '...
@@ -185,7 +185,7 @@ end
 
 
 
-function tp=stoneholmes_passagetime(alp,gam,eta,d,n)
+function tp=stoneholmes_passagetime(alp,gam,eta,d,n,tol)
 % Stable and unstable eigenvalues
 lambda_s = abs(alp([end 1:end-1])-gam([end 1:end-1]));
 lambda_u = alp([2:end 1]);
@@ -194,17 +194,51 @@ lim = d_eta.*sqrt(lambda_s);
 d_etalambda_u = d_eta.^2.*lambda_u;
 
 % Stone-Holmes first passage time using quadrature integration
-q = zeros(n,1);
-for i = 1:n
-    q(i) = quad(@(x)log1p(d_etalambda_u(i)./x.^2).*exp(-x.^2),0,lim(i));
+for i = n:-1:1
+    q(i) = quad(@(x)f(x,d_etalambda_u(i)),0,lim(i),tol);
 end
 tp = ((2/sqrt(pi))*q-erf(lim).*log1p(lambda_u./lambda_s))./(2*lambda_u);
+
+
+function tp=stoneholmes_passagetimegk(alp,gam,eta,d,nd,tol)
+% Stable and unstable eigenvalues
+lambda_s = abs(alp([end 1:end-1])-gam([end 1:end-1]));
+lambda_u = alp([2:end 1]);
+d_eta = d./eta;
+
+% Stone-Holmes first passage time using quadrature integration
+q = (2/sqrt(pi))*integral(@(x)f(x,d_eta.^2.*lambda_u),0,Inf,...
+    'ArrayValued',nd,'RelTol',tol,'AbsTol',tol^1.5);
+tp = (q-erf(d_eta.*sqrt(lambda_s)).*log1p(lambda_u./lambda_s))./(2*lambda_u);
+
+
+function y=f(x,d_etalambda_u)
+% Quadrature integration integrand
+y = log1p(d_etalambda_u.*x.^-2).*exp(-x.^2);
+
+
+function tp=stoneholmes_passagetimeq(alp,gam,eta,d)
+% Stable and unstable eigenvalues
+lambda_s = abs(alp([end 1:end-1])-gam([end 1:end-1]));
+lambda_u = alp([2:end 1]);
+d_eta = d./eta;
+
+% Stone-Holmes first passage time using PCHIP interpolation
+xs = log2(lambda_u.*d_eta.^2);
+fxs = floor(xs);
+xs = xs-fxs;
+c = stoneholmespassagetimelookuptable(min(max(fxs+53,1),959));
+f = c(:,1);
+for i = 2:4
+	f = xs(:).*f+c(:,i);
+end
+tp = ((2/sqrt(pi))*f...
+    -erf(d_eta.*sqrt(lambda_s)).*log1p(lambda_u./lambda_s))./(2*lambda_u);
 
 
 function td=interpassage_decaytime(alp,bet,gam,d,n,dt)
 alp2 = alp([2:end 1]);
 bet2 = bet([2:end 1]);
-a2td = zeros(n,1);
 
 % Estimate a1(0) by assuming slope parallel to a1 eigenvector, a2(0) = d
 aab = alp+alp2.*bet;
@@ -214,7 +248,7 @@ a10 = (bet.*(sqrt(bet2).*(alp-d*gam).*aab...
       +sign(rad).*sqrt(abs(rad))))./(2*alp.*sqrt(bet2).*aab);
 
 % Numerically integrate for over one period (tau+td) to find a2(td) on manifold
-for i = 1:n
+for i = n:-1:1
     rho = [alp(i)/bet(i) gam(i)        0;
            0             alp(i)/bet(i) gam(i);
            0             0             alp2(i)/bet2(i)];
@@ -238,7 +272,7 @@ B5 = [9017/3168;-355/33;46732/5247;49/176;-5103/18656;0;0];
 B6 = [35/384;0;500/1113;125/192;-2187/6784;11/84;0];
 E = [71/57600;0;-71/16695;71/1920;-17253/339200;22/525;-1/40];
 
-f = zeros(3,7);
+f(3,7) = 0;
 y = [a10;d;tol^1.5];
 f(:,1) = y.*(alpv-rho*y);
 
