@@ -5,7 +5,7 @@ function shc_lv_decaytime_test(net,eta)
 %   SHC_LV_DECAYTIME_TEST(RHO,ETA)
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-15-10
-%   Revision: 1.0, 6-21-12
+%   Revision: 1.0, 7-1-12
 
 
 % Check inputs and find passage times
@@ -17,7 +17,7 @@ d = shc_lv_neighborhood(bet);
 t0 = 0;
 dt = 1e-4;
 
-opts = sdeset('RandSeed',0);
+opts = struct('RandSeed',0);
 
 figure
 if all(td_e(1) == td_e)

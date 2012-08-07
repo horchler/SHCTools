@@ -4,7 +4,7 @@ function net=buildrho(net)
 %
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-21-10
-%   Revision: 1.0, 6-29-12
+%   Revision: 1.0, 6-30-12
 
 
 % Convert from XML file to structure if necessary
@@ -19,7 +19,7 @@ shc_validatenetwork(net);
 m = net.size;
 n = net.s{1}.size;
 z(n,1) = 0;
-zz(m-n,1) = 0;
+zz = zeros(m-n,1);
 
 % Initialize parameter vectors
 net.alpha = [z+net.s{1}.alpha;zz];

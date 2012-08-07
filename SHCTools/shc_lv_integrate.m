@@ -36,41 +36,41 @@ function [A W]=shc_lv_integrate(tspan,a0,rho,eta,varargin)
 %   Platen, "Numerical solution of Stochastic Differential Equations,"
 %   Springer-Verlag, 1992.
 
-%   Andrew D. Horchler, adh9@case.edu, Created 3-30-12
-%   Revision: 1.0, 6-29-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
+%   Revision: 1.0, 6-30-12
 
 
 % Check inputs and outputs
 if nargin < 4
-    error(  'SHCTools:shc_lv_integrate:NotEnoughInputs',...
-            'Not enough input arguments.');
+    error('SHCTools:shc_lv_integrate:NotEnoughInputs',...
+          'Not enough input arguments.');
 end
 if nargin > 6
-    error(  'SHCTools:shc_lv_integrate:TooManyInputs',...
-            'Too many input arguments.');
+    error('SHCTools:shc_lv_integrate:TooManyInputs',...
+          'Too many input arguments.');
 end
 
 % Check that tspan is internally consistent
 lt = length(tspan);         % number of time steps
 if lt < 2
-    error(  'SHCTools:shc_lv_integrate:InvalidTSpanSize',...
-            'Input vector TSPAN must have length >= 2.');
+    error('SHCTools:shc_lv_integrate:InvalidTSpanSize',...
+          'Input vector TSPAN must have length >= 2.');
 end
 if ~isfloat(tspan) || ~isreal(tspan)
-    error(  'SHCTools:shc_lv_integrate:InvalidTSpanDataType',...
-            'The input vector TSPAN must be real single or double.');
+    error('SHCTools:shc_lv_integrate:InvalidTSpanDataType',...
+          'The input vector TSPAN must be real single or double.');
 end
 if any(~isfinite(tspan))
-    warning(    'SDELab:sdearguments:TSpanNotFinite',...
-                'One or more elements of the input TSPAN are not finite.');
+    warning('SHCTools:shc_lv_integrate:TSpanNotFinite',...
+            'One or more elements of the input TSPAN are not finite.');
 end
 tspan = tspan(:);
 t0 = tspan(1);
 tdir = sign(tspan(end)-t0);
 dtspan = diff(tspan);
 if tdir == 0 || (tdir > 0 && any(dtspan <= 0)) || (tdir < 0 && any(dtspan >= 0))
-	error(	'SHCTools:shc_lv_integrate:TspanNotMonotonic',...
-            'The entries in TSPAN must strictly increase or decrease.');
+	error('SHCTools:shc_lv_integrate:TspanNotMonotonic',...
+          'The entries in TSPAN must strictly increase or decrease.');
 end
 dtspan = abs(dtspan);       % length time steps
 htspan = abs(tspan(2)-t0);  % length of first time step
@@ -86,9 +86,9 @@ h = tdir*h;
 
 % Check initial conditions
 if isempty(a0) || ~isfloat(a0)
-    error(  'SHCTools:shc_lv_integrate:A0EmptyOrNotFloat',...
-           ['The initial conditions, A0, must be a non-empty floating-point '...
-            'vector.']);
+    error('SHCTools:shc_lv_integrate:A0EmptyOrNotFloat',...
+         ['The initial conditions, A0, must be a non-empty floating-point '...
+          'vector.']);
 end
 a0 = a0(:);
 N = length(a0);	% number of state variables
@@ -98,14 +98,14 @@ if isstruct(rho) && isfield(rho,'rho')
     if isfield(rho,'alpha')
         alpv = rho.alpha';
         if ~isfloat(alpv) || ~isreal(alpv) || ~all(isfinite(alpv))
-            error(  'SHCTools:shc_lv_integrate:AlphaVectorInvalid',...
-                   ['The ''alpha'' field of the SHC network structure must '...
-                    'be a finite real floating-point vector.']);
+            error('SHCTools:shc_lv_integrate:AlphaVectorInvalid',...
+                 ['The ''alpha'' field of the SHC network structure must be '...
+                  'a finite real floating-point vector.']);
         end
         if ~isvector(alpv) || size(alpv,2) ~= N
-            error(  'SHCTools:shc_lv_integrate:AlphaVectorDimensionMismatch',...
-                   ['The ''alpha'' field of the SHC network structure must '...
-                    'be a column vector the same length as A0.']);
+            error('SHCTools:shc_lv_integrate:AlphaVectorDimensionMismatch',...
+                 ['The ''alpha'' field of the SHC network structure must be '...
+                  'a column vector the same length as A0.']);
         end
         rho = rho.rho';
     else
@@ -113,35 +113,35 @@ if isstruct(rho) && isfield(rho,'rho')
         alpv = diag(rho)';
     end
     if ~isfloat(rho) || ~isreal(rho) || ~all(isfinite(rho(:)))
-        error(  'SHCTools:shc_lv_integrate:InvalidRhoStruct',...
-               ['If the input RHO is a SHC network structure, the ''rho'' '...
-                'field must be a finite real floating-point matrix.']);
+        error('SHCTools:shc_lv_integrate:InvalidRhoStruct',...
+             ['If the input RHO is a SHC network structure, the ''rho'' '...
+              'field must be a finite real floating-point matrix.']);
     end
 elseif isfloat(rho)
     if ~isreal(rho) || ~all(isfinite(rho(:)))
-        error(  'SHCTools:shc_lv_integrate:InvalidRhoMatrix',...
-                'RHO must be finite a real floating-point matrix.');
+        error('SHCTools:shc_lv_integrate:InvalidRhoMatrix',...
+              'RHO must be finite a real floating-point matrix.');
     end
     rho = rho';
     alpv = diag(rho)';
 else
-    error(  'SHCTools:shc_lv_integrate:InvalidRho',...
-           ['RHO must be finite real floating-point matrix or SHC network '...
-            'structure with a ''rho'' field.']);
+    error('SHCTools:shc_lv_integrate:InvalidRho',...
+         ['RHO must be finite real floating-point matrix or SHC network '...
+          'structure with a ''rho'' field.']);
 end
-if ndims(rho) ~= 2 || ~all(size(rho) == N)	%#ok<*ISMAT>
-    error(  'SHCTools:shc_lv_integrate:RhoDimensionMismatch',...
-            'RHO must be a square matrix the same dimension as A0.');
+if ~shc_ismatrix(rho) || ~all(size(rho) == N)
+    error('SHCTools:shc_lv_integrate:RhoDimensionMismatch',...
+          'RHO must be a square matrix the same dimension as A0.');
 end
 
 % Check Eta
 if ~isvector(eta) || ~any(length(eta) == [1 N])
-    error(  'SHCTools:shc_lv_integrate:EtaDimensionMismatch',...
-            'ETA must be a scalar or a vector the same length as A0.');
+    error('SHCTools:shc_lv_integrate:EtaDimensionMismatch',...
+          'ETA must be a scalar or a vector the same length as A0.');
 end
 if ~isfloat(eta) || ~isreal(eta) || ~all(isfinite(eta))
-    error(  'SHCTools:shc_lv_integrate:InvalidEta',...
-            'ETA must be a finite real floating-point vector.');
+    error('SHCTools:shc_lv_integrate:InvalidEta',...
+          'ETA must be a finite real floating-point vector.');
 end
 eta = eta(:)';
 D = length(eta);
@@ -164,7 +164,7 @@ for i = 5:nargin
         mu = v(:)';
         muset = false;
     elseif isstruct(v) || isempty(v) && (isnumeric(v) || iscell(v))
-        if isempty(v) && (ndims(v) ~= 2 || ~all(size(v) == 0))
+        if isempty(v) && (~shc_ismatrix(v) || ~all(size(v) == 0))
             error('SHCTools:shc_lv_integrate:InvalidOptionsStruct',...
                   'Invalid OPTIONS structure.');
         end
@@ -203,11 +203,11 @@ end
 
 % Generate Wiener increments if not all eta values are zero
 if any(eta ~= 0)
-    RandFUN = sdeget(options,'RandFUN',[],'flag');
+    RandFUN = getknownfield(options,'RandFUN',[]);
     if ~isempty(RandFUN)
         if ~isa(RandFUN,'function_handle')
-            error(  'SHCTools:shc_lv_integrate:RandFUNNotAFunctionHandle',...
-                    'RandFUN must be a function handle.');
+            error('SHCTools:shc_lv_integrate:RandFUNNotAFunctionHandle',...
+                  'RandFUN must be a function handle.');
         end
 
         % Use alternative random number generator
@@ -232,16 +232,16 @@ if any(eta ~= 0)
                     rethrow(err);
             end
         end
-        if ndims(r) ~= 2 || isempty(r) || ~isfloat(r)
-            error(  'SHCTools:shc_lv_integrate:RandFUNNot2DArray3',...
-                   ['RandFUN must return a non-empty matrix of floating '...
-                    'point values.']);
+        if ~shc_ismatrix(r) || isempty(r) || ~isfloat(r)
+            error('SHCTools:shc_lv_integrate:RandFUNNot2DArray3',...
+                 ['RandFUN must return a non-empty matrix of floating point '...
+                  'values.']);
         end
         [m n] = size(r);
         if m ~= lt-1 || n ~= N
-            error(  'SHCTools:shc_lv_integrate:RandFUNDimensionMismatch3',...
-                   ['The specified alternative RandFUN did not output a '...
-                    '%d by %d matrix as requested.',N,lt-1]);
+            error('SHCTools:shc_lv_integrate:RandFUNDimensionMismatch3',...
+                 ['The specified alternative RandFUN did not output a %d by '...
+                  '%d matrix as requested.',lt-1,N]);
         end
 
         % Calculate Wiener increments from normal variates
@@ -254,14 +254,14 @@ if any(eta ~= 0)
         % remove large temporary variable to save memory 
         clear r;
     else    % Use Matlab's random number generator for normal variates
-        RandSeed = sdeget(options,'RandSeed',[],'flag');
+        RandSeed = getknownfield(options,'RandSeed',[]);
         if ~isempty(RandSeed)
-            if ~isscalar(RandSeed) || ~isnumeric(RandSeed) || ...
-                    ~isreal(RandSeed) || ~isfinite(RandSeed) || ...
-                    RandSeed >= 2^32 || RandSeed < 0
-                error(	'SHCTools:shc_lv_integrate:InvalidRandSeed',...
-                       ['RandSeed must be a non-negative integer value less '...
-                        'than 2^32.']);
+            if ~isscalar(RandSeed) || ~isnumeric(RandSeed) ...
+                    || ~isreal(RandSeed) || ~isfinite(RandSeed) ...
+                    || RandSeed >= 2^32 || RandSeed < 0
+                error('SHCTools:shc_lv_integrate:InvalidRandSeed',...
+                     ['RandSeed must be a non-negative integer value less '...
+                      'than 2^32.']);
             end
             % Create new stream based on seed value
             Stream = RandStream.create('mt19937ar','Seed',RandSeed);
@@ -275,8 +275,8 @@ if any(eta ~= 0)
         end
 
         % Set property if antithetic random variates option is specified
-        set(Stream,'Antithetic',strcmp(sdeget(options,'Antithetic','no',...
-            'flag'),'yes'));
+        set(Stream,'Antithetic',strcmp(getknownfield(options,'Antithetic',...
+            'no'),'yes'));
         
         % Create function handle to be used for generating Wiener increments
         RandFUN = @(M,N)randn(Stream,M,N,dataType);

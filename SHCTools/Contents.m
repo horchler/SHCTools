@@ -1,5 +1,5 @@
 %SHCTools
-%  Version 1.0, 6-6-12
+%  Version 1.0, 8-7-12
 %
 %  SHC network creation, modification, and visualization, and conversion.
 %      buildrho               - Create RHO matrix from SHC network structure.
@@ -18,6 +18,7 @@
 %      shc_lv_eigs            - Eigenvalues/vectors of Lotka-Volterra system.
 %      shc_lv_ic              - Generate initial conditions on the SHC manifold.
 %      shc_lv_integrate       - Solve Lotka-Volterra SDEs numerically.
+%      shc_lv_invpassagetime  - Find noise magnitude from SHC network structure. 
 %      shc_lv_jacobian        - Jacobian of N-dimensional Lotka-Volterra system.
 %      shc_lv_ode         	  - ODEs for N-dimensional Lotka-Volterra system.
 %      shc_lv_params          - Find RHO matrix parameters from description.
@@ -45,7 +46,7 @@
 %  Compatibility maintained back through Matlab 7.4 (R2007a)
 
 %  Andrew D. Horchler, adh9 @ case . edu
-%  Created: 1-4-12, Revision: 1.0, 6-21-12
+%  Created: 1-4-12, Revision: 1.0, 8-7-12
 
 
 %  Acknowledgment of support: This material is based upon work supported by the

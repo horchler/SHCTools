@@ -6,8 +6,8 @@ function varargout=shc_lv_passagetime_simulate(varargin)
 %   [TAU,TP,TD] = SHC_LV_PASSAGETIME_SIMULATE(NET,ETA,N)
 %   [...] = SHC_LV_PASSAGETIME_SIMULATE(RHO,ETA,N)
 
-%   Andrew D. Horchler, adh9@case.edu, Created 5-28-12
-%   Revision: 1.0, 6-9-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 5-28-12
+%   Revision: 1.0, 7-1-12
 
 
 if nargout > 3
@@ -145,7 +145,7 @@ tt = t(ones(n,1),:);
 i = 1;
 waittext(0,'init');
 while n_total < N
-    opts = sdeset('RandSeed',seed);
+    opts = struct('RandSeed',seed);
     a = shc_lv_integrate(t,a0,net,eta,opts)';
     
     dagtd = diff(a>d,[],2);

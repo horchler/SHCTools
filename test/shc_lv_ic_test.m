@@ -4,7 +4,7 @@ function varargout=shc_lv_ic_test(net,eta,tol,seed)
 %
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-25-12
-%   Revision: 1.0, 6-21-12
+%   Revision: 1.0, 7-1-12
 
 
 % Check network structure, shc_lv_ic will perform further checks
@@ -72,7 +72,7 @@ else
     error('SHCTools:shc_lv_ic_test:NetworkStructInvalid',...
          ['Input must be a valid numeric SHC network structure with '...
           '''rho'', ''alpha'' (optional, default: diag(rho)), ''beta'' '...
-          '(otional, default: 1), and ''gamma'' fields.']);
+          '(optional, default: 1), and ''gamma'' fields.']);
 end
 
 % Check Eta
@@ -116,10 +116,10 @@ if nargin > 3
     if ~isreal(seed) || ~isfinite(seed) || seed < 0 || seed >= 2^32 ...
             || seed-floor(seed) ~= 0
          error('SHCTools:shc_lv_ic_test:SeedInvalid',...
-             ['The random seed must be a finite real integer greater than '...
-              'or equal to zero and less than 2^32.']);
+              ['The random seed must be a finite real integer greater than '...
+               'or equal to zero and less than 2^32.']);
     end
-    opts = sdeset('RandSeed',seed);
+    opts = struct('RandSeed',seed);
 else
     opts = [];
 end
