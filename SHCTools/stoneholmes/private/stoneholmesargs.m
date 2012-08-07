@@ -77,7 +77,7 @@ end
 ns=~all(sz == 1,2);
 
 % Check that first dimension is consistent for column expansion case
-if any(sz([false;ns(2:end)],1) ~= sz(ns(1),1))
+if ns(1) && any(sz([false;ns(2:end)],1) ~= sz(ns(1),1))
     if ~(isLike || isMedianMode)
         if isTheta
             thetastr='Theta'; 

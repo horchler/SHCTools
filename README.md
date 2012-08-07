@@ -1,7 +1,7 @@
 SHCTools
 ========
 #####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems Based&nbsp;on&nbsp;Networks&nbsp;of&nbsp;Stable&nbsp;Heteroclinic&nbsp;Channels&nbsp;(SHCs).#####
-######Version 1.0, 6-21-12######
+######Version 1.0, 8-7-12######
 &nbsp;  
 
 SHC network creation, modification, and visualization, and conversion.  
@@ -21,6 +21,7 @@ Lotka-Volterra SHC network tools.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_eigs```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_eigs.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Eigenvalues/vectors of Lotka-Volterra system.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_ic```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_ic.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Generate initial conditions on the SHC manifold.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_integrate```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_integrate.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Solve Lotka-Volterra SDEs numerically.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_invpassagetime```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_invpassagetime.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Find noise magnitude from SHC network structure.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_jacobian```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_jacobian.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Jacobian of N-dimensional Lotka-Volterra system.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_ode```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_ode.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- ODEs for N-dimensional Lotka-Volterra system.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_params```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_params.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Find RHO matrix parameters from description.  
@@ -47,7 +48,7 @@ XML validation files.
 --------
 
 Andrew D. Horchler, *adh9 @ case . edu*, [biorobots.case.edu](http://biorobots.case.edu/)  
-Created: 1-4-12, Revision: 1.0, 6-21-12  
+Created: 1-4-12, Revision: 1.0, 8-7-12  
 
 This version tested with Matlab 7.14.0.739 (R2012a)  
 Mac OS X 10.6.8 (Build: 10K549), Java 1.6.0_33-b03-424-10M3720  
