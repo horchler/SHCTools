@@ -4,51 +4,57 @@ function tau=stoneholmespassagetime(varargin)
 %   mean passage time of the Stone-Holmes distribution with positive parameters
 %   Delta, Epsilon, Lambda_U, and Lambda_S. Delta is the size of the 
 %   neighborhood, Epsilon (0 <= Epsilon << Delta) is the root-mean-square of the
-%   noise, and Lambda_U and Lambda_S are the eigenvalues with the largest
-%   positive and negative real parts, respectively. NaN is returned for any
-%   Delta <= 0, Epsilon < 0, Epsilon = Inf, Lambda_U <= 0, Lambda_U = Inf,
-%   Lambda_S <= 0, Lambda_S = Inf or certain illconditioned parameter
-%   combinations. The parameters must be scalars, length M column vectors, or
-%   M-by-N-by-... size arrays. If any combination of Delta, Epsilon, Lambda_U,
-%   or Lambda_S are column vectors, they will be applied across the
+%   noise, and Lambda_U and Lambda_S (Lambda_S >= Lambda_U) are the eigenvalues
+%   with the largest positive and negative real parts, respectively. NaN is
+%   returned for any Delta <= 0, Epsilon < 0, Epsilon = Inf, Lambda_U <= 0,
+%   Lambda_U = Inf, Lambda_S <= 0, Lambda_S = Inf, or certain illconditioned
+%   parameter combinations. The parameters must be scalars, length M column
+%   vectors, or M-by-N-by-... size arrays. If any combination of Delta, Epsilon,
+%   Lambda_U, or Lambda_S are column vectors, they will be applied across the
 %   N-dimensional columns of TAU. The size of the output TAU is that of Delta,
 %   Epsilon, Lambda_U, and Lambda_S if all are equal size arrays. If any subset
 %   of the parameters are scalars or column vectors, the size of TAU is the size
 %   of the other parameter(s).
 %
-%   TAU = STONEHOLMESPASSAGETIME(THETA,LAMBDA_U,LAMBDA_S) returns mean passage
-%   time of the Stone-Holmes distribution for the three parameter case, where
-%   Theta = Epsilon/Delta (0 <= Theta << 1) is the size of the noise relative to
-%   that of the neighborhood. NaN is returned if Theta = Inf, Theta < 0,
-%   Lambda_U <= 0, Lambda_U = Inf, Lambda_S <= 0, or Lambda_S = Inf.
+%   TAU = STONEHOLMESPASSAGETIME(THETA,LAMBDA_U,LAMBDA_S) returns the mean
+%   passage time of the Stone-Holmes distribution in the three parameter case,
+%   where Theta = Epsilon/Delta (0 <= Theta << 1) is the size of the noise
+%   relative to that of the neighborhood, Delta. NaN is returned if Theta = Inf,
+%   Theta < 0, Lambda_U <= 0, Lambda_U = Inf, Lambda_S <= 0, or Lambda_S = Inf.
+%
+%   Note:
+%       If (Delta/Epsilon)*sqrt(Lambda_U) or (Delta/Epsilon)*sqrt(Lambda_S) is
+%       less than 50, i.e., large noise (or small Lambda_U or Lambda_S), a more
+%       costly full analytical solution is used instead of a much simpler
+%       asymptotic series expansion about Infinty.
 %
 %   Example:
 %       % Generate plot similar to Fig. 3a in Stone & Holmes, 1990
 %       delta = 1; lambda_u = 0.5; lambda_s = 1;
-%       epsilon = [0.0005 0.001:0.001:0.01 0.015:0.005:0.05 rand*0.01+0.05];
+%       epsilon = [0.0005 0.001:0.001:0.01 0.015:0.005:0.05];
 %       tau = stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
 %       figure; plot(epsilon,tau,'.-',epsilon,log(delta./epsilon)/lambda_u,'.-')
 %       title(['Stone-Holmes Passage Time: $\delta$ = ' num2str(delta)...
 %           ', $\lambda_u$ = ' num2str(lambda_u) ', $\lambda_s$ = '...
 %           num2str(lambda_s) '$~~~~~~~~~~~~~~$'],'Interpreter','latex');
 %       xlabel('\epsilon'); ylabel('\tau_p'); grid on; axis([0 0.06 0 20]);
-%       h = legend(' $\tau_p$, Theoretical (Eq. 2.28, Stone \& Holmes, 1990)',...
+%       h = legend('$\tau_p$, Theoretical (Eq. 2.28, Stone \& Holmes, 1990)',...
 %           ' $\tau_p \approx $ ln$(\delta/\epsilon)/\lambda_u$',2);
 %       set(h,'Interpreter','latex','EdgeColor',[1 1 1]);
 %       p = get(h,'Position'); set(h,'Position',[p(1:2) 1.25*p(3) p(4)]);
 %   
 %   See also:
-%       STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESRND, STONEHOLMESINV,
-%       STONEHOLMESFIT, STONEHOLMESLIKE, STONEHOLMESMODE, STONEHOLMESMEDIAN,
-%       QUAD, QUADV
+%       STONEHOLMESINVPASSAGETIME, STONEHOLMESPDF, STONEHOLMESCDF,
+%       STONEHOLMESRND, STONEHOLMESINV, STONEHOLMESFIT, STONEHOLMESLIKE,
+%       STONEHOLMESMODE, STONEHOLMESMEDIAN
 
-%   Uses a personally derived analytical solution based on Eq. (2.28) in: Emily
+%   Uses a personally derived analytical solution based on Eq. (2.28) in:
 %   Emily Stone and Philip Holmes, "Random Perturbations of Heteroclinic
 %   Attractors," SIAM J. Appl. Math., Vol. 50, No. 3, pp. 726-743, Jun. 1990.
 %   http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-19-12
-%   Revision: 1.0, 8-6-12
+%   Revision: 1.0, 8-10-12
 
 
 % Check variable inputs
@@ -186,13 +192,14 @@ else
         de = delta./epsilon;
         desls = de.*sqrt(lambda_s);
         deslu = de.*sqrt(lambda_u);
+        eulergamma = 0.577215664901533;
         
-        % Use fast small noise (and non-small Lambda) approximation by default
+        % Use fast small noise (and/or large Lambda) approximation by default
         ii = (desls > 50 & deslu > 50);
         if any(ii)
+            % Asymptotic series expansion of 2F2(1/2,1/2;3/2,3/2;-Z^2) at Z=Inf
             ideslu2 = 1./deslu.^2;
             s = ideslu2.*(1/2-ideslu2.*(3/8-ideslu2.*(5/8-(105/64)*ideslu2)));
-            eulergamma = 0.577215664901533;
             tau(i) = (s+log(4*lambda_u.*lambda_s./(lambda_u+lambda_s))...
                 +eulergamma+2*log(de))./(2*lambda_u);
         end
@@ -200,24 +207,6 @@ else
         % Recalculate using full analytical solution for any large noise cases
         if any(~ii)
             ii = ~ii;
-            deslsi = desls(ii);
-            deslui = deslu(ii);
-            deslsi2 = deslsi.^2;
-            deslui2 = deslui.^2;
-            
-            % Sum infinite series for each value
-            k = 1:172;
-            gk = gamma(0.5+k);
-            isk = -1./(sqrt(pi)*k);
-            for j = nnz(ii):-1:1
-                dk = (-deslui2(j)).^k;
-                s = isk.*(gk.*gammainc(deslui2(j),0.5+k)./dk ...
-                    +dk.*(gammaincNegative(deslui2(j),0.5-k,'upper')...
-                    -gammaincNegative(deslsi2(j),0.5-k,'upper')));
-                
-                % Sum terms from smallest to largest avoiding NaNs
-                S(j) = sum([s(find(~isfinite(s),1)-1:-1:1) 0]);
-            end
             
             if ~isscalar(lambda_u)
                 lambda_u = lambda_u(ii);
@@ -225,9 +214,56 @@ else
             if ~isscalar(lambda_s)
                 lambda_s = lambda_s(ii);
             end
-            tau(ii) = (S(:)-erf(deslsi).*log1p(lambda_s./lambda_u)...
-                +(4/sqrt(pi))*deslsi.*hypergeomq([1/2 1/2],[3/2 3/2],...
-                -deslsi2))./(2*lambda_u);
+            if ~isscalar(deslu)
+                deslu = deslu(ii);
+            end
+            if ~isscalar(desls)
+                desls = desls(ii);
+            end
+            
+            % Full analytical solution to Stone-Holmes mean passage time
+            desls2 = desls.^2;
+            deslu2 = deslu.^2;
+
+            % Sum infinite series for each value
+            k = 1:170;
+            gk = gamma(0.5+k);
+            isk = -1./(sqrt(pi)*k);
+            if isscalar(deslu2) && ~isscalar(desls2)
+                dk = (-deslu2).^k;
+                t = gk.*gammainc(deslu2,0.5+k)./dk...
+                    +dk.*gammaincNegative(deslu2,0.5-k,'upper');
+                for j = length(desls2):-1:1
+                    s = isk.*(t-dk.*gammaincNegative(desls2(j),0.5-k,'upper'));
+
+                    % Sum from smallest to largest avoiding non-finite values
+                    S(j) = sum([s(find(~isfinite([s Inf]),1)-1:-1:1) 0]);
+                end
+            elseif isscalar(desls2)
+                t = gammaincNegative(desls2,0.5-k,'upper');
+                for j = length(deslu2):-1:1
+                    dk = (-deslu2(j)).^k;
+                    s = isk.*(gk.*gammainc(deslu2(j),0.5+k)./dk ...
+                        +dk.*(gammaincNegative(deslu2(j),0.5-k,'upper')-t));
+
+                    % Sum from smallest to largest avoiding non-finite values
+                    S(j) = sum([s(find(~isfinite([s Inf]),1)-1:-1:1) 0]);
+                end
+            else
+                for j = length(deslu2):-1:1
+                    dk = (-deslu2(j)).^k;
+                    s = isk.*(gk.*gammainc(deslu2(j),0.5+k)./dk ...
+                        +dk.*(gammaincNegative(deslu2(j),0.5-k,'upper')...
+                        -gammaincNegative(desls2(j),0.5-k,'upper')));
+
+                    % Sum from smallest to largest avoiding non-finite values
+                    S(j) = sum([s(find(~isfinite([s Inf]),1)-1:-1:1) 0]);
+                end
+            end
+
+            tau(ii) = (S(:)-erf(desls).*log1p(lambda_s./lambda_u)...
+                +(4/sqrt(pi))*desls.*hypergeomq([1/2 1/2],[3/2 3/2],...
+                -desls2))./(2*lambda_u);
         end
         
         % Resolve any possible underflow and error conditions

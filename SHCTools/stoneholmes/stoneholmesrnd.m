@@ -35,7 +35,8 @@ function r=stoneholmesrnd(delta,epsilon,lambda_u,varargin)
 %   
 %   See also:
 %       STONEHOLMESINV, STONEHOLMESCDF, STONEHOLMESPDF, STONEHOLMESLIKE,
-%       STONEHOLMESFIT, STONEHOLMESPASSAGETIME, RANDSTREAM
+%       STONEHOLMESFIT, STONEHOLMESPASSAGETIME, STONEHOLMESINVPASSAGETIME,
+%       RANDSTREAM
 
 %   STONEHOLMESRND uses the inversion method.
 
@@ -47,7 +48,7 @@ function r=stoneholmesrnd(delta,epsilon,lambda_u,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-6-12
-%   Revision: 1.0, 6-21-12
+%   Revision: 1.0, 8-10-12
 
 
 % Check three parameters

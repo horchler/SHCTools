@@ -5,8 +5,8 @@ function stoneholmesdemo(varargin)
 %   (Eq. 2.10 in Stone & Holmes, 1990) using default parameters of Delta = 1,
 %   Epsilon = 0.03, Lambda_U = 0.5, Lambda_S = 1. Delta is the size of the 
 %   neighborhood, Epsilon (0 <= Epsilon << Delta) is the root-mean-square of the
-%   noise, and Lambda_U and Lambda_S are the eigenvalues with the largest
-%   positive and negative real parts, respectively.
+%   noise, and Lambda_U and Lambda_S (Lambda_U <= Lambda_S) are the eigenvalues
+%   with the largest positive and negative real parts, respectively.
 %
 %   STONEHOLMESDEMO(DELTA,EPSILON,LAMBDA_U,LAMBDA_S,N) runs N simulations of the
 %   demo system with scalar parameters Delta, Epsilon, Lambda_U, and Lambda_S.
@@ -18,7 +18,8 @@ function stoneholmesdemo(varargin)
 %
 %   See also:
 %       STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESFIT, STONEHOLMESRND,
-%       STONEHOLMESINV, STONEHOLMESLIKE, STONEHOLMESMODE, STONEHOLMESMEDIAN
+%       STONEHOLMESINV, STONEHOLMESLIKE, STONEHOLMESMODE, STONEHOLMESMEDIAN,
+%       STONEHOLMESPASSAGETIME, STONEHOLMESINVPASSAGETIME
 
 %   Based on Eqs. (2.10), (2.18), (2.24), and (2.31) in:
 %   Emily Stone and Philip Holmes, "Random Perturbations of Heteroclinic
@@ -26,7 +27,7 @@ function stoneholmesdemo(varargin)
 %   http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-25-12
-%   Revision: 1.0, 6-29-12
+%   Revision: 1.0, 8-10-12
 
 
 if nargin == 0

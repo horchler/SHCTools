@@ -1,5 +1,5 @@
 %SHCTools
-%  Version 1.0, 8-7-12
+%  Version 1.0, 8-10-12
 %
 %  SHC network creation, modification, and visualization, and conversion.
 %      buildrho               - Create RHO matrix from SHC network structure.
@@ -30,6 +30,7 @@
 %      stoneholmesdemo        - Demonstrate Stone-Holmes distribution functions.
 %      stoneholmesfit         - Parameter estimates from data.
 %      stoneholmesinv         - Inverse cummulative distribution.
+%      stoneholmesinvpassagetime - Noise as a function of mean passage time.
 %      stoneholmeslike   	  - Negative log-likelihood.
 %      stoneholmesmedian 	  - Median of distribution.
 %      stoneholmesmode        - Mode (maximum value) of distribution.
@@ -46,7 +47,7 @@
 %  Compatibility maintained back through Matlab 7.4 (R2007a)
 
 %  Andrew D. Horchler, adh9 @ case . edu
-%  Created: 1-4-12, Revision: 1.0, 8-7-12
+%  Created: 1-4-12, Revision: 1.0, 8-10-12
 
 
 %  Acknowledgment of support: This material is based upon work supported by the

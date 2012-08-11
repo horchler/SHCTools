@@ -29,42 +29,43 @@ function h=hypergeomq(n,d,z)
 %   See also: HYPERGEOM, SYM/HYPERGEOM.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-22-12
-%   Revision: 1.0, 7-30-12
+%   Revision: 1.0, 8-10-12
 
 
 % Check zeroes
 if ~isvector(n) && ~isempty(n)
-    error('hypergeomq:NonVectorN','The first input must be a vector.');
+    error('SHCTools:hypergeomq:NonVectorN','The first input must be a vector.');
 end
 if ~isnumeric(n) && ~islogical(n)
-    error('hypergeomq:NonNumericN',...
+    error('SHCTools:hypergeomq:NonNumericN',...
           'The first input argument must be a numeric or logical vector.');
 end
 if ~all(isfinite(n))
-    error('hypergeomq:NonFiniteN',...
+    error('SHCTools:hypergeomq:NonFiniteN',...
           'The first input must be a vector of finite values.');
 end
 
 % Check poles
 if ~isvector(d) && ~isempty(d)
-    error('hypergeomq:NonVectorD','The second input must be a vector.')
+    error('SHCTools:hypergeomq:NonVectorD',...
+          'The second input must be a vector.');
 end
 if ~isnumeric(d) && ~islogical(d)
-    error('hypergeomq:NonNumericD',...
+    error('SHCTools:hypergeomq:NonNumericD',...
           'The second input argument must be a numeric or logical vector.');
 end
 if ~all(isfinite(d))
-    error('hypergeomq:NonFiniteD',...
+    error('SHCTools:hypergeomq:NonFiniteD',...
           'The second input must be a vector of finite values.');
 end
 
 % Check Z values
 if ~isnumeric(z) && ~islogical(z)
-    error('hypergeomq:NonNumericD',...
+    error('SHCTools:hypergeomq:NonNumericD',...
           'The third input argument must be a numeric or logical array.');
 end
 if ~all(isfinite(z))
-    error('hypergeomq:NonFiniteZ',...
+    error('SHCTools:hypergeomq:NonFiniteZ',...
           'The third input must be an array of finite values.');
 end
 
@@ -149,27 +150,31 @@ else
     
     % Try getting an analytic expression as a function of z
     mupadmexExists = (exist('mupadmex','file') == 3);
+    
     if mupadmexExists
         % Low-level function with pre-formatted arguments, no validation
-        s = mupadmex('symobj::char',charcmd(mupadmex('symobj::map','z',...
-            'symobj::hypergeom',N,D)),0);
+        sy = mupadmex('symobj::map','z','symobj::hypergeom',N,D);
+        sc = mupadmex('symobj::char',charcmd(sy),0);
+        if ~isempty(strfind(sc,'_symans_'))
+            sc = char(sy);
+        end
     else
         % Pass string arguments and convert output to string
-        s = char(hypergeom(N,D,'z'));
+        sc = char(hypergeom(N,D,'z'));
     end
     
     % Evaluate vectorized analytic expression if not function of hypergeometrics
-    if isempty(strfind(s,'hypergeom(')) && isempty(strfind(s,'_symans_'))
+    if isempty(strfind(sc,'hypergeom('))
         if ~isscalar(z)
             % Vectorize analytic expression
-            s = strrep(s,'*','.*');
-            s = strrep(s,'/','./');
-            s = strrep(s,'^','.^');
+            sc = strrep(sc,'*','.*');
+            sc = strrep(sc,'/','./');
+            sc = strrep(sc,'^','.^');
         end
         
         % Analytical expression can return errors, e.g. hypergeomq(1,0.5,-1)
         try
-            h = eval(s(2:end-1));
+            h = eval(sc(2:end-1));
             return;
         catch	%#ok<CTCH>  
         end
@@ -192,8 +197,11 @@ else
     try
         if mupadmexExists
             % Low-level function with pre-formatted arguments and no validation
-            hc = mupadmex('symobj::char',charcmd(mupadmex('symobj::map',Z,...
-                'symobj::hypergeom',N,D)),0);
+            hy = mupadmex('symobj::map',Z,'symobj::hypergeom',N,D);
+            hc = mupadmex('symobj::char',charcmd(hy),0);
+            if ~isempty(strfind(hc,'_symans_'))
+                hc = char(hy);
+            end
         else
             % Pass string arguments and convert output to string
             hc = char(hypergeom(N,D,Z));
@@ -202,20 +210,20 @@ else
         if strcmp(ME.identifier,'symbolic:mupadmex:CommandError')...
                 && (~isempty(strfind(ME.message,'Singularity'))...
                 || ~isempty(strfind(ME.message,'Division by zero')))
-            error('hypergeomq:mupadmexSingularityError',...
+            error('SHCTools:hypergeomq:mupadmexSingularityError',...
                   'One or more singularities exist at or near the Z values.');
         else
             rethrow(ME);
         end
     end
-
+    
     % Replace special constants and format for conversion
     hc = strrep(hc,'RD_INF','Inf');
     hc = strrep(hc,'RD_NINF','-Inf');
     hc = strrep(hc,'RD_NAN','NaN');
     hc = strrep(hc,' ','');
     hc = strrep(hc,'*i','i');
-
+    
     % Convert output to floating point - much faster than calling sym/double
     if isscalar(z)
         h = cast(str2double(hc(2:end-1)),outType);

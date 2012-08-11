@@ -19,14 +19,14 @@ function y=stoneholmespdf(x,varargin)
 %   See also:
 %       STONEHOLMESCDF, STONEHOLMESRND, STONEHOLMESINV, STONEHOLMESFIT,
 %       STONEHOLMESLIKE, STONEHOLMESMODE, STONEHOLMESMEDIAN,
-%       STONEHOLMESPASSAGETIME
+%       STONEHOLMESPASSAGETIME, STONEHOLMESINVPASSAGETIME
 
 %   Based on Eqs. (2.31) and (2.24) in: Emily Stone and Philip Holmes, "Random
 %   Perturbations of Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50,
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-5-12
-%   Revision: 1.0, 6-29-12
+%   Revision: 1.0, 8-10-12
 
 
 % Check variable inputs
