@@ -29,7 +29,7 @@ function h=hypergeomq(n,d,z)
 %   See also: HYPERGEOM, SYM/HYPERGEOM.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-22-12
-%   Revision: 1.0, 8-10-12
+%   Revision: 1.0, 8-11-12
 
 
 % Check zeroes
@@ -155,7 +155,7 @@ else
         % Low-level function with pre-formatted arguments, no validation
         sy = mupadmex('symobj::map','z','symobj::hypergeom',N,D);
         sc = mupadmex('symobj::char',charcmd(sy),0);
-        if ~isempty(strfind(sc,'_symans_'))
+        if ~isempty(strncmp(sc,'"_symans_',9))
             sc = char(sy);
         end
     else
@@ -199,7 +199,7 @@ else
             % Low-level function with pre-formatted arguments and no validation
             hy = mupadmex('symobj::map',Z,'symobj::hypergeom',N,D);
             hc = mupadmex('symobj::char',charcmd(hy),0);
-            if ~isempty(strfind(hc,'_symans_'))
+            if ~isempty(strncmp(hc,'"_symans_',9))
                 hc = char(hy);
             end
         else
