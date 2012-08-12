@@ -34,7 +34,7 @@ function varargout=shc_lv_eigs(rho,M)
 %       SHC_LV_JACOBIAN, SHC_LV_SYMEQUILIBRIA, BUILDRHO, SHC_CREATE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-6-12
-%   Revision: 1.0, 6-29-12
+%   Revision: 1.0, 8-11-12
 
 
 if nargout > 2
@@ -123,9 +123,12 @@ isSym = (isa(p,'sym') || isa(alpv,'sym') || isa(betv,'sym'));
 
 if nargin == 2 && ~ischar(M)
     % Check M
-    if ~validateindex(M) || ~isnumeric(M)
-        error('SHTools:shc_lv_eigs:NonScalarM',...
-              'M must be a finite real integer greater than or equal to one.');
+    if ~validateindex(M) || ~isnumeric(M) || M > m
+        error('SHTools:shc_lv_eigs:InvalidM',...
+             ['M must be a finite real integer greater than or equal to one '...
+              'and less than or equal to the dimension of RHO. Use the '...
+              '''all'' option to obtain eigenvalues and eigenvectors other '...
+              'than those for the N nodes.']);
     end
     
     eqpt(m,1) = 0;
@@ -152,8 +155,9 @@ else
     if nargin == 2
         if ~strcmpi(M,'all')
             error('SHCTools:shc_lv_eigs:InvalidStringArgument',...
-                 ['Second input argument must be the string ''all'' or a finite '...
-                  'real integer greater than or equal to one.']);
+                 ['Second input argument must be the string ''all'' or a '...
+                  'finite real integer greater than or equal to one and '...
+                  'less than or equal to the dimension of RHO.']);
         end
         
         % Solve for equilibrium points

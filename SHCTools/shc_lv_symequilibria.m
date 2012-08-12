@@ -13,7 +13,7 @@ function s=shc_lv_symequilibria(rho)
 %       SHC_LV_JACOBIAN, SHC_LV_EIGS, BUILDRHO, SHC_CREATE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-3-11
-%   Revision: 1.0, 4-21-12
+%   Revision: 1.0, 10-11-12
 
 
 % Check Rho matrix
@@ -74,7 +74,7 @@ if isempty(p) || ndims(p) ~= 2 || m ~= n    %#ok<*ISMAT>
 end
 
 % Column vector of number state variables
-a = sym(sym('a%d',[n 1]),'positive');
+a = sym(sym('a%d',[n 1]),'real');
 
 % Generate equations and convert to strings
 eq = char((a.*(alpv-p*a))');
