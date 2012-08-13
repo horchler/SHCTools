@@ -55,7 +55,7 @@ function epsilon=stoneholmesinvpassagetime(tau,varargin)
 %   http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-6-12
-%   Revision: 1.0, 8-10-12
+%   Revision: 1.0, 8-13-12
 
 
 % Check variable inputs
@@ -170,7 +170,7 @@ else
         % Initial quess for delta/epsilon assuming small noise
         eulergamma = 0.577215664901533;
         de0 = max(real(1./sqrt(-2*lambda_u.*wrightOmegaq(eulergamma...
-            +log(-2*lambda_u./(lambda_u+lambda_s))-2*lambda_u.*tau))),0);
+            +log(-2*lambda_s./(lambda_u+lambda_s))-2*lambda_u.*tau))),0);
         
         desls = de0.*sqrt(lambda_s);
         deslu = de0.*sqrt(lambda_u);
