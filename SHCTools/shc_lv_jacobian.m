@@ -16,7 +16,7 @@ function J=shc_lv_jacobian(rho,eqpt)
 %       SHC_LV_EIGS, BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA
 
 %   Andrew D. Horchler, adh9@case.edu, Created 12-1-10
-%   Revision: 1.0, 6-29-12
+%   Revision: 1.0, 8-14-12
 
 
 % Check Rho matrix
@@ -96,10 +96,6 @@ if nargin == 2
     % Calculate Jacobian
     J = p.*eqpt(:,ones(1,n));
     J(1:n+1:end) = alpv.*(1+eqpt)+p*eqpt;
-    
-    if isa(J,'sym')
-        J = simplify(J);
-    end
 else
     if isstruct(rho) && isfield(rho,'rho') && isfield(rho,'beta')
         betv = rho.beta;
@@ -123,16 +119,11 @@ else
         eqpt = -eye(n);
     end
     
-    isSym = (isa(p,'sym') || isa(alpv,'sym') || isa(eqpt,'sym'));
     z = ones(1,n);
     for i = n:-1:1
         % Calculate Jacobian
         v = eqpt(:,i);
         J{i} = p.*v(:,z);
         J{i}(1:n+1:end) = alpv.*(1+v)+p*v;
-        
-        if isSym
-            J{i} = simplify(J{i});
-        end
     end
 end

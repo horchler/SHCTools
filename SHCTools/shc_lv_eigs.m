@@ -34,7 +34,7 @@ function varargout=shc_lv_eigs(rho,M)
 %       SHC_LV_JACOBIAN, SHC_LV_SYMEQUILIBRIA, BUILDRHO, SHC_CREATE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-6-12
-%   Revision: 1.0, 8-11-12
+%   Revision: 1.0, 8-14-12
 
 
 if nargout > 2
@@ -119,8 +119,6 @@ if isempty(p) || ndims(p) ~= 2 || m ~= n    %#ok<*ISMAT>
           'equilibrium point vector.']);
 end
 
-isSym = (isa(p,'sym') || isa(alpv,'sym') || isa(betv,'sym'));
-
 if nargin == 2 && ~ischar(M)
     % Check M
     if ~validateindex(M) || ~isnumeric(M) || M > m
@@ -132,7 +130,7 @@ if nargin == 2 && ~ischar(M)
     end
     
     eqpt(m,1) = 0;
-    if isSym
+    if isa(p,'sym') || isa(alpv,'sym') || isa(betv,'sym')
         eqpt = sym(eqpt);
     end
     eqpt(M) = -betv(M);
@@ -144,10 +142,6 @@ if nargin == 2 && ~ischar(M)
     % Calculate eigenvalues/eigenvectors
     if nargout == 2
         [V D] = eig(J);
-        if isSym
-            V = simplify(V);
-            D = simplify(D);
-        end
     else
         E = eig(J);
     end
@@ -161,7 +155,7 @@ else
         end
         
         % Solve for equilibrium points
-        eqpt = -shc_lv_symequilibria(p);
+        eqpt = -shc_lv_symequilibria(rho);
         n = size(eqpt,2);
     else
         % Generate equilibrium point matrix
@@ -178,10 +172,6 @@ else
         % Calculate eigenvalues/eigenvectors
         if nargout == 2
             [V{i} D{i}] = eig(J);
-            if isSym
-                V{i} = simplify(V{i});
-                D{i} = simplify(D{i});
-            end
         else
             E(:,i) = eig(J);
         end
@@ -193,8 +183,5 @@ if nargout == 2
     varargout{1} = V;
     varargout{2} = D;
 else
-    if isSym
-        E = simplify(E);
-    end
     varargout{1} = E;
 end

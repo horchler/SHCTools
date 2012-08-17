@@ -13,7 +13,7 @@ function s=shc_lv_symequilibria(rho)
 %       SHC_LV_JACOBIAN, SHC_LV_EIGS, BUILDRHO, SHC_CREATE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-3-11
-%   Revision: 1.0, 10-11-12
+%   Revision: 1.0, 10-14-12
 
 
 % Check Rho matrix
@@ -83,7 +83,7 @@ v = char(a');
 % Remove 'matrix([[ ... ]])' from converting sym to char and solve system
 s = struct2cell(solve(eq(10:end-3),v(10:end-3)));
 if isa(p,'sym') || isa(alpv,'sym')
-    s = simplify([s{:}]');
+    s = [s{:}]';
 else
     % Convert back to class of rho and alpv if neither is symbolic
     s = cast([s{:}],superiorfloat(class(p),class(alpv)))';
