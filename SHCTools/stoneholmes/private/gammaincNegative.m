@@ -2,7 +2,8 @@ function y=gammaincNegative(x,a,tail)
 %GAMMAINCNEGATIVE  Evaluates the unscaled incomplete gamma function for all A.
 %   Y = GAMMAINCNEGATIVE(X,A) returns the lower incomplete gamma function not
 %   scaled by 1/GAMMA(A). X and A must be real and the same size (or either can
-%   be a scalar). The unscaled lower incomplete gamma function is defined as:
+%   be a scalar). NaN is returned for X < 0 or X = 0 and A not 0 or a negative
+%   integer. The unscaled lower incomplete gamma function is defined as:
 %
 %       gammaincNegative(X,A) = integral from 0 to x of t^(a-1) exp(-t) dt
 %
@@ -17,65 +18,104 @@ function y=gammaincNegative(x,a,tail)
 %
 %   See also: GAMMAINC, GAMMA.
 
-%   Based on: http://functions.wolfram.com/GammaBetaErf/Gamma2/16/01/01/0004/
+%   Based on: http://functions.wolfram.com/GammaBetaErf/Gamma2/16/01/01/
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-5-12
-%   Revision: 1.0, 8-6-12
+%   Revision: 1.0, 8-28-12
 
 
-if nargin < 3
-    tail = 'lower';
+if isscalar(a)
+    y = NaN(size(x),superiorfloat(a,x));
+else
+    y = NaN(size(a),superiorfloat(a,x));
 end
 
-i = (a >= 0);
-if any(i)
-    if isscalar(x)
-        y(i) = gamma(a(i)).*gammainc(x,a(i),tail);
-    elseif isscalar(a)
-        y = gamma(a).*gammainc(x,a,tail);
+i = find(x > 0 | (x == 0 & (a > 0 | a-floor(a) ~= 0)));
+if ~isempty(i)
+    if isscalar(a) && isscalar(x)
+        y = gammainc_recurse(a,x);
+    elseif isscalar(a) && ~isscalar(x)
+        y(i) = gammainc_recurse(a,x(i));
+    elseif isscalar(x)
+        for j = 1:numel(a(i))
+            y(i(j)) = gammainc_recurse(a(i(j)),x);
+        end
     else
-        y(i) = gamma(a(i)).*gammainc(x(i),a(i),tail);
-    end
-end
-
-i = ~i;
-if any(i)
-    if isscalar(x)
-        a = a(i);
-    elseif ~isscalar(a)
-        x = x(i);
-        a = a(i);
-    end
-    
-    n = min(-floor(a),171);
-    an = max(a+n,0);
-    ga = gamma(a);
-    
-    if isscalar(x)
-        k = n-1:-1:0;
-        s = sum(x.^k.*ga./gamma(a+k+1));
-    else
-        s = ga./gamma(a+1);
-        for k = n-1:-1:1
-            s = s+x.^k.*ga./gamma(a+k+1);
+        for j = 1:numel(a(i))
+            y(i(j)) = gammainc_recurse(a(i(j)),x(i(j)));
         end
     end
     
-    if isscalar(a)
-        y = (-1).^n.*gamma(1-an).*gamma(an).*gammainc(x,an,tail)./gamma(1-an+n)-exp(-x).*x.^a.*s;
-        j = isnan(y);
-        if any(j)
-            y(j) = exp(-x(j)).*x(j).^a./(x(j)+a);
+    if nargin < 3 || strcmpi(tail,'lower')
+        if isscalar(a)
+            y(i) = gamma(a)-y(i);
+        else
+            y(i) = gamma(a(i))-y(i);
         end
-    else
-        y(i) = (-1).^n.*gamma(1-an).*gamma(an).*gammainc(x,an,tail)./gamma(1-an+n)-exp(-x).*x.^a.*s;
-        j = isnan(y(i));
-        if any(j)
-            if isscalar(x)
-                y(j) = exp(-x).*x.^a(j)./(x+a(j));
-            else
-                y(j) = exp(-x(j)).*x(j).^a(j)./(x(j)+a(j));
-            end
+    end
+end
+
+
+function y=gammainc_recurse(a,x)
+if a == 0
+    y = expint(x);
+elseif a > 0
+    i = (x == 0);
+    if any(i)
+        y(i) = gamma(a);
+    end
+    
+    i = ~i;
+    if any(i)
+        y(i) = gamma(a).*gammainc(x(i),a,'upper');
+    end
+elseif a < 0
+    i = (x == 0 | x == Inf);
+    if any(i)
+        if a < -171 || x == Inf
+            y(i) = 0;
+        else
+            y(i) = -pi*csc(-pi*a)/gamma(1-a);
+        end
+    end
+    
+    i = (~i & a < -5 & x > 10 & x > -0.5*a);
+    if any(i)
+        % Asymtotic series expansion from Gautschi (1959)
+        xi = x(i);
+        z = (xi-a).^2;
+        y(i) = exp(-xi).*xi.^a.*(1-xi./z+xi.*(2*xi+a)./z.^2-xi.*(6*xi.^2 ...
+            +8*a*xi+a^2)./z.^3+xi.*(24*xi.^3+58*a*xi.^2+22*a^2*xi...
+            -a^3)./z.^4)./(xi-a);
+    end
+    
+    i = (~i & x > 0);
+    if any(i)
+        xi = x(i);
+        n = -floor(a);
+        an = 1-a-n;
+        
+        k = 0:n-1;
+        if n > 150
+            ga = gammaln(an);
+            ank = exp(gammaln(an+k)-ga);
+            p = (-1)^-n*exp(ga-gammaln(1-a));
+        else
+            ga = gamma(an);
+            ank = gamma(an+k)/ga;
+            p = (-1)^-n*ga/gamma(1-a);
+        end
+        
+        for j = numel(xi):-1:1
+            v = (-xi(j)).^-k.*ank;
+            s(j) = sum(v(isfinite(v)));
+        end
+        
+        ex = exp(-xi).*xi.^-an.*s;
+        if an == 1
+            y(i) = (expint(xi)-ex)*p;
+        else
+            y(i) = (gammainc_recurse(a+n,xi)-ex)*p;
         end
     end
 end
