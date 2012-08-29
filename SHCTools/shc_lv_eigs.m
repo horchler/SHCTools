@@ -4,8 +4,9 @@ function varargout=shc_lv_eigs(rho,M)
 %   node of the N-dimensional Lotka-Volterra SHC network described by the
 %   connection matrix RHO. RHO is an N-by-N floating-point or symbolic matrix or
 %   an SHC network structure. If RHO is a matrix, the amplitude scaling
-%   parameters, beta, are asummed to all be equal to one. If RHO is an SHC
-%   network structure, arbitrary beta values may be used. M is a scalar integer.
+%   parameters, Beta, are asummed to all be equal to one. If RHO is an SHC
+%   network structure, arbitrary Beta values may be used. M (1 <= M <= N) is a
+%   scalar integer.
 %
 %   [V,D] = SHC_LV_EIGS(RHO,M) produces an N-by-N diagonal matrix D of
 %   eigenvalues and a full N-by-N matrix V whose columns are the corresponding
@@ -31,10 +32,11 @@ function varargout=shc_lv_eigs(rho,M)
 %   V whose columns are the corresponding eigenvectors are returned.
 %
 %   See also:
-%       SHC_LV_JACOBIAN, SHC_LV_SYMEQUILIBRIA, BUILDRHO, SHC_CREATE
+%       SHC_LV_JACOBIAN, SHC_LV_SYMEQUILIBRIA, BUILDRHO, SHC_CREATE, 
+%       SHC_LV_LAMBDA_US
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-6-12
-%   Revision: 1.0, 8-14-12
+%   Revision: 1.0, 8-29-12
 
 
 if nargout > 2
