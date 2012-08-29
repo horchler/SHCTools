@@ -23,10 +23,14 @@ function epsilon=stoneholmesinvpassagetime(tau,varargin)
 %
 %   Note:
 %       If (Delta/Epsilon0)*sqrt(Lambda_U) or (Delta/Epsilon0)*sqrt(Lambda_S) is
-%       less than 50, i.e., large noise (or small Lambda_U or Lambda_S), a more
+%       less than 5, i.e., large noise (or small Lambda_U or Lambda_S), a more
 %       costly full analytical solution is used instead of a much simpler
-%       asymptotic series expansion about Infinty. Epsilon0 is an initial first
-%       order estimate of Epsilon.
+%       asymptotic series expansion about Infinity. Epsilon0 is an initial first
+%       order estimate of Epsilon. Note that the large noise case may or may not
+%       be useful in practice (again, Stone & Holmes define Epsilon << Delta),
+%       but this function does provide a reliable solution to the integral
+%       expression defining the mean passage time regardless of the physical
+%       significance of the model.
 %
 %   Example:
 %       % Plot inverse passage time solution for wide range of Tau and Lambda_U
@@ -49,13 +53,13 @@ function epsilon=stoneholmesinvpassagetime(tau,varargin)
 %       STONEHOLMESINV, STONEHOLMESFIT, STONEHOLMESLIKE, STONEHOLMESMODE,
 %       STONEHOLMESMEDIAN
 
-%   Uses a personally derived analytical solution based on Eq. (2.28) in:
-%   Emily Stone and Philip Holmes, "Random Perturbations of Heteroclinic
-%   Attractors," SIAM J. Appl. Math., Vol. 50, No. 3, pp. 726-743, Jun. 1990.
-%   http://jstor.org/stable/2101884
+%   Uses a personally derived analytical solution and approximation based on
+%   Eq. (2.28) in: Emily Stone and Philip Holmes, "Random Perturbations of
+%   Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50, No. 3, pp. 726-743,
+%   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-6-12
-%   Revision: 1.0, 8-13-12
+%   Revision: 1.0, 8-28-12
 
 
 % Check variable inputs
@@ -181,7 +185,7 @@ else
             lambda_sj = lambda_s((j-1)*(~isscalar(lambda_s))+1);
             
             % Create function handle
-            if desls(j) > 50 && deslu(j) > 50
+            if desls(j) > 5 && deslu(j) > 5
                 derng = [1 eps(realmax(dtype))];
                 
                 % Fast small noise (and/or large Lambda) approximation
@@ -252,8 +256,9 @@ end
 
 function z=epsilonroot_small(de,tau,lambda_u,lambda_s)
 % Based on asymptotic series expansion of 2F2(1/2,1/2;3/2,3/2;-1/Z^2) at Z=Inf
-ideslu2 = 1/(lambda_u*de^2);
-s = ideslu2.*(1/2-ideslu2.*(3/8-ideslu2.*(5/8-(105/64)*ideslu2)));
+ideslu2 = 1./(4*lambda_u*de^2);
+s = ideslu2.*(2-ideslu2.*(6-ideslu2.*(40-ideslu2.*(420-ideslu2.*(6048 ...
+    -ideslu2.*(110880-2436480*ideslu2))))));
 eulergamma = 0.577215664901533;
 z = (s+log(4*lambda_u*lambda_s/(lambda_u+lambda_s))+eulergamma...
     +2*log(de))/(2*lambda_u)-tau;
@@ -266,16 +271,13 @@ deslu = de*sqrt(lambda_u);
 desls2 = desls^2;
 deslu2 = deslu^2;
 
-% Terms for infinite series
-k = 1:170;
+% Terms for infinite series, sum from small to large avoiding non-finite values
+k = 172:-1:1;
 dk = (-deslu2).^k;
 s = (gamma(0.5+k).*gammainc(deslu2,0.5+k)./dk ...
     +dk.*(gammaincNegative(deslu2,0.5-k,'upper')...
     -gammaincNegative(desls2,0.5-k,'upper')))./(sqrt(pi)*k);
 
-% Sum from smallest to largest avoiding non-finite values
-s = sum([s(find(~isfinite([s Inf]),1)-1:-1:1) 0]);
-
-z = (-s-erf(desls)*log1p(lambda_s/lambda_u)...
+z = (-sum(s(isfinite(s)))-erf(desls)*log1p(lambda_s/lambda_u)...
     +(4/sqrt(pi))*desls*hypergeomq([0.5 0.5],[1.5 1.5],-desls2))/(2*lambda_u)...
     -tau;

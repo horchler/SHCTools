@@ -24,9 +24,13 @@ function tau=stoneholmespassagetime(varargin)
 %
 %   Note:
 %       If (Delta/Epsilon)*sqrt(Lambda_U) or (Delta/Epsilon)*sqrt(Lambda_S) is
-%       less than 50, i.e., large noise (or small Lambda_U or Lambda_S), a more
+%       less than 5, i.e., large noise (or small Lambda_U or Lambda_S), a more
 %       costly full analytical solution is used instead of a much simpler
-%       asymptotic series expansion about Infinty.
+%       asymptotic series expansion about Infinity. Note that the large noise
+%       case may or may not be useful in practice (again, Stone & Holmes define
+%       Epsilon << Delta), but this function does provide a reliable solution to
+%       the integral expression defining the mean passage time regardless of the
+%       physical significance of the model. 
 %
 %   Example:
 %       % Generate plot similar to Fig. 3a in Stone & Holmes, 1990
@@ -48,13 +52,13 @@ function tau=stoneholmespassagetime(varargin)
 %       STONEHOLMESRND, STONEHOLMESINV, STONEHOLMESFIT, STONEHOLMESLIKE,
 %       STONEHOLMESMODE, STONEHOLMESMEDIAN
 
-%   Uses a personally derived analytical solution based on Eq. (2.28) in:
-%   Emily Stone and Philip Holmes, "Random Perturbations of Heteroclinic
-%   Attractors," SIAM J. Appl. Math., Vol. 50, No. 3, pp. 726-743, Jun. 1990.
-%   http://jstor.org/stable/2101884
+%   Uses a personally derived analytical solution and approximation based on
+%   Eq. (2.28) in: Emily Stone and Philip Holmes, "Random Perturbations of
+%   Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50, No. 3, pp. 726-743,
+%   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-19-12
-%   Revision: 1.0, 8-10-12
+%   Revision: 1.0, 8-28-12
 
 
 % Check variable inputs
@@ -195,11 +199,12 @@ else
         eulergamma = 0.577215664901533;
         
         % Use fast small noise (and/or large Lambda) approximation by default
-        ii = (desls > 50 & deslu > 50);
+        ii = (desls > 5 & deslu > 5);
         if any(ii)
             % Asymptotic series expansion of 2F2(1/2,1/2;3/2,3/2;-Z^2) at Z=Inf
-            ideslu2 = 1./deslu.^2;
-            s = ideslu2.*(1/2-ideslu2.*(3/8-ideslu2.*(5/8-(105/64)*ideslu2)));
+            ideslu2 = 1./(4*deslu.^2);
+            s = ideslu2.*(2-ideslu2.*(6-ideslu2.*(40-ideslu2.*(420 ...
+                -ideslu2.*(6048-ideslu2.*(110880-2436480*ideslu2))))));
             tau(i) = (s+log(4*lambda_u.*lambda_s./(lambda_u+lambda_s))...
                 +eulergamma+2*log(de))./(2*lambda_u);
         end
@@ -225,8 +230,8 @@ else
             desls2 = desls.^2;
             deslu2 = deslu.^2;
 
-            % Sum infinite series for each value
-            k = 1:170;
+            % Sum infinite series from small to large avoiding non-finite values
+            k = 172:-1:1;
             gk = gamma(0.5+k);
             isk = -1./(sqrt(pi)*k);
             if isscalar(deslu2) && ~isscalar(desls2)
@@ -235,9 +240,8 @@ else
                     +dk.*gammaincNegative(deslu2,0.5-k,'upper');
                 for j = length(desls2):-1:1
                     s = isk.*(t-dk.*gammaincNegative(desls2(j),0.5-k,'upper'));
-
-                    % Sum from smallest to largest avoiding non-finite values
-                    S(j) = sum([s(find(~isfinite([s Inf]),1)-1:-1:1) 0]);
+                    
+                    S(j) = sum(s(isfinite(s)));
                 end
             elseif isscalar(desls2)
                 t = gammaincNegative(desls2,0.5-k,'upper');
@@ -245,9 +249,8 @@ else
                     dk = (-deslu2(j)).^k;
                     s = isk.*(gk.*gammainc(deslu2(j),0.5+k)./dk ...
                         +dk.*(gammaincNegative(deslu2(j),0.5-k,'upper')-t));
-
-                    % Sum from smallest to largest avoiding non-finite values
-                    S(j) = sum([s(find(~isfinite([s Inf]),1)-1:-1:1) 0]);
+                    
+                    S(j) = sum(s(isfinite(s)));
                 end
             else
                 for j = length(deslu2):-1:1
@@ -255,12 +258,11 @@ else
                     s = isk.*(gk.*gammainc(deslu2(j),0.5+k)./dk ...
                         +dk.*(gammaincNegative(deslu2(j),0.5-k,'upper')...
                         -gammaincNegative(desls2(j),0.5-k,'upper')));
-
-                    % Sum from smallest to largest avoiding non-finite values
-                    S(j) = sum([s(find(~isfinite([s Inf]),1)-1:-1:1) 0]);
+                    
+                    S(j) = sum(s(isfinite(s)));
                 end
             end
-
+            
             tau(ii) = (S(:)-erf(desls).*log1p(lambda_s./lambda_u)...
                 +(4/sqrt(pi))*desls.*hypergeomq([1/2 1/2],[3/2 3/2],...
                 -desls2))./(2*lambda_u);
