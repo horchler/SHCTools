@@ -36,7 +36,7 @@ function varargout=shc_lv_eigs(rho,M)
 %       SHC_LV_LAMBDA_US
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-6-12
-%   Revision: 1.0, 8-29-12
+%   Revision: 1.0, 8-30-12
 
 
 if nargout > 2
@@ -115,7 +115,7 @@ else
     [m n] = size(p);
     betv = ones(n,1);
 end
-if isempty(p) || ndims(p) ~= 2 || m ~= n    %#ok<*ISMAT>
+if isempty(p) || ~shc_ismatrix(p) || m ~= n
     error('SHTools:shc_lv_eigs:RhoDimensionMismatch',...
          ['RHO must be a non-empty square matrix the same dimension as the '...
           'equilibrium point vector.']);
