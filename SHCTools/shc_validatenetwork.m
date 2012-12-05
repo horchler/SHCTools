@@ -4,7 +4,7 @@ function shc_validatenetwork(net,usestrict)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-11-12
-%   Revision: 1.0, 6-5-12
+%   Revision: 1.0, 11-19-12
 
 
 % Check base structure input
@@ -31,7 +31,7 @@ if nargin == 2
     end
     
     f = fieldnames(net);
-    v = {'s','size','alpha','beta','gamma','delta','order','T','rho'};
+    v = {'s','size','alpha','beta','gamma','delta','nu','order','T','rho'};
     for i = 1:length(f)
         if ~any(strcmp(f{i},v))
             error(  'SHCTools:shc_validatenetwork:InvalidArgument',...
@@ -142,6 +142,30 @@ if isfield(net,'delta')
         error(  'SHCTools:shc_validatenetwork:InvalidParameter',...
                ['The ''delta'' field of the combined network must be a '...
                 'finite real scalar value or column vector.']);
+    end
+end
+
+if isfield(net,'nu')
+    if ~isfield(net,'size')
+        error(  'SHCTools:shc_validatenetwork:InvalidParameter',...
+               ['The ''nu'' field of the combined network is specified, but '...
+                'the ''size'' field is not.']);
+    end
+    if ~isvector(net.nu) || ~all(size(net.nu) == [net.size 1]) 
+        error(  'SHCTools:shc_validatenetwork:InvalidParameter',...
+               ['The ''nu'' field of the combined network must be a scalar '...
+                'value or a column vector the same dimension as the network '...
+                '''size'' field.']);
+    end
+    if ~(isfloat(net.nu) || isa(net.nu,'sym'))
+        error(  'SHCTools:shc_validatenetwork:InvalidParameter',...
+               ['The ''nu'' field of the combined network must be a '...
+                'floating-point or symbolic scalar value or column vector.']);
+    end
+    if ~isreal(net.nu) || any(abs(net.nu) == Inf) || any(isnan(net.nu))
+        error(  'SHCTools:shc_validatenetwork:InvalidParameter',...
+               ['The ''nu'' field of the combined network must be a finite '...
+                'real scalar value or column vector.']);
     end
 end
 

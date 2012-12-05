@@ -4,7 +4,7 @@ function net=shc_initialize(net,reinit)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-14-12
-%   Revision: 1.0, 6-29-12
+%   Revision: 1.0, 11-19-12
 
 
 % Check for 'reset' mode to clear and reset 'children', 'index,' and 'T' fields
@@ -55,9 +55,16 @@ for i = 1:nnets
         s.beta = 1;
     end
     
-    % Delta is optional, but needs to be set to 0 if not specified
-    if ~isfield(s,'delta')
-        s.delta = 0;
+    if ~isfield(s,'nu')
+        if ~isfield(s,'gamma')
+            error('SHCTools:shc_initialize:GammaMissing',...
+                  'Network %d does not have required field named ''gamma''.',i);  
+        end
+        
+        % Delta is optional, but needs to be set to 0 if not specified
+        if ~isfield(s,'delta')
+            s.delta = 0;
+        end
     end
     
     % Calculate 'index' field and build 'children' field values
@@ -120,6 +127,29 @@ for i = 1:nnets
             if strcmp(s.type,'contour')
                 s.T(j,j+s.direction*(s.size-1)) = true;
             end
+        end
+    end
+    
+    % Construct 'gamma' and 'delta' fields from 'nu' field
+    if isfield(s,'nu')
+        alp = s.alpha;
+        if s.size > 1 && (~isscalar(alp) || ~isscalar(s.beta) ...
+                || ~isscalar(s.nu))
+            s.gamma = double(~s.T);
+            s.gamma(1:s.size+1:end) = 0;
+            for j = 1:s.size
+                for k = 1:s.size
+                    if s.gamma(j,k) ~= 0
+                        s.gamma(j,k) = alp(j)./s.beta(k)+alp(k).*s.nu(k);
+                    end
+                end
+            end
+            
+            s.delta = alp./s.beta([end 1:end-1])...
+                -alp([end 1:end-1])./s.nu([end 1:end-1]); 
+        else
+            s.gamma = alp/s.beta+alp*s.nu;
+            s.delta = alp/s.beta-alp/s.nu;
         end
     end
     

@@ -2,19 +2,21 @@ function net=shc_createnetwork(nettype,params,varargin)
 %SHC_CREATENETWORK  Create SHC network from parameters or transition matrix.
 %
 %   NET = SHC_CREATENETWORK(NETTYPE,PARAMS)
+%   PARAMS = {ALPHA,BETA,GAMMA,DELTA}
+%   PARAMS = {ALPHA,BETA,NU}
 %   NET = SHC_CREATENETWORK(NETTYPE,PARAMS,N)
 %   NET = SHC_CREATENETWORK('custom',PARAMS,T)
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-28-12
-%   Revision: 1.0, 6-29-12
+%   Revision: 1.0, 11-19-12
 
 
 % Handle network type
 nettype = lower(nettype);
 if ~any(strcmp(nettype,{'contour','channel','cluster','custom'}))
     error('SHCTools:shc_create:InvalidNetworkType',...
-         ['The network type must be ''contour'', ''channel'', ''cluster'', '...
-          'or ''custom''.']);
+         ['The network type must be ''contour'', ''channel'', '...
+          '''cluster'', or ''custom''.']);
 end
 isCluster = strcmp(nettype,'cluster');
 isCustom = strcmp(nettype,'custom');
@@ -26,22 +28,14 @@ if ~iscell(params)
           'The input parameters must be a cell array.');
 end
 lp = length(params);
-if lp == 2
-    alp = params{1};
-    bet = 1;
-    gam = params{2};
-    del = 0;
-    if isChannelContour
-        netdir = 1;
-    end
-elseif lp == 3
+if lp == 3
     alp = params{1};
     bet = params{2};
-    gam = params{3};
-    del = 0;
+    nu = params{3};
     if isChannelContour
         netdir = 1;
     end
+    isNuNet = true;
 elseif lp == 4
     alp = params{1};
     bet = params{2};
@@ -50,16 +44,9 @@ elseif lp == 4
     if isChannelContour
         netdir = 1;
     end
-elseif lp == 5
-    alp = params{1};
-    bet = params{2};
-    gam = params{3};
-    del = params{4};
-    if isChannelContour
-        netdir = params{5};
-    end
+    isNuNet = false;
 else
-    if lp < 2
+    if lp < 3
         error('SHCTools:shc_createnetwork:TooFewParams',...
               'Not enough parameters.');
     else
@@ -76,8 +63,8 @@ end
 if ~isreal(alp) || any(alp == Inf) || any(isnan(alp)) || ...
         isnumeric(alp) && any(alp <= 0)
     error('SHCTools:shc_createnetwork:AlphaNonFiniteReal',...
-         ['Alpha must be a positive finite real floating-point or symbolic '...
-          'vector.']);
+         ['Alpha must be a positive finite real floating-point or '...
+          'symbolic vector.']);
 end
 
 if ~(isnumeric(bet) || isa(bet,'sym')) || ~isvector(bet) || isempty(bet)
@@ -91,26 +78,40 @@ if ~isreal(bet) || any(bet == Inf) || any(isnan(bet)) || ...
           'vector.']);
 end
 
-if ~(isnumeric(gam) || isa(gam,'sym')) || ~isvector(gam) || isempty(gam)
-    error('SHCTools:shc_createnetwork:GammaInvalid',...
-          'Gamma must be a non-empty floating-point or symbolic vector.');
-end
-if ~isreal(gam) || any(gam == Inf) || any(isnan(gam)) || ...
-        isnumeric(gam) && any(gam < 0)
-    error('SHCTools:shc_createnetwork:GammaNonFiniteReal',...
-         ['Gamma must be a positive finite real floating-point or symbolic '...
-          'vector.']);
-end
+if isNuNet
+    if ~(isnumeric(nu) || isa(nu,'sym')) || ~isvector(nu) || isempty(nu)
+        error('SHCTools:shc_createnetwork:NuInvalid',...
+              'Nu must be a non-empty floating-point or symbolic vector.');
+    end
+    if ~isreal(nu) || any(nu == Inf) || any(isnan(nu)) ...
+            || isnumeric(nu) && any(nu <= 0)
+        error('SHCTools:shc_createnetwork:NuNonFiniteReal',...
+             ['Nu must be a positive finite real floating-point or symbolic '...
+              'vector.']);
+    end
+else
+    if ~(isnumeric(gam) || isa(gam,'sym')) || ~isvector(gam) || isempty(gam)
+        error('SHCTools:shc_createnetwork:GammaInvalid',...
+              'Gamma must be a non-empty floating-point or symbolic vector.');
+    end
+    if ~isreal(gam) || any(gam == Inf) || any(isnan(gam)) ...
+            || isnumeric(gam) && any(gam <= 0)
+        error('SHCTools:shc_createnetwork:GammaNonFiniteReal',...
+             ['Gamma must be a positive finite real floating-point or '...
+              'symbolic vector.']);
+    end
 
-if ~(isnumeric(del) || isa(del,'sym')) || ~isvector(del) || isempty(del)
-    error('SHCTools:shc_createnetwork:DeltaInvalid',...
-          'Delta must be a non-empty floating-point or symbolic vector.');
-end
-if ~isreal(del) || any(del == Inf) || any(isnan(del)) || ...
-        isnumeric(del) && any(del < 0)
-    error('SHCTools:shc_createnetwork:DeltaNonFiniteReal',...
-         ['Delta must be a positive finite real floating-point symbolic '...
-          'vector.']);
+    if ~(isnumeric(del) || isa(del,'sym')) || ~isvector(del) || isempty(del)
+        error('SHCTools:shc_createnetwork:DeltaInvalid',...
+              'Delta must be a non-empty floating-point or symbolic vector.');
+    end
+
+    if isnumeric(del) && ~isreal(del) || any(del == Inf) || any(isnan(del)) ...
+            || isnumeric(del) && any(del < 0)
+        error('SHCTools:shc_createnetwork:DeltaNonFiniteReal',...
+             ['Delta must be a positive finite real floating-point symbolic '...
+              'vector.']);
+    end
 end
 
 if isChannelContour
@@ -126,13 +127,24 @@ if isChannelContour
 end
 
 % Check parameter lengths
-lv = [length(alp) length(bet) length(gam) length(del)];
-n = max(lv);
-lv = lv(lv ~= 1);
-if length(lv) > 1 && ~all(lv(2:end) == lv(1))
-    error('SHCTools:shc_createnetwork:DimensionMismatchParameters',...
-         ['If any combination of Alpha, Beta, Gamma, and Delta are '...
-          'non-scalar vectors, they must have the same lengths.']);
+if isNuNet
+    lv = [length(alp) length(bet) length(nu)];
+    n = max(lv);
+    lv = lv(lv ~= 1);
+    if length(lv) > 1 && ~all(lv(2:end) == lv(1))
+        error('SHCTools:shc_createnetwork:DimensionMismatchNuParameters',...
+             ['If any combination of Alpha, Beta, and Nu are non-scalar '...
+              'vectors, they must have the same lengths.']);
+    end
+else
+    lv = [length(alp) length(bet) length(gam) length(del)];
+    n = max(lv);
+    lv = lv(lv ~= 1);
+    if length(lv) > 1 && ~all(lv(2:end) == lv(1))
+        error('SHCTools:shc_createnetwork:DimensionMismatchParameters',...
+             ['If any combination of Alpha, Beta, Gamma, and Delta are '...
+              'non-scalar vectors, they must have the same lengths.']);
+    end
 end
     
 % Handle variable input
@@ -165,16 +177,16 @@ elseif nargin > 2
              ['The network size, N, must be a positive finite real scalar '...
               'integer.']);
     end
-    if n ~= 1
+    if n > 1 && m ~= n && m ~= 1
         error('SHCTools:shc_createnetwork:NonScalarParams',...
              ['All input parameters must be scalar if the network size, N, '...
               'is specified']);
     end
-    if strcmp(nettype,'contour') && m < 3
+    n = max(m,n);
+    if strcmp(nettype,'contour') && n < 3
         error('SHCTools:shc_createnetwork:ContourNetworkSizeTooSmall',...
               'The minimum contour network size, N, is 3.');
     end
-    n = m;
 end
 if nargin > 3
     error('SHCTools:shc_createnetwork:TooManyInputs',...
@@ -182,75 +194,99 @@ if nargin > 3
 end
 
 % If any of the parameter are symbolic
-if isa(alp,'sym') || isa(bet,'sym') || isa(gam,'sym') || isa(del,'sym')
+%{
+if isa(alp,'sym') || isa(bet,'sym') || isNuNet && isa(nu,'sym') ...
+        || ~isNuNet && (isa(gam,'sym') || isa(del,'sym'))
     isSym =  true;
 else
     isSym =  false;
 end
-
-% Check stability
-if ~isSym && all(del == 0) && any(gam < 2*alp./bet)
-    warning('SHCTools:shc_createnetwork:StabilityCriterion',...
-           ['Stability criterion not met for some states '...
-            '(Gamma < 2*Alpha/Beta).']);
-end
+%}
 
 % If elements of vector parameters are equal, collapse to n = 1, else expand
-N = n;
-if n > 1 && all(alp(1) == alp) && all(bet(1) == bet) && all(gam(1) == gam) ...
-        && all(del(1) == del)
-	alp = alp(1);
-    bet = bet(1);
-    gam = gam(1);
-    del = del(1);
-    n = 1;
+if isNuNet
+    N = n;
+    if n > 1 && all(alp(1) == alp) && all(bet(1) == bet) && all(nu(1) == nu)
+        alp = alp(1);
+        bet = bet(1);
+        nu = nu(1);
+        n = 1;
+    else
+        z = ones(n,1);
+        if isscalar(alp)
+            alp = alp(z);
+        else
+            alp = alp(:);
+        end
+        if isscalar(bet)
+            bet = bet(z);
+        else
+            bet = bet(:);
+        end
+        if isscalar(nu)
+            nu = nu(z);
+        else
+            nu = nu(:);
+        end
+    end
 else
-    z = ones(n,1);
-    if isscalar(alp)
-        alp = alp(z);
+    N = n;
+    if n > 1 && all(alp(1) == alp) && all(bet(1) == bet) ...
+            && all(gam(1) == gam) && all(del(1) == del)
+        alp = alp(1);
+        bet = bet(1);
+        gam = gam(1);
+        del = del(1);
+        n = 1;
     else
-        alp = alp(:);
-    end
-    if isscalar(bet)
-        bet = bet(z);
-    else
-        bet = bet(:);
-    end
-    if isscalar(gam)
-        gam = gam(z);
-    else
-        gam = gam(:);
-    end
-    if isscalar(del)
-        del = del(z);
-    else
-        del = del(:);
+        z = ones(n,1);
+        if isscalar(alp)
+            alp = alp(z);
+        else
+            alp = alp(:);
+        end
+        if isscalar(bet)
+            bet = bet(z);
+        else
+            bet = bet(:);
+        end
+        if isscalar(gam)
+            gam = gam(z);
+        else
+            gam = gam(:);
+        end
+        if isscalar(del)
+            del = del(z);
+        else
+            del = del(:);
+        end
     end
 end
 
 % Build network structure
 net = struct;
 if isCustom
-    for i = n:-1:2
-        net.s{i} = struct('type','custom','size',1,'alpha',alp(i),...
-                          'beta',bet(i),'gamma',gam(i),'delta',del(i),...
-                          'parent',1,'node',i);
+    if isNuNet
+        net.s{1} = struct('type','custom','size',N,'alpha',alp,'beta',bet,...
+                          'nu',nu,'T',logical(T));
+    else
+        net.s{1} = struct('type','custom','size',N,'alpha',alp,'beta',bet,...
+                          'gamma',gam,'delta',del,'T',logical(T));
     end
-    net.s{1} = struct('type','custom','size',N,'alpha',alp(1),'beta',bet(1),...
-                      'gamma',gam(1),'delta',del(1),'T',logical(T));
 elseif isCluster
-    for i = n:-1:2
-        net.s{i} = struct('type','cluster','size',1,'alpha',alp(i),...
-                          'beta',bet(i),'gamma',gam(i),'parent',1,'node',i);
+    if isNuNet
+        net.s{1} = struct('type','cluster','size',N,'alpha',alp,'beta',bet,...
+                          'nu',nu);
+    else
+        net.s{1} = struct('type','cluster','size',N,'alpha',alp,'beta',bet,...
+                          'gamma',gam);
     end
-    net.s{1} = struct('type','cluster','size',N,'alpha',alp(1),'beta',bet(1),...
-                      'gamma',gam(1));
 else
-    for i = n:-1:2
-        net.s{i} = struct('type','channel','size',1,'alpha',alp(i),...
-                          'beta',bet(i),'gamma',gam(i),'delta',del(i),...
-                          'direction',netdir,'parent',1,'node',i);
+    if isNuNet
+        net.s{1} = struct('type',nettype,'size',N,'alpha',alp,'beta',bet,...
+                          'nu',nu,'direction',netdir);
+    else
+        net.s{1} = struct('type',nettype,'size',N,'alpha',alp,'beta',bet,...
+                          'gamma',gam,'delta',del,'direction',netdir);
     end
-    net.s{1} = struct('type',nettype,'size',N,'alpha',alp(1),'beta',bet(1),...
-                      'gamma',gam(1),'delta',del(1),'direction',netdir);
 end
