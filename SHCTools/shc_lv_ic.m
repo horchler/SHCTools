@@ -4,7 +4,7 @@ function a0=shc_lv_ic(net,a0,eta)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-11-12
-%   Revision: 1.0, 7-4-12
+%   Revision: 1.0, 9-9-12
 
 
 %{
@@ -90,6 +90,7 @@ alp2 = alp(j);
 bet1 = bet(i);
 bet2 = bet(j);
 gam1 = gam(i);
+gam2 = gam(j);
 a20 = a0(i);
 if isvector(eta)
     eta = eta(i);
@@ -103,11 +104,11 @@ a10 = (bet1*(sqrt(bet2)*(alp1-a20*gam1)*aab...
       +sign(rad)*sqrt(abs(rad))))/(2*alp1*sqrt(bet2)*aab);
 
 alpv = [alp1;alp1;alp2];
-rho = [alp1/bet1 gam1      0;
+rho = [alp1/bet1 gam1      gam1;
        0         alp1/bet1 gam1;
-       0         0         alp2/bet2];
+       gam2  	 0         alp2/bet2];
 
-[tp td] = shc_lv_passagetime(net,eta,'pchip');	%#ok<ASGLU>
+[tp td] = shc_lv_passagetime(net,eta);	%#ok<ASGLU>
 dt = min(1e-2,0.1*td(i));
 a = [a10;a20;eta];
 

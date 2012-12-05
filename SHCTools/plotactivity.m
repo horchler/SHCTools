@@ -4,7 +4,7 @@ function plotactivity(a,t,net,opts)
 %
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-8-10
-%   Revision: 1.0, 6-21-12
+%   Revision: 1.0, 9-24-12
 
 
 % Check activity data and time
@@ -33,7 +33,7 @@ if length(t) ~= size(a,1)
 end
 
 % Validate network structure
-shc_validatenetwork(net);
+%shc_validatenetwork(net);
 
 n = size(a,2);
 if n ~= net.size
@@ -43,7 +43,7 @@ if n ~= net.size
 end
 
 y = 1:n;
-yt = num2cell(sprintf('%d',y));
+yt = arrayfun(@(x)sprintf('%d',x),y,'UniformOutput',false);
 xtick = false;
 cmap = jet(256);
 
@@ -67,8 +67,7 @@ if nargin > 3
             case 'grayscale'
                 cmap = 1-gray(256);
             otherwise
-                error('SHCTools:plotactivity:UnknownOption',...
-                      'Unknown option.');
+                error('SHCTools:plotactivity:UnknownOption','Unknown option.');
         end
     end
 end
@@ -118,7 +117,7 @@ end
 
 % Y-label for each state ID
 for i = 1:n
-    text(-0.035*t(end),y(i),yt(i))
+    text(-0.01*t(end),y(i),yt{i},'HorizontalAlignment','right');
 end
 hy = ylabel('State ID');
 set(hy,'Color',[0 0 0])
