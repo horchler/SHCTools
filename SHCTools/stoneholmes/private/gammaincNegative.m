@@ -21,7 +21,7 @@ function y=gammaincNegative(x,a,tail)
 %   Based on: http://functions.wolfram.com/GammaBetaErf/Gamma2/16/01/01/
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-5-12
-%   Revision: 1.0, 8-28-12
+%   Revision: 1.0, 11-26-12
 
 
 if isscalar(a)
@@ -95,7 +95,7 @@ elseif a < 0
         n = -floor(a);
         an = 1-a-n;
         
-        k = 0:n-1;
+        k = n-1:-1:0;
         if n > 150
             ga = gammaln(an);
             ank = exp(gammaln(an+k)-ga);

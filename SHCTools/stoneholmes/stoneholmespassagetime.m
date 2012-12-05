@@ -58,7 +58,7 @@ function tau=stoneholmespassagetime(varargin)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-19-12
-%   Revision: 1.0, 8-28-12
+%   Revision: 1.0, 11-26-12
 
 
 % Check variable inputs
@@ -229,7 +229,7 @@ else
             % Full analytical solution to Stone-Holmes mean passage time
             desls2 = desls.^2;
             deslu2 = deslu.^2;
-
+            
             % Sum infinite series from small to large avoiding non-finite values
             k = 172:-1:1;
             gk = gamma(0.5+k);
@@ -241,7 +241,8 @@ else
                 for j = length(desls2):-1:1
                     s = isk.*(t-dk.*gammaincNegative(desls2(j),0.5-k,'upper'));
                     
-                    S(j) = sum(s(isfinite(s)));
+                    s = s(isfinite(s));
+                    S(j) = sum(s(diff(abs(s))>=0));
                 end
             elseif isscalar(desls2)
                 t = gammaincNegative(desls2,0.5-k,'upper');
@@ -250,7 +251,8 @@ else
                     s = isk.*(gk.*gammainc(deslu2(j),0.5+k)./dk ...
                         +dk.*(gammaincNegative(deslu2(j),0.5-k,'upper')-t));
                     
-                    S(j) = sum(s(isfinite(s)));
+                    s = s(isfinite(s));
+                    S(j) = sum(s(diff(abs(s))>=0));
                 end
             else
                 for j = length(deslu2):-1:1
@@ -259,7 +261,8 @@ else
                         +dk.*(gammaincNegative(deslu2(j),0.5-k,'upper')...
                         -gammaincNegative(desls2(j),0.5-k,'upper')));
                     
-                    S(j) = sum(s(isfinite(s)));
+                    s = s(isfinite(s));
+                    S(j) = sum(s(diff(abs(s))>=0));
                 end
             end
             
