@@ -37,7 +37,7 @@ function [A W]=shc_lv_integrate(tspan,a0,rho,eta,varargin)
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.0, 6-30-12
+%   Revision: 1.0, 11-10-12
 
 
 % Check inputs and outputs
@@ -112,6 +112,21 @@ if isstruct(rho) && isfield(rho,'rho')
         rho = rho.rho';
         alpv = diag(rho)';
     end
+    if isfield(rho,'beta')
+        betv = rho.beta';
+        if ~isfloat(betv) || ~isreal(betv) || ~all(isfinite(betv))
+            error('SHCTools:shc_lv_integrate:BetaVectorInvalid',...
+                 ['The ''beta'' field of the SHC network structure must be '...
+                  'a finite real floating-point vector.']);
+        end
+        if ~isvector(betv) || size(betv,2) ~= N
+            error('SHCTools:shc_lv_integrate:BetaVectorDimensionMismatch',...
+                 ['The ''beta'' field of the SHC network structure must be '...
+                  'a column vector the same length as A0.']);
+        end
+    else
+        betv = alpv./diag(rho)';
+    end
     if ~isfloat(rho) || ~isreal(rho) || ~all(isfinite(rho(:)))
         error('SHCTools:shc_lv_integrate:InvalidRhoStruct',...
              ['If the input RHO is a SHC network structure, the ''rho'' '...
@@ -124,6 +139,7 @@ elseif isfloat(rho)
     end
     rho = rho';
     alpv = diag(rho)';
+    betv = 1;
 else
     error('SHCTools:shc_lv_integrate:InvalidRho',...
          ['RHO must be finite real floating-point matrix or SHC network '...
@@ -301,7 +317,7 @@ if any(eta ~= 0)
         if ~ConstStep
             dt = h(i);
         end 
-        A(i+1,:) = max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt+A(i+1,:),0);
+        A(i+1,:) = min(max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt+A(i+1,:),0),betv);
     end
 else
     % Only allocate W matrix if requested as output
@@ -320,6 +336,6 @@ else
         if ~ConstStep
             dt = h(i);
         end
-        A(i+1,:) = A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt;
+        A(i+1,:) = min(max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt,0),betv);
     end
 end
