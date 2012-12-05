@@ -7,10 +7,10 @@ function varargout=shc_lv_passagetime(net,eta,method)
 %   [...] = SHC_LV_PASSAGETIME(NET,ETA,METHOD)
 %
 %   See also:
-%       QUAD, INTEGRAL, PCHIP
+%       STONEHOLMESPASSAGETIME, QUAD, INTEGRAL, PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-28-12
-%   Revision: 1.0, 7-21-12
+%   Revision: 1.0, 12-4-12
 
 
 if nargout > 3
@@ -33,13 +33,7 @@ else
         alp = net.alpha;
         bet = net.beta;
         gam = net.gamma;
-        
-        if isfield(net,'delta') && any(net.delta ~= 0)
-            warning('SHCTools:shc_lv_passagetime:DeltaFieldNonZero',...
-                   ['The ''delta'' field of the SHC Network Structure '...
-                    'appears to have non-zero values, but the passage time '...
-                    'analysis assumes all Delta are zero.']);
-        end
+        del = net.delta;
     else
         error('SHCTools:shc_lv_passagetime:NetworkStructOrRhoInvalid',...
               'Input must be a valid SHC network structure or RHO matrix.');
@@ -74,6 +68,15 @@ if ~isreal(gam) || ~all(isfinite(gam)) || any(gam <= 0)
           'Gamma must be a positive finite real floating-point vector.');
 end
 
+if ~isvector(del) || isempty(del) || ~isfloat(del)
+    error('SHCTools:shc_lv_passagetime:DeltaInvalid',...
+          'Delta must be a non-empty floating-point vector.');
+end
+if ~isreal(del) || ~all(isfinite(del)) || any(del < 0)
+    error('SHCTools:shc_lv_passagetime:DeltaNonFiniteReal',...
+          'Delta must be a non-negative finite real floating-point vector.');
+end
+
 if ~isvector(eta) || isempty(eta) || ~isfloat(eta)
     error('SHCTools:shc_lv_passagetime:EtaInvalid',...
          ['The noise magnitude, Eta, must be a non-empty floating-point '...
@@ -85,55 +88,57 @@ if ~isreal(eta) || ~all(isfinite(eta)) || any(eta <= 0)
           'floating-point vector.']);
 end
 
-% Check stability
-if any(gam < 2*alp./bet)
-    warning('SHCTools:shc_lv_passagetime:StabilityCriterion',...
-           ['Stability criterion not met for some states '...
-            '(Gamma < 2*Alpha/Beta). Results may be inaccurate and may not '...
-             'reflect long-term mean passage times of the unstable system.']);
-end
-
 % Check lengths
-lv = [length(alp) length(bet) length(gam) length(eta)];
+lv = [length(alp) length(bet) length(gam) length(del) length(eta)];
 n = max(lv);
 lv = lv(lv ~= 1);
 if length(lv) > 1 && ~all(lv(2:end) == lv(1))
     error('SHCTools:shc_lv_passagetime:DimensionMismatch',...
-         ['If any combination of Alpha, Beta, Gamma, and Eta are non-scalar '...
-          'vectors, they must have the same lengths.']);
+         ['If any combination of Alpha, Beta, Gamma, Delta, and Eta are '...
+          'non-scalar vectors, they must have the same lengths.']);
 end
+
+% Stable and unstable eigenvalues
+[lambda_u,lambda_s] = shc_lv_lambda_us(net);
 
 % If elements of vector inputs are equal, collapse to n = 1, re-expand at end
 N = n;
 if n > 1 && all(alp(1) == alp) && all(bet(1) == bet) && all(gam(1) == gam) ...
-         && all(eta(1) == eta)
+         && all(del(1) == del) && all(eta(1) == eta)
+    lambda_u = lambda_u(1);
+    lambda_s = lambda_s(1);
     alp = alp(1);
     bet = bet(1);
     gam = gam(1);
+    del = del(1);
     eta = eta(1);
     n = 1;
 end
 
 % Neighborhood size
 d = shc_lv_neighborhood(bet);
+d_eta = d./eta;
 tol = 1e-6;
 
 % Create function handles, specify integration method
+warningCaught = false;
 switch lower(method)
-    case {'default','quad'}
+    case {'default','stoneholmes'}
+        % Stone-Holmes mean first passage time using analytical solution
+        tp = stoneholmespassagetime(d,eta,lambda_u,lambda_s);
+    case {'quad'}
         % Start try-catch of warning in quad function
         catchID = 'MATLAB:quad:MinStepSize';
         CatchWarningObj = catchwarning(catchID);
         
-        warningCaught = false;
         try
-            % Stone-Holmes first passage time
-            tp = stoneholmes_passagetime(alp,gam,eta,d,n,tol);
+            % Stone-Holmes mean first passage time
+            tp = stoneholmes_passagetime(lambda_u,lambda_s,d_eta,n,tol);
         catch ME
             if strcmp(ME.identifier,catchID)
                 % Disable warning and re-perform calculation to get output
                 set(CatchWarningObj,'',catchID)
-                tp = stoneholmes_passagetime(alp,gam,eta,d,n,tol);
+                tp = stoneholmes_passagetime(lambda_u,lambda_s,d_eta,n,tol);
                 warningCaught = true;
             else
                 rethrow(ME);
@@ -145,24 +150,22 @@ switch lower(method)
                   'MATLAB:integral:NonFiniteValue'};
         CatchWarningObj = catchwarning(catchIDs);
         
-        warningCaught = false;
         try
-            % Stone-Holmes first passage time
-            tp = stoneholmes_passagetimegk(alp,gam,eta,d,(n ~= 1),tol);
+            % Stone-Holmes mean first passage time
+            tp = stoneholmes_passagetimegk(lambda_u,lambda_s,d_eta,(n~=1),tol);
         catch ME
             if any(strcmp(ME.identifier,catchIDs))
                 % Disable warnings and re-perform calculation to get output
                 set(CatchWarningObj,'',catchIDs)
-                tp = stoneholmes_passagetime(alp,gam,eta,d,n,tol);
+                tp = stoneholmes_passagetime(lambda_u,lambda_s,d_eta,n,tol);
                 warningCaught = true;
             else
                 rethrow(ME);
             end
         end
     case {'pchip','fast','quick','interp'}
-        % Stone-Holmes first passage time
-        tp = stoneholmes_passagetimeq(alp,gam,eta,d);
-        warningCaught = false;
+        % Stone-Holmes mean first passage time
+        tp = stoneholmes_passagetimeq(lambda_u,lambda_s,d_eta);
     otherwise
         error('SHCTools:shc_lv_params:UnknownMethod',...
              ['Unknown method. Valid methods are: ''quad'' (default), '...
@@ -187,7 +190,7 @@ elseif warningCaught
 end
 
 % Inter-passage decay time, estimate dt from passage time
-td = interpassage_decaytime(alp,bet,gam,d,eta,n,tp,tol);
+td = interpassage_decaytime(alp,bet,gam,del,d,eta,n,tp,tol);
 if any(td <= 0)
     error('SHCTools:shc_lv_passagetime:NegativeDecayTime',...
          ['Cannot find valid inter-passage decay time, TD. Input '...
@@ -214,28 +217,19 @@ end
 
 
 
-function tp=stoneholmes_passagetime(alp,gam,eta,d,n,tol)
-% Stable and unstable eigenvalues
-lambda_s = abs(alp([end 1:end-1])-gam([end 1:end-1]));
-lambda_u = alp([2:end 1]);
-d_eta = d./eta;
+function tp=stoneholmes_passagetime(lambda_u,lambda_s,d_eta,n,tol)
 lim = d_eta.*sqrt(lambda_s);
 d_etalambda_u = d_eta.^2.*lambda_u;
 
-% Stone-Holmes first passage time using quadrature integration
+% Stone-Holmes mean first passage time using quadrature integration
 for i = n:-1:1
     q(i) = quad(@(x)f(x,d_etalambda_u(i)),0,lim(i),tol);
 end
 tp = ((2/sqrt(pi))*q-erf(lim).*log1p(lambda_u./lambda_s))./(2*lambda_u);
 
 
-function tp=stoneholmes_passagetimegk(alp,gam,eta,d,nd,tol)
-% Stable and unstable eigenvalues
-lambda_s = abs(alp([end 1:end-1])-gam([end 1:end-1]));
-lambda_u = alp([2:end 1]);
-d_eta = d./eta;
-
-% Stone-Holmes first passage time using quadrature integration
+function tp=stoneholmes_passagetimegk(lambda_u,lambda_s,d_eta,nd,tol)
+% Stone-Holmes mean first passage time using quadrature integration
 q = (2/sqrt(pi))*integral(@(x)f(x,d_eta.^2.*lambda_u),0,Inf,...
     'ArrayValued',nd,'RelTol',tol,'AbsTol',tol^1.5);
 tp = (q-erf(d_eta.*sqrt(lambda_s)).*log1p(lambda_u./lambda_s))./(2*lambda_u);
@@ -246,13 +240,8 @@ function y=f(x,d_etalambda_u)
 y = log1p(d_etalambda_u.*x.^-2).*exp(-x.^2);
 
 
-function tp=stoneholmes_passagetimeq(alp,gam,eta,d)
-% Stable and unstable eigenvalues
-lambda_s = abs(alp([end 1:end-1])-gam([end 1:end-1]));
-lambda_u = alp([2:end 1]);
-d_eta = d./eta;
-
-% Stone-Holmes first passage time using PCHIP interpolation
+function tp=stoneholmes_passagetimeq(lambda_u,lambda_s,d_eta)
+% Stone-Holmes mean first passage time using PCHIP interpolation
 xs = log2(lambda_u.*d_eta.^2);
 fxs = floor(xs);
 xs = xs-fxs;
@@ -265,9 +254,11 @@ tp = ((2/sqrt(pi))*f...
     -erf(d_eta.*sqrt(lambda_s)).*log1p(lambda_u./lambda_s))./(2*lambda_u);
 
 
-function td=interpassage_decaytime(alp,bet,gam,d,eta,n,tp,tol)
+function td=interpassage_decaytime(alp,bet,gam,del,d,eta,n,tp,tol)
 alp2 = alp([2:end 1]);
 bet2 = bet([2:end 1]);
+gam2 = gam([2:end 1]);
+del2 = del([2:end 1]);
 
 % Estimate a1(0) by assuming slope parallel to a1 eigenvector, a2(0) = d
 aab = alp+alp2.*bet;
@@ -277,22 +268,22 @@ a10 = (bet.*(sqrt(bet2).*(alp-d*gam).*aab...
       +sign(rad).*sqrt(abs(rad))))./(2*alp.*sqrt(bet2).*aab);
 
 for i = n:-1:1
-    rho = [alp(i)/bet(i) gam(i)        0;
-           0             alp(i)/bet(i) gam(i);
-           0             0             alp2(i)/bet2(i)];
+    rho = [alp(i)/bet(i) gam(i)        gam(i);
+           del(i)        alp(i)/bet(i) gam(i);
+           gam2(i)    	 del2(i)       alp2(i)/bet2(i)];
     alpv = [alp(i);alp(i);alp2(i)];
     a = [a10(i);d;eta];
     
     % Find time step
     dt = 0.01*tp(i);
-    rdt = norm(a.*(alpv-rho*a)./max(a,1),Inf)/(0.8*tol^0.2);
+    rdt = norm(a.*(alpv-rho*a)./max(a,1),Inf)/(0.8*(bet(i)*tol)^0.2);
     if dt*rdt > 1
         dt = 1/rdt;
     end
     dt = max(dt,16*eps);
     
     % Integrate for over one period (tau+td) to find a2(td) on manifold
-    while a(2) >= d
+    while a(3) <= d
         ap = a;
         f1 = a.*(alpv-rho*a);
         a = ap+0.5*dt*f1;
@@ -304,9 +295,20 @@ for i = n:-1:1
         a = max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0);
     end
     
-    % Linearly interpolate for a(3) at a(2) = d
-    a2td(i) = ap(3)+(a(3)-ap(3))*(d-ap(2))/(a(2)-ap(2));
+    % Linearly interpolate for a(2) at a(3) = d
+    a20(i) = ap(2)+(a(2)-ap(2))*(d-ap(3))/(a(3)-ap(3));
+    
+    % Linearly interpolate for a(1) at a(3) = d
+    a30(i) = ap(1)+(a(1)-ap(1))*(d-ap(3))/(a(3)-ap(3));
+    
+    a = [a20(i);d;a30(i)];
+    
+    % Integrate to find number of time-steps to a(1) = d
+    dt = 0.01*dt;
+    nt = 0;
+    while a(1) >= d
+        a = max(a+a.*(alpv-rho*a)*dt,0);
+        nt = nt+1;
+    end
+    td(i) = nt*dt;
 end
-
-% Solve for inter-passage decay time, td, as a function of a2(0) = d and a2(td)
-td = real((log1p(-bet/d)-log1p(-bet./a2td))./alp);
