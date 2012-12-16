@@ -37,7 +37,7 @@ function [A W]=shc_lv_integrate(tspan,a0,rho,eta,varargin)
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.0, 11-10-12
+%   Revision: 1.0, 12-16-12
 
 
 % Check inputs and outputs
@@ -253,7 +253,7 @@ if any(eta ~= 0)
                  ['RandFUN must return a non-empty matrix of floating point '...
                   'values.']);
         end
-        [m n] = size(r);
+        [m,n] = size(r);
         if m ~= lt-1 || n ~= N
             error('SHCTools:shc_lv_integrate:RandFUNDimensionMismatch3',...
                  ['The specified alternative RandFUN did not output a %d by '...
@@ -317,7 +317,8 @@ if any(eta ~= 0)
         if ~ConstStep
             dt = h(i);
         end 
-        A(i+1,:) = min(max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt+A(i+1,:),0),betv);
+        % Order of operations is important to handle small values
+        A(i+1,:) = min(max(A(i,:)+(A(i,:).*alpv-A(i,:).*(A(i,:)*rho)+mu)*dt+A(i+1,:),0),betv);
     end
 else
     % Only allocate W matrix if requested as output
@@ -336,6 +337,7 @@ else
         if ~ConstStep
             dt = h(i);
         end
-        A(i+1,:) = min(max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt,0),betv);
+        % Order of operations is important to handle small values
+        A(i+1,:) = min(max(A(i,:)+(A(i,:).*alpv-A(i,:).*(A(i,:)*rho)+mu)*dt,0),betv);
     end
 end

@@ -21,7 +21,7 @@ function adot=shc_lv_ode(t,a,varargin)	%#ok<INUSL>
 %       SHC_LV_JACOBIAN, SHC_SYMEQUILIBRIA, SHC_LV_INTEGRATE, ODE45
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-28-12
-%   Revision: 1.0, 3-31-12
+%   Revision: 1.0, 12-16-12
 
 
 rho = varargin{1};
@@ -31,8 +31,9 @@ if isstruct(rho) && isfield(rho,'rho')
 else
     alpv = diag(rho);
 end
+% Order of operations is important to handle small values
 if nargin == 3
-    adot = a.*(alpv-rho*a);
+    adot = a.*alpv-a.*(rho*a);
 else
-    adot = a.*(alpv-rho*a)+varargin{2};
+    adot = a.*alpv-a.*(rho*a)+varargin{2};
 end
