@@ -32,13 +32,13 @@ end
 if isscalar(net.s{1}.gamma)
     gam = double(~net.s{1}.T);
     gam(1:n+1:end) = 0;
-    net.gamma(1:n^2) = net.s{1}.gamma.*gam;
+    net.gamma(1:n,1:n) = net.s{1}.gamma.*gam;
 elseif isvector(net.s{1}.gamma)
   	gam = double(~net.s{1}.T);
     gam(1:n+1:end) = 0;
-    net.gamma(1:n^2) = net.s{1}.gamma(:,ones(1,n)).*gam;
+    net.gamma(1:n,1:n) = net.s{1}.gamma(:,ones(1,n)).*gam;
 else
-    net.gamma(1:n^2) = net.s{1}.gamma;
+    net.gamma(1:n,1:n) = net.s{1}.gamma;
 end
 net.delta = [z+net.s{1}.delta;zz];
 if isfield(net.s{1},'nu')
@@ -124,8 +124,24 @@ if isNu
 end
 
 % convert T to rho
-net.rho = ~net.T.*net.gamma+net.T.*net.delta(:,ones(1,n));
-net.rho(1:n+1:end) = net.alpha./net.beta;
+gam2 = ~net.T.*net.gamma;
+net.rho = gam2+net.T.*net.delta(:,ones(1,m));
+net.rho(1:m+1:end) = net.alpha./net.beta;
+
+% convert Gamma matrix to column vector if possible
+gamv = true;
+for i = m:-1:1
+    gami = gam2(i,gam2(i,:) ~= 0);
+    gam3(i) = gami(1);
+    if any(gami(1) ~= gami)
+        gamv = false;
+        break;
+    end
+end
+if gamv
+    net.gamma = gam3(:);
+end
+
 if nargout == 0
     net = net.rho;
 end

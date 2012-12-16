@@ -4,7 +4,7 @@ function net=shc_initialize(net,reinit)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-14-12
-%   Revision: 1.0, 11-19-12
+%   Revision: 1.0, 12-9-12
 
 
 % Check for 'reset' mode to clear and reset 'children', 'index,' and 'T' fields
@@ -135,18 +135,51 @@ for i = 1:nnets
         alp = s.alpha;
         if s.size > 1 && (~isscalar(alp) || ~isscalar(s.beta) ...
                 || ~isscalar(s.nu))
-            s.gamma = double(~s.T);
+            bet = s.beta;
+            nu = s.nu;
+            z = ones(s.size,1);
+            if isscalar(alp)
+                alp = alp(z,1);
+            end
+            if isscalar(alp)
+                alp = alp(z,1);
+            end
+            if isscalar(bet)
+                bet = bet(z,1);
+            end
+            if isscalar(nu)
+                nu = nu(z,1);
+            end
+            
+            if isa(alp,'sym') || isa(bet,'sym') || isa(nu,'sym')
+                s.gamma = sym(~s.T);
+                gam2 = sym(zeros(s.size,1));
+            else
+                s.gamma = double(~s.T);
+                gam2(s.size,1) = 0;
+            end
             s.gamma(1:s.size+1:end) = 0;
+            gamv = true;
             for j = 1:s.size
                 for k = 1:s.size
                     if s.gamma(j,k) ~= 0
-                        s.gamma(j,k) = alp(j)./s.beta(k)+alp(k).*s.nu(k);
+                        s.gamma(j,k) = alp(j)./bet(k)+alp(k).*nu(k);
+                        if gamv
+                            if gam2(j) == 0
+                                gam2(j) = s.gamma(j,k);
+                            elseif gam2(j) ~= s.gamma(j,k)
+                                gamv = false;
+                            end
+                        end
                     end
                 end
             end
+            if gamv
+                s.gamma = gam2;
+            end
             
-            s.delta = alp./s.beta([end 1:end-1])...
-                -alp([end 1:end-1])./s.nu([end 1:end-1]); 
+            s.delta = alp./bet([end 1:end-1])...
+                -alp([end 1:end-1])./nu([end 1:end-1]); 
         else
             s.gamma = alp/s.beta+alp*s.nu;
             s.delta = alp/s.beta-alp/s.nu;
