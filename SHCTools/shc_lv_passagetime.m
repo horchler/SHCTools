@@ -7,10 +7,10 @@ function varargout=shc_lv_passagetime(net,eta,method)
 %   [...] = SHC_LV_PASSAGETIME(NET,ETA,METHOD)
 %
 %   See also:
-%       STONEHOLMESPASSAGETIME, QUAD, INTEGRAL, PCHIP
+%       SHC_LV_PASSAGETIME_MU, STONEHOLMESPASSAGETIME, QUAD, INTEGRAL, PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-28-12
-%   Revision: 1.0, 12-4-12
+%   Revision: 1.0, 12-9-12
 
 
 if nargout > 3
@@ -132,7 +132,7 @@ switch lower(method)
         CatchWarningObj = catchwarning(catchID);
         
         try
-            % Stone-Holmes mean first passage time
+            % Stone-Holmes mean first passage time via quad function
             tp = stoneholmes_passagetime(lambda_u,lambda_s,d_eta,n,tol);
         catch ME
             if strcmp(ME.identifier,catchID)
@@ -151,7 +151,7 @@ switch lower(method)
         CatchWarningObj = catchwarning(catchIDs);
         
         try
-            % Stone-Holmes mean first passage time
+            % Stone-Holmes mean first passage time via integral function
             tp = stoneholmes_passagetimegk(lambda_u,lambda_s,d_eta,(n~=1),tol);
         catch ME
             if any(strcmp(ME.identifier,catchIDs))
@@ -164,10 +164,10 @@ switch lower(method)
             end
         end
     case {'pchip','fast','quick','interp'}
-        % Stone-Holmes mean first passage time
+        % Stone-Holmes mean first passage time via fast PCHIP interpolation
         tp = stoneholmes_passagetimeq(lambda_u,lambda_s,d_eta);
     otherwise
-        error('SHCTools:shc_lv_params:UnknownMethod',...
+        error('SHCTools:shc_lv_passagetime:UnknownMethod',...
              ['Unknown method. Valid methods are: ''quad'' (default), '...
               '''quadgk'', and ''pchip''.']);
 end
