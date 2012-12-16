@@ -25,7 +25,7 @@ function v=shc_lv_stability(rho,M)
 %       BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA
 
 %   Andrew D. Horchler, adh9@case.edu, Created 8-30-12
-%   Revision: 1.0, 8-30-12
+%   Revision: 1.0, 12-16-12
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the
 %   Phase Plane," Nieuw Archief Voor Wiskunde (3), Vol. 27, 1979, pp. 238?254.
@@ -46,7 +46,7 @@ if isstruct(rho) && isfield(rho,'rho')
                   'a finite real floating-point vector.']);
         end
         p = rho.rho;
-        [m n] = size(p);
+        [m,n] = size(p);
         if size(alpv,1) ~= n
             error('SHCTools:shc_lv_stability:AlphaVectorDimensionMismatch',...
                  ['The ''alpha'' field of the SHC network structure must be '...
@@ -54,7 +54,7 @@ if isstruct(rho) && isfield(rho,'rho')
         end
     else
         p = rho.rho;
-        [m n] = size(p);
+        [m,n] = size(p);
     end
     if ~isfloat(p)
         error('SHCTools:shc_lv_stability:InvalidRhoStruct',...
@@ -78,7 +78,7 @@ else
              ['The ''rho'' field of the SHC network structure must be a '...
               'finite real floating-point matrix.']);
     end
-    [m n] = size(p);
+    [m,n] = size(p);
 end
 if isempty(p) || ~shc_ismatrix(p) || m ~= n
     error('SHTools:shc_lv_stability:RhoDimensionMismatch',...
@@ -96,11 +96,10 @@ if nargin == 2
     end
     
     E = shc_lv_eigs(rho,M);
-    E = sort(E);
-    lambda_u = E(end);
-    lambda_s = -E(end-1);
+    lambda_u = min(E(E > 0));
+    lambda_s = -max(E(E < 0));
     
-    if lambda_u <= 0 || lambda_s <= 0
+    if isempty(lambda_u) || isempty(lambda_s)
         error('SHTools:shc_lv_stability:InvalidNetworkNode',...
              ['The eigenvalues for node %d of the specified RHO matrix do '...
               'not appear to be of the form: Lambda_1 > 0 > Lambda_2 >= '...
@@ -109,15 +108,16 @@ if nargin == 2
     v = lambda_s/lambda_u;
 else
     E = shc_lv_eigs(rho);
-    E = sort(E);
-    lambda_u = E(end,:);
-    lambda_s = -E(end-1,:);
-    
-    if any(lambda_u <= 0) || any(lambda_s <= 0)
-        error('SHTools:shc_lv_stability:InvalidNetwork',...
-             ['The eigenvalues for one or more of the nodes of the '...
-              'specified RHO matrix do not appear to be of the form: '...
-              'Lambda_1 > 0 > Lambda_2 >= Lambda_3 >= ... >= Lambda_N.']);
+    for i = m:-1:1
+        lamu = min(E(E(:,i) > 0,i));
+        lams = -max(E(E(:,i) < 0,i));
+
+        if isempty(lamu) || isempty(lams)
+            error('SHTools:shc_lv_stability:InvalidNetwork',...
+                 ['The eigenvalues for node %d of the specified RHO matrix '...
+                  'are not of the form: Lambda_1 > 0 > Lambda_2 >= '...
+                  'Lambda_3 >= ... >= Lambda_N.'],i);
+        end
+        v(i,1) = lams/lamu;
     end
-    v = (lambda_s./lambda_u)';
 end

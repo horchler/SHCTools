@@ -36,7 +36,7 @@ function varargout=shc_lv_eigs(rho,M)
 %       SHC_LV_LAMBDA_US
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-6-12
-%   Revision: 1.0, 8-30-12
+%   Revision: 1.0, 12-16-12
 
 
 if nargout > 2
@@ -58,7 +58,7 @@ if isstruct(rho) && isfield(rho,'rho')
                   'a finite real symbolic or floating-point vector.']);
         end
         p = rho.rho;
-        [m n] = size(p);
+        [m,n] = size(p);
         if size(alpv,1) ~= n
             error('SHCTools:shc_lv_eigs:AlphaVectorDimensionMismatch',...
                  ['The ''alpha'' field of the SHC network structure must be '...
@@ -67,7 +67,7 @@ if isstruct(rho) && isfield(rho,'rho')
     else
         p = rho.rho;
         alpv = diag(p);
-        [m n] = size(p);
+        [m,n] = size(p);
     end
     if isfield(rho,'beta')
         betv = rho.beta;
@@ -112,7 +112,7 @@ else
               'finite real symbolic or floating-point matrix.']);
     end
     alpv = diag(p);
-    [m n] = size(p);
+    [m,n] = size(p);
     betv = ones(n,1);
 end
 if isempty(p) || ~shc_ismatrix(p) || m ~= n
@@ -143,7 +143,7 @@ if nargin == 2 && ~ischar(M)
     
     % Calculate eigenvalues/eigenvectors
     if nargout == 2
-        [V D] = eig(J);
+        [V,D] = eig(J);
     else
         E = eig(J);
     end
@@ -173,7 +173,7 @@ else
         
         % Calculate eigenvalues/eigenvectors
         if nargout == 2
-            [V{i} D{i}] = eig(J);
+            [V{i},D{i}] = eig(J);
         else
             E(:,i) = eig(J);
         end
