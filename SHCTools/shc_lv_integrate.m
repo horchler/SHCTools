@@ -1,4 +1,4 @@
-function [A W]=shc_lv_integrate(tspan,a0,rho,eta,varargin)
+function [A,W,TE,AE,IE]=shc_lv_integrate(tspan,a0,rho,eta,mu,options,varargin)
 %SHC_LV_INTEGRATE  Solve stochastic Lotka-Volterra differential equations.
 %   AOUT = SHC_LV_INTEGRATE(TSPAN,A0,RHO,ETA) with TSPAN = [T0 T1 ... TFINAL]
 %   integrates the stochastic differential equations for the N-dimensional
@@ -22,10 +22,11 @@ function [A W]=shc_lv_integrate(tspan,a0,rho,eta,varargin)
 %
 %   [...] = SHC_LV_INTEGRATE(TSPAN,A0,RHO,ETA,OPTIONS) specifies options to be
 %   for generating the random variates that are used to calculate the Wiener
-%   increments.
+%   increments. Supported properties: RandSeed, RandFUN, Antithetic, and
+%   EventsFUN.
 %
 %   See also:
-%       SHC_LV_ODE, RANDSTREAM
+%       SHC_LV_ODE, SHC_LV_IC, RANDSTREAM
 
 %   SHC_LV_INTEGRATE is an implementation of the explicit Euler-Maruyama scheme
 %   with diagonal additive noise (order 1.0 strong convergence). Ito and
@@ -37,7 +38,7 @@ function [A W]=shc_lv_integrate(tspan,a0,rho,eta,varargin)
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.0, 12-16-12
+%   Revision: 1.0, 1-1-13
 
 
 % Check inputs and outputs
@@ -163,54 +164,153 @@ eta = eta(:)';
 D = length(eta);
 
 % Check optional Mu and Options structure inputs
-mu = 0;
-options = [];
-muset = true;
-for i = 5:nargin
-    v = varargin{i-4};
-    if ~isempty(v) && isvector(v) && ~isstruct(v)
-        if ~isfloat(v) || ~isreal(v) || ~all(isfinite(v))
+if nargin >= 5
+    if ~isempty(mu) && isvector(mu) && ~isstruct(mu)
+        if ~isfloat(mu) || ~isreal(mu) || ~all(isfinite(mu))
             error('SHCTools:shc_lv_integrate:InvalidMu',...
                   'MU must be a finite real floating-point vector.');
         end
-        if ~any(length(v) == [1 N])
+        if ~any(length(mu) == [1 N])
             error('SHCTools:shc_lv_integrate:MuDimensionMismatch',...
                   'MU must be a scalar or a vector the same length as A0.');
         end
-        mu = v(:)';
-        muset = false;
-    elseif isstruct(v) || isempty(v) && (isnumeric(v) || iscell(v))
-        if isempty(v) && (~shc_ismatrix(v) || ~all(size(v) == 0))
-            error('SHCTools:shc_lv_integrate:InvalidOptionsStruct',...
+        if nargin >= 6
+            if isempty(options) && (~shc_ismatrix(options)...
+                    || ~all(size(options) == 0))
+                error('SHCTools:shc_lv_integrate:InvalidOptionsStruct6',...
+                      'Invalid OPTIONS structure.');
+            end
+        else
+            options = [];
+        end
+        
+        % Determine the dominant data type, single or double
+        if ~all(strcmp(class(t0),{class(a0),class(rho),class(eta),class(mu)}))
+            warning('SHCTools:shc_lv_integrate:InconsistentDataType',...
+                   ['Mixture of single and double datatypes for inputs '...
+                    'TSPAN, A0, RHO, ETA, and MU.']);
+        end
+        dataType = superiorfloat(t0,a0,rho,eta,mu);
+    elseif isstruct(mu) || isempty(mu) && (isnumeric(mu) || iscell(mu))
+        options = mu;
+        mu = 0;
+        if isempty(options) && (~shc_ismatrix(options)...
+                || ~all(size(options) == 0))
+            error('SHCTools:shc_lv_integrate:InvalidOptionsStruct5',...
                   'Invalid OPTIONS structure.');
         end
-        options = v;
+        
+        % Determine the dominant data type, single or double
+        if ~all(strcmp(class(t0),{class(a0),class(rho),class(eta)}))
+            warning('SHCTools:shc_lv_integrate:InconsistentDataType',...
+                   ['Mixture of single and double datatypes for inputs '...
+                    'TSPAN, A0, RHO, and ETA.']);
+        end
+        dataType = superiorfloat(t0,a0,rho,eta);
     else
         error('SHCTools:shc_lv_integrate:UnknownInput',...
-             ['Input argument %d is not valid MU parameter or OPTIONS '...
-              'structure.'],i);
+             ['Fifth input argument is not valid MU parameter or OPTIONS '...
+              'structure.']);
     end
+else
+    options = [];
 end
 
-% Determine the dominant data type, single or double
-if muset
-    if ~all(strcmp(class(t0),{class(a0),class(rho),class(eta)}))
-        warning('SHCTools:shc_lv_integrate:InconsistentDataType',...
-               ['Mixture of single and double datatypes for inputs TSPAN, '...
-                'A0, RHO, and ETA.']);
+% Check for events function
+EventsFUN = getknownfield(options,'EventsFUN',[]);
+if ~isempty(EventsFUN)
+    if ~isa(EventsFUN,'function_handle')
+        error('SHCTools:shc_lv_integrate:EventsFUNNotAFunctionHandle',...
+              'EventsFUN, if specified, must be a function handle.');
     end
-    dataType = superiorfloat(t0,a0,rho,eta);
+    
+    % Check output of EventsFUN at initial condition and save value
+    try
+        [EventsValue,isterminal,direction] = feval(EventsFUN,tspan(1),a0,varargin{:});
+    catch err
+        switch err.identifier
+            case 'MATLAB:TooManyInputs'
+                error('SHCTools:shc_lv_integrate:EventsFUNTooFewInputs',...
+                      'EventsFUN must have at least two inputs.');
+            case 'MATLAB:TooManyOutputs'
+                error('SHCTools:shc_lv_integrate:EventsFUNNoOutput',...
+                     ['The output of EventsFUN was not specified. EventsFUN '...
+                      'must return three non-empty vectors.']);
+            case 'MATLAB:unassignedOutputs'
+                error('SHCTools:shc_lv_integrate:EventsFUNUnassignedOutput',...
+                      'The first output of EventsFUN was not assigned.');
+            case 'MATLAB:minrhs'
+                error('SHCTools:shc_lv_integrate:EventsFUNTooManyInputs',...
+                     ['EventsFUN requires one or more input arguments '...
+                      '(parameters) that were not supplied.']);
+            otherwise
+                rethrow(err);
+        end
+    end
+    if ~isvector(EventsValue) || isempty(EventsValue)...
+            || ~all(isfinite(EventsValue)) 
+        error('SHCTools:shc_lv_integrate:InvalidEventsValue',...
+             ['The first output of EventsFUN, ''Value'', must be a '...
+              'non-empty finite vector.']);
+    end
+    if ~isvector(isterminal)...
+            || ~any(length(isterminal) == [length(EventsValue) 1])
+        error('SHCTools:shc_lv_integrate:EventsIsterminalDimensionMismatch',...
+             ['The second output of EventsFUN, ''IsTerminal'', must be a '...
+              'scalar or a vector the same length as the first output.']);
+    end
+    if ~all(isterminal == 0 | isterminal == 1)
+        error('SHCTools:shc_lv_integrate:InvalidEventsIsterminal',...
+             ['The elements of the second output of EventsFUN, '...
+              '''IsTerminal'', must be equal to 0 (false) or 1 (true).']);
+    end
+    if ~isempty(direction)
+        if ~isvector(direction)...
+                || ~any(length(direction) == [length(EventsValue) 1])
+            error('SHCTools:shc_lv_integrate:EventsDirectionDimensionMismatch',...
+                 ['If the third output of EventsFUN, ''Direction'', is not '...
+                  'specified as the empty matrix, [], it must be a scalar '...
+                  'or a vector the same length as first output.']);
+        end
+        if ~all(direction == 0 | direction == 1 | direction == -1)
+            error('SHCTools:shc_lv_integrate:InvalidEventsDirection',....
+                 ['The third output of EventsFUN, ''Direction'', must be '...
+                  'equal to 0 (default), 1, or -1.']);
+        end
+    end
+    
+    % Initialize outputs for zero-crossing events
+    if nargout > 5
+        error('SHCTools:shc_lv_integrate:EventsTooManyOutputs',...
+              'Too many output arguments.');
+    else
+        if nargout >= 3
+            TE = [];
+            if nargout >= 4
+                AE = [];
+                if nargout >= 5
+                    IE = [];
+                end
+            end
+        end
+    end
+    isEvents = true;
 else
-    if ~all(strcmp(class(t0),{class(a0),class(rho),class(eta),class(mu)}))
-        warning('SHCTools:shc_lv_integrate:InconsistentDataType',...
-               ['Mixture of single and double datatypes for inputs TSPAN, '...
-                'A0, RHO, ETA, and MU.']);
+    if nargout > 2
+        if nargout <= 5
+            error('SHCTools:shc_lv_integrate:NoEventsTooManyOutputs',...
+                 ['Too many output arguments. An events function has not '...
+                  'been specified.']);
+        else
+            error('SHCTools:shc_lv_integrate:TooManyOutputs',...
+                  'Too many output arguments.');
+        end
     end
-    dataType = superiorfloat(t0,a0,rho,eta,mu);
+    isEvents = false;
 end
-isDouble = strcmp(dataType,'double');
 
 % State array
+isDouble = strcmp(dataType,'double');
 if isDouble
     A(lt,N) = 0;
 else
@@ -296,6 +396,9 @@ if any(eta ~= 0)
         
         % Create function handle to be used for generating Wiener increments
         RandFUN = @(M,N)randn(Stream,M,N,dataType);
+        
+        % Function to call on completion or early termination of integration
+        ResetStream = onCleanup(@()reset_stream(Stream));
 
         % Calculate Wiener increments from normal variates
         if D == 1 && ConstStep
@@ -306,7 +409,7 @@ if any(eta ~= 0)
     end
     
     % Only allocate W matrix if requested as output
-    if nargout == 2
+    if nargout >= 2
         W = cumsum(A,1);
     end
     
@@ -317,12 +420,35 @@ if any(eta ~= 0)
         if ~ConstStep
             dt = h(i);
         end 
-        % Order of operations is important to handle small values
-        A(i+1,:) = min(max(A(i,:)+(A(i,:).*alpv-A(i,:).*(A(i,:)*rho)+mu)*dt+A(i+1,:),0),betv);
+        A(i+1,:) = min(max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt+A(i+1,:),0),betv);
+        %A(i+1,:) = min(max(A(i,:)+(A(i,:).*alpv-A(i,:).*(A(i,:)*rho)+mu)*dt+A(i+1,:),0),betv);
+        
+        % Check for and handle zero-crossing events
+        if isEvents
+            [te,ae,ie,EventsValue,IsTerminal] = shc_zero(EventsFUN,tspan(i+1),A(i+1,:),EventsValue,varargin);
+            if ~isempty(te)
+                if nargout >= 3
+                    TE = [TE;te];           %#ok<AGROW>
+                    if nargout >= 4
+                        AE = [AE;ae];       %#ok<AGROW>
+                        if nargout >= 5
+                            IE = [IE;ie];	%#ok<AGROW>
+                        end
+                    end
+                end
+                if IsTerminal
+                    A = A(1:i+1,:);
+                    if nargout >= 2
+                        W = W(1:i+1,:);
+                    end
+                    return;
+                end
+            end
+        end
     end
 else
     % Only allocate W matrix if requested as output
-    if nargout == 2
+    if nargout >= 2
         if isDouble
             W(lt,N) = 0;
         else
@@ -337,7 +463,30 @@ else
         if ~ConstStep
             dt = h(i);
         end
-        % Order of operations is important to handle small values
-        A(i+1,:) = min(max(A(i,:)+(A(i,:).*alpv-A(i,:).*(A(i,:)*rho)+mu)*dt,0),betv);
+        A(i+1,:) = min(max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt,0),betv);
+        %A(i+1,:) = min(max(A(i,:)+(A(i,:).*alpv-A(i,:).*(A(i,:)*rho)+mu)*dt,0),betv);
+        
+        % Check for and handle zero-crossing events
+        if isEvents
+            [te,ae,ie,EventsValue,IsTerminal] = shc_zero(EventsFUN,tspan(i+1),A(i+1,:),EventsValue,varargin);
+            if ~isempty(te)
+                if nargout >= 3
+                    TE = [TE;te];           %#ok<AGROW>
+                    if nargout >= 4
+                        AE = [AE;ae];       %#ok<AGROW>
+                        if nargout >= 5
+                            IE = [IE;ie];	%#ok<AGROW>
+                        end
+                    end
+                end
+                if IsTerminal
+                    A = A(1:i+1,:);
+                    if nargout >= 2
+                        W = W(1:i+1,:);
+                    end
+                    return;
+                end
+            end
+        end
     end
 end

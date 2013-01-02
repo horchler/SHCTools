@@ -7,10 +7,11 @@ function varargout=shc_lv_passagetime(net,eta,method)
 %   [...] = SHC_LV_PASSAGETIME(NET,ETA,METHOD)
 %
 %   See also:
-%       SHC_LV_PASSAGETIME_MU, STONEHOLMESPASSAGETIME, QUAD, INTEGRAL, PCHIP
+%       SHC_LV_INVPASSAGETIME, SHC_LV_PASSAGETIME_MU, SHC_LV_INVPASSAGETIME_MU,
+%       STONEHOLMESPASSAGETIME, QUAD, INTEGRAL, PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-28-12
-%   Revision: 1.0, 12-9-12
+%   Revision: 1.0, 12-17-12
 
 
 if nargout > 3
@@ -18,7 +19,7 @@ if nargout > 3
           'Too many output arguments.');
 end
 
-% Handle inputs to get Alpha, Beta, Gamma, and Method
+% Handle inputs to get Alpha, Beta, Gamma, Delta, and Method
 if nargin < 2
     error('SHCTools:shc_lv_passagetime:TooFewInputs',...
 	      'Not enough input arguments.');

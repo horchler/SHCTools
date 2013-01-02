@@ -6,10 +6,11 @@ function eta=shc_lv_invpassagetime(varargin)
 %   ETA = SHC_LV_INVPASSAGETIME(...,OPTIONS)
 %
 %   See also:
+%       SHC_LV_PASSAGETIME, SHC_LV_INVPASSAGETIME_MU, SHC_LV_PASSAGETIME_MU,
 %       FZERO, QUAD, QUADGK, PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-25-12
-%   Revision: 1.0, 7-19-12
+%   Revision: 1.0, 12-17-12
 
 
 % Handle variable inputs to get Alpha, Beta, Gamma, Tp, and options
