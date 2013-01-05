@@ -38,7 +38,7 @@ function [A,W,TE,AE,IE]=shc_lv_integrate(tspan,a0,rho,eta,mu,options,varargin)
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.0, 1-2-13
+%   Revision: 1.0, 1-5-13
 
 
 % Check inputs and outputs
@@ -214,6 +214,8 @@ if nargin >= 5
     end
 else
     options = [];
+    mu = 0;
+    dataType = superiorfloat(t0,a0,rho,eta);
 end
 
 % Check for events function

@@ -8,7 +8,7 @@ function a0=shc_lv_ic(net,a0,eta,mu)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-11-12
-%   Revision: 1.0, 1-2-13
+%   Revision: 1.0, 1-5-13
 
 
 %{
@@ -209,7 +209,7 @@ a = circshift([bet(j)-d;sqrt(d(j));em(ones(n-2,1)).^2],j-1);	% IC guess
 
 % Find time step using estimate from mean first passage time
 [lambda_u,lambda_s] = shc_lv_lambda_us(net);
-dt = 0.1*stoneholmespassagetime(d,em,lambda_u,lambda_s);
+dt = 0.1*max(stoneholmespassagetime(d,em,lambda_u,lambda_s));
 rdt = norm((a.*(alpv-rho*a)+mu)./max(a,1),Inf)/(0.8*(max(bet)*tol)^0.2);
 if dt*rdt > 1
     dt = 1/rdt;
