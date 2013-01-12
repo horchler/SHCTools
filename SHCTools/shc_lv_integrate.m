@@ -1,4 +1,4 @@
-function [A,W,TE,AE,IE]=shc_lv_integrate(tspan,a0,rho,eta,mu,options,varargin)
+function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,rho,eta,mu,options)
 %SHC_LV_INTEGRATE  Solve stochastic Lotka-Volterra differential equations.
 %   AOUT = SHC_LV_INTEGRATE(TSPAN,A0,RHO,ETA) with TSPAN = [T0 T1 ... TFINAL]
 %   integrates the stochastic differential equations for the N-dimensional
@@ -25,6 +25,20 @@ function [A,W,TE,AE,IE]=shc_lv_integrate(tspan,a0,rho,eta,mu,options,varargin)
 %   increments. Supported properties names: RandSeed, RandFUN, Antithetic, and
 %   EventsFUN.
 %
+%   [AOUT, W, TE, AE, WE, IE] = SHC_LV_INTEGRATE(TSPAN,A0,RHO,ETA,OPTIONS) with
+%   the EventsFUN property set to a function handle, in order to specify an
+%   events function, solves as above while also finding zero-crossings. The
+%   corresponding function must take at least two inputs and output three
+%   vectors: [Value, IsTerminal, Direction] = Events(T,Y). The scalar input T is
+%   the current integration time and the vector Y is the current state. For the
+%   i-th event, Value(i) is the value of the zero-crossing function and
+%   IsTerminal(i) = 1 specifies that integration is to terminate at a zero or to
+%   continue if IsTerminal(i) = 0. If Direction(i) = 1, only zeros where
+%   Value(i) is increasing are found, if Direction(i) = -1, only zeros where
+%   Value(i) is decreasing are found, otherwise if Direction(i) = 0, all zeros
+%   are found. If Direction is set to the empty matrix, [], all zeros are found
+%   for all events. Direction and IsTerminal may also be scalars.
+%
 %   See also:
 %       SHC_LV_ODE, SHC_LV_IC, RANDSTREAM
 
@@ -38,7 +52,7 @@ function [A,W,TE,AE,IE]=shc_lv_integrate(tspan,a0,rho,eta,mu,options,varargin)
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.0, 1-5-13
+%   Revision: 1.0, 1-12-13
 
 
 % Check inputs and outputs
@@ -228,7 +242,7 @@ if ~isempty(EventsFUN)
     
     % Check output of EventsFUN at initial condition and save value
     try
-        [EventsValue,isterminal,direction] = feval(EventsFUN,tspan(1),a0,varargin{:});
+        [EventsValue,isterminal,direction] = EventsFUN(tspan(1),a0);
     catch err
         switch err.identifier
             case 'MATLAB:TooManyInputs'
@@ -282,7 +296,7 @@ if ~isempty(EventsFUN)
     end
     
     % Initialize outputs for zero-crossing events
-    if nargout > 5
+    if nargout > 6
         error('SHCTools:shc_lv_integrate:EventsTooManyOutputs',...
               'Too many output arguments.');
     else
@@ -291,7 +305,10 @@ if ~isempty(EventsFUN)
             if nargout >= 4
                 AE = [];
                 if nargout >= 5
-                    IE = [];
+                    WE = [];
+                    if nargout >= 6
+                        IE = [];
+                    end
                 end
             end
         end
@@ -299,7 +316,7 @@ if ~isempty(EventsFUN)
     isEvents = true;
 else
     if nargout > 2
-        if nargout <= 5
+        if nargout <= 6
             error('SHCTools:shc_lv_integrate:NoEventsTooManyOutputs',...
                  ['Too many output arguments. An events function has not '...
                   'been specified.']);
@@ -427,14 +444,17 @@ if any(eta ~= 0)
         
         % Check for and handle zero-crossing events
         if isEvents
-            [te,ae,ie,EventsValue,IsTerminal] = shc_zero(EventsFUN,tspan(i+1),A(i+1,:),EventsValue,varargin);
+            [te,ae,we,ie,EventsValue,IsTerminal] = shc_zero(EventsFUN,tspan(i+1),A(i+1,:),W(i+1,:),EventsValue);
             if ~isempty(te)
                 if nargout >= 3
-                    TE = [TE;te];           %#ok<AGROW>
+                    TE = [TE;te];               %#ok<AGROW>
                     if nargout >= 4
-                        AE = [AE;ae];       %#ok<AGROW>
+                        AE = [AE;ae];           %#ok<AGROW>
                         if nargout >= 5
-                            IE = [IE;ie];	%#ok<AGROW>
+                            WE = [WE;we];       %#ok<AGROW>
+                            if nargout >= 6
+                                IE = [IE;ie];	%#ok<AGROW>
+                            end
                         end
                     end
                 end
@@ -449,13 +469,16 @@ if any(eta ~= 0)
         end
     end
 else
-    % Only allocate W matrix if requested as output
+    % Only allocate W matrix if requested as output (no noise, all zeros)
     if nargout >= 2
         if isDouble
             W(lt,N) = 0;
         else
             W(lt,N) = single(0);
         end
+    end
+    if isEvents
+        Wz = W(1,:);
     end
     
     % Integration loop
@@ -470,14 +493,17 @@ else
         
         % Check for and handle zero-crossing events
         if isEvents
-            [te,ae,ie,EventsValue,IsTerminal] = shc_zero(EventsFUN,tspan(i+1),A(i+1,:),EventsValue,varargin);
+            [te,ae,we,ie,EventsValue,IsTerminal] = shc_zero(EventsFUN,tspan(i+1),A(i+1,:),Wz,EventsValue);
             if ~isempty(te)
                 if nargout >= 3
-                    TE = [TE;te];           %#ok<AGROW>
+                    TE = [TE;te];               %#ok<AGROW>
                     if nargout >= 4
-                        AE = [AE;ae];       %#ok<AGROW>
+                        AE = [AE;ae];           %#ok<AGROW>
                         if nargout >= 5
-                            IE = [IE;ie];	%#ok<AGROW>
+                            WE = [WE;we];       %#ok<AGROW>
+                            if nargout >= 6
+                                IE = [IE;ie];	%#ok<AGROW>
+                            end
                         end
                     end
                 end
