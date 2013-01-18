@@ -62,7 +62,7 @@ function tau=stoneholmespassagetime(varargin)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-19-12
-%   Revision: 1.0, 1-17-13
+%   Revision: 1.0, 1-18-13
 
 
 % Check variable inputs
@@ -203,8 +203,8 @@ else
         
         % Compute mean passage time of Stone-Holmes distribution in-range values
         de = delta./epsilon;
-        desls = de.*sqrt(lambda_s)
-        deslu = de.*sqrt(lambda_u)
+        desls = de.*sqrt(lambda_s);
+        deslu = de.*sqrt(lambda_u);
         eulergamma = 0.577215664901533;
         
         % Use fast small noise (and/or large Lambda) approximation by default
