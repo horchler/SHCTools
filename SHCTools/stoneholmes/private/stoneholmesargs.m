@@ -1,6 +1,6 @@
 function [szy,expnd]=stoneholmesargs(str,varargin)
 %STONEHOLMESARGS  Checks input arguments for Stone-Holmes distribution functions
-%   [SZY,EXPANSION] = STONEHOLMESARGS(STR,SZX,SZDELTA,SZEPSILON,SZLAMBDA_U)
+%   [SZY,EXPANSION] = STONEHOLMESARGS(STR,SZX,SZDELTA,SZEPSILON,SZLAMBDA_U,SZLAMBDA_S)
 %   returns the combined size vector, SZY, of the input size vectors and a
 %   Boolean vector indicating if any of the input arrays are column vectors that
 %   will need to be expanded to match SZY. STR is a string specifying the name
@@ -8,14 +8,14 @@ function [szy,expnd]=stoneholmesargs(str,varargin)
 %   constraints. Valid strings for this input format are 'pdf', 'cdf', 'inv',
 %   'rnd', and 'like'.
 %
-%   [...] = STONEHOLMESARGS(STR,SZX,SZTHETA,SZLAMBDA_U) handles the two
-%   parameter case, but only for the input strings 'pdf', 'cdf', and 'inv' as
-%   'rnd' and 'like' do permit the parameters to be specified as Theta and
-%   Lambda_U.
+%   [...] = STONEHOLMESARGS(STR,SZX,SZTHETA,SZLAMBDA_U,SZLAMBDA_S) handles the
+%   three parameter case, but only for the input strings 'pdf', 'cdf', and 'inv'
+%   as 'rnd' and 'like' do permit the parameters to be specified as Theta,
+%   Lambda_U, Lambda_S.
 %
-%   [...] = STONEHOLMESARGS(STR,SZDELTA,SZEPSILON,SZLAMBDA_U) and
-%   [...] = STONEHOLMESARGS(STR,SZTHETA,SZLAMBDA_U) are as above, but valid
-%   strings, STR, for this input format are 'median' and 'mode'.
+%   [...] = STONEHOLMESARGS(STR,SZDELTA,SZEPSILON,SZLAMBDA_U,SZLAMBDA_S) and
+%   [...] = STONEHOLMESARGS(STR,SZTHETA,SZLAMBDA_U,SZLAMBDA_S) are as above, but
+%   valid strings, STR, for this input format are 'median' and 'mode'.
 %
 %   [...] = STONEHOLMESARGS(STR,SZDELTA,SZEPSILON,SZLAMBDA_U,SZLAMBDA_S) and
 %   [...] = STONEHOLMESARGS(STR,SZTHETA,SZLAMBDA_U,SZLAMBDA_S) are as above, but
@@ -30,7 +30,7 @@ function [szy,expnd]=stoneholmesargs(str,varargin)
 %   versions prior to Matlab 7.11 (R2010b).
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-12-12
-%   Revision: 1.0, 6-21-12
+%   Revision: 1.0, 1-13-13
 
 
 if ~ischar(str)
@@ -47,16 +47,16 @@ isLikeRnd=any(strcmpi(str,{'like','rnd'}));
 isPassageTime=strcmpi(str,'passagetime');
 isX=~(isMedianMode || isPassageTime);
 
-if isMedianMode && nargin < 3 || isLikeRnd && nargin < 5 || nargin < 4
+if isMedianMode && nargin < 4 || isLikeRnd && nargin < 6 || nargin < 5
     error('SHCTools:stoneholmesargs:TooFewInputs','Not enough input arguments.')
 end
-if isMedianMode && nargin > 4 || nargin > 5
+if isMedianMode && nargin > 5 || nargin > 6
     error('SHCTools:stoneholmesargs:TooManyInputs','Too many input arguments.')
 end
 
 % Check for two parameter case
 isTheta=true;
-if isMedianMode && nargin == 4 || nargin == 5
+if isMedianMode && nargin == 5 || nargin == 6
     isTheta=false;
 end
 
@@ -77,7 +77,9 @@ end
 ns=~all(sz == 1,2);
 
 % Check that first dimension is consistent for column expansion case
-if ns(1) && any(sz([false;ns(2:end)],1) ~= sz(ns(1),1))
+if ns(1) && (~isLike && any(sz([false;ns(2:end)],1) ~= sz(ns(1),1)) ...
+        || isLike && any(sz([false;ns(2:end)],1) ~= 1) ...
+        && any(sz([false;ns(2:end)],2) ~= sz(ns(1),1)))
     if ~(isLike || isMedianMode)
         if isTheta
             thetastr='Theta'; 
@@ -86,7 +88,7 @@ if ns(1) && any(sz([false;ns(2:end)],1) ~= sz(ns(1),1))
         end
     end
     if isX && ns(1) && ~isLike
-        if nargin < 5
+        if nargin < 6
             msgstr='the data';
         else
             switch(lower(str))
@@ -100,18 +102,19 @@ if ns(1) && any(sz([false;ns(2:end)],1) ~= sz(ns(1),1))
                     msgstr='the data';
             end
         end
-        errmsg=['If more than one of ' thetastr ', Lambda_U, or ' msgstr ...
-                ' are non-scalar, they must have the same number of rows.'];
+        errmsg=['If more than one of ' thetastr ', Lambda_U, Lambda_S, or ' ...
+                msgstr ' are non-scalar, they must have the same number of '...
+                'rows.'];
     elseif isPassageTime
         errmsg=['If more than one of ' thetastr ', Lambda_U, or Lambda_S '...
                 'are non-scalar, they must have the same number of rows.'];
     elseif isLike
         if isTheta
-            errmsg=['Theta and Lambda_U must be scalars or 1-by-N-by-... '...
-                    'arrays.'];
-        else
-            errmsg=['Delta, Epsilon, and Lambda_U must be scalars or '...
+            errmsg=['Theta, Lambda_U, and Lambda_S must be scalars or '...
                     '1-by-N-by-... arrays.'];
+        else
+            errmsg=['Delta, Epsilon, Lambda_U, and Lambda_S must be scalars '...
+                    'or 1-by-N-by-... arrays.'];
         end
     else
         if isTheta
@@ -160,19 +163,20 @@ if size(sza,1) > 1 && any(any(bsxfun(@ne,sza(2:end,2:end),sza(1,2:end)),2))
                             'vectors'];
             end
         end
-        errmsg=['If more than one of ' thetastr ', Lambda_U, or ' msgstr...
-                ', they must have the same dimensions.'];
+        errmsg=['If more than one of ' thetastr ', Lambda_U, Lambda_S, or ' ...
+                msgstr ', they must have the same dimensions.'];
     elseif isPassageTime
         errmsg=['If more than one of ' thetastr ', Lambda_U, or Lambda_S '...
                 'are non-scalar arrays and not column vectors, they must '...
                 'have the same dimensions.'];
     elseif isLike
         if isTheta
-            errmsg=['If Theta and/or Lambda_U are non-scalar arrays, they '...
-                    'must have the same dimensions.'];
-        else
-            errmsg=['If more than one of Delta, Epsilon, or Lambda_U are '...
+            errmsg=['If more than one of Theta, Lambda_U, or Lambda_S are '...
                     'non-scalar arrays, they must have the same dimensions.'];
+        else
+            errmsg=['If more than one of Delta, Epsilon, Lambda_U, or '...
+                    'Lambda_S are non-scalar arrays, they must have the '...
+                    'same dimensions.'];
         end
     else
         if isTheta
@@ -210,11 +214,11 @@ if nargout == 2
     else
         if isX
             expnd=isCol & (1-eye(length(sz)))*isArray > 0;
-            if nargin == 4
+            if nargin == 5
                 expnd=[expnd(1);false;expnd(2:end)];
             end
-        else
-            if isPassageTime && nargin == 4 || isMedianMode && nargin == 3
+        else  
+            if isPassageTime && nargin == 4 || isMedianMode && nargin == 4
                 expnd=[false;(isCol & (1-eye(length(sz)))*double(isArray) > 0)];
             else
                 expnd=(isCol & (1-eye(length(sz)))*double(isArray) > 0);

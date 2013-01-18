@@ -4,23 +4,23 @@ function tau=stoneholmespassagetime(varargin)
 %   mean passage time of the Stone-Holmes distribution with positive parameters
 %   Delta, Epsilon, Lambda_U, and Lambda_S. Delta is the size of the 
 %   neighborhood, Epsilon (0 <= Epsilon << Delta) is the root-mean-square of the
-%   noise, and Lambda_U and Lambda_S (Lambda_S >= Lambda_U) are the eigenvalues
-%   with the largest positive and negative real parts, respectively. NaN is
-%   returned for any Delta <= 0, Epsilon < 0, Epsilon = Inf, Lambda_U <= 0,
-%   Lambda_U = Inf, Lambda_S <= 0, Lambda_S = Inf, or certain illconditioned
-%   parameter combinations. The parameters must be scalars, length M column
-%   vectors, or M-by-N-by-... size arrays. If any combination of Delta, Epsilon,
-%   Lambda_U, or Lambda_S are column vectors, they will be applied across the
-%   N-dimensional columns of TAU. The size of the output TAU is that of Delta,
-%   Epsilon, Lambda_U, and Lambda_S if all are equal size arrays. If any subset
-%   of the parameters are scalars or column vectors, the size of TAU is the size
-%   of the other parameter(s).
+%   noise, and Lambda_U and Lambda_S (Lambda_U < Lambda_S) are the absolute
+%   value of the eigenvalues with the largest positive and negative real parts,
+%   respectively. NaN is returned for any Delta <= 0, Epsilon < 0,
+%   Epsilon = Inf, Lambda_U <= 0, Lambda_U = Inf, Lambda_S <= 0, or certain
+%   illconditioned parameter combinations. The parameters must be scalars,
+%   length M column vectors, or M-by-N-by-... size arrays. If any combination of
+%   Delta, Epsilon, Lambda_U, or Lambda_S are column vectors, they will be
+%   applied across the N-dimensional columns of TAU. The size of the output TAU
+%   is that of Delta, Epsilon, Lambda_U, and Lambda_S if all are equal size
+%   arrays. If any subset of the parameters are scalars or column vectors, the
+%   size of TAU is the size of the other parameter(s).
 %
 %   TAU = STONEHOLMESPASSAGETIME(THETA,LAMBDA_U,LAMBDA_S) returns the mean
 %   passage time of the Stone-Holmes distribution in the three parameter case,
 %   where Theta = Epsilon/Delta (0 <= Theta << 1) is the size of the noise
 %   relative to that of the neighborhood, Delta. NaN is returned if Theta = Inf,
-%   Theta < 0, Lambda_U <= 0, Lambda_U = Inf, Lambda_S <= 0, or Lambda_S = Inf.
+%   Theta < 0, Lambda_U <= 0, Lambda_U = Inf, or Lambda_S <= 0.
 %
 %   Note:
 %       If (Delta/Epsilon)*sqrt(Lambda_U) or (Delta/Epsilon)*sqrt(Lambda_S) is
@@ -30,22 +30,26 @@ function tau=stoneholmespassagetime(varargin)
 %       case may or may not be useful in practice (again, Stone & Holmes define
 %       Epsilon << Delta), but this function does provide a reliable solution to
 %       the integral expression defining the mean passage time regardless of the
-%       physical significance of the model. 
+%       physical significance of the model.
 %
 %   Example:
 %       % Generate plot similar to Fig. 3a in Stone & Holmes, 1990
-%       delta = 1; lambda_u = 0.5; lambda_s = 1;
-%       epsilon = [0.0005 0.001:0.001:0.01 0.015:0.005:0.05];
-%       tau = stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
-%       figure; plot(epsilon,tau,'.-',epsilon,log(delta./epsilon)/lambda_u,'.-')
-%       title(['Stone-Holmes Passage Time: $\delta$ = ' num2str(delta)...
-%           ', $\lambda_u$ = ' num2str(lambda_u) ', $\lambda_s$ = '...
-%           num2str(lambda_s) '$~~~~~~~~~~~~~~$'],'Interpreter','latex');
-%       xlabel('\epsilon'); ylabel('\tau_p'); grid on; axis([0 0.06 0 20]);
-%       h = legend('$\tau_p$, Theoretical (Eq. 2.28, Stone \& Holmes, 1990)',...
-%           ' $\tau_p \approx $ ln$(\delta/\epsilon)/\lambda_u$',2);
+%       delta=1; lambda_u=0.5; lambda_s=1;
+%       epsilon=[0.0005 0.001:0.001:0.01 0.015:0.005:0.05];
+%       tau=stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
+%       figure; grid on; axis([0 0.06 0 20]);
+%       plot(epsilon,tau,'.-',epsilon,log(delta./epsilon)/lambda_u,'.-');
+%       xlabel('$\epsilon$','Interpreter','latex');
+%       ylabel('$\tau_\mathrm{p}$','Interpreter','latex');
+%       title(['Stone-Holmes Distribution Mean Passage Times: $\delta$ = ' ...
+%           num2str(delta) ', $\lambda_\mathrm{u}$ = ' num2str(lambda_u) ...
+%           ', $\lambda_\mathrm{s}$ = ' num2str(lambda_s) ...
+%           '$~~~~~~~~~~~~~~~~~~~~~$'],'Interpreter','latex');
+%       h=legend([' $\tau_\mathrm{p}$, Theoretical (Eq. 2.28, Stone \& ' ...
+%           'Holmes, 1990)'],[' $\tau_\mathrm{p} \approx $ ' ...
+%           'ln$(\delta/\epsilon)/\lambda_\mathrm{u}$'],2);
 %       set(h,'Interpreter','latex','EdgeColor',[1 1 1]);
-%       p = get(h,'Position'); set(h,'Position',[p(1:2) 1.25*p(3) p(4)]);
+%       p=get(h,'Position'); set(h,'Position',[p(1:2) 1.25*p(3) p(4)]);
 %   
 %   See also:
 %       STONEHOLMESINVPASSAGETIME, STONEHOLMESPDF, STONEHOLMESCDF,
@@ -58,7 +62,7 @@ function tau=stoneholmespassagetime(varargin)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-19-12
-%   Revision: 1.0, 11-26-12
+%   Revision: 1.0, 1-17-13
 
 
 % Check variable inputs
@@ -140,11 +144,9 @@ lambda_u = lambda_u(:);
 lambda_s = lambda_s(:);
 
 % Logical linear indices for out-of-range parameters
-idelta = (delta <= 0 | isnan(delta));             	% Delta:    (0, Inf]
-iepsilon = (epsilon < 0 | isnan(epsilon));        	% Epsilon:  [0, Inf)
-ilambda_u = (lambda_u <= 0 | isnan(lambda_u));     	% Lambda_U: (0, Inf)
-ilambda_s = (lambda_s <= 0 | isnan(lambda_s));      % Lambda_S: (0, Inf)
-i = (idelta | iepsilon | ilambda_u | ilambda_s);
+% Delta: (0, Inf], Epsilon: [0, Inf), Lambda_U: (0, Inf), Lambda_S: (0, Inf]
+i = (delta <= 0 | isnan(delta) | epsilon < 0 | isnan(epsilon) | ...
+    lambda_u <= 0 | isnan(lambda_u) | lambda_s <= 0 | isnan(lambda_s));
 
 % Check for empty output or if all values of any parameter is out-of-range
 dtype = superiorfloat(delta,epsilon,lambda_u,lambda_s);
@@ -159,7 +161,7 @@ else
     tau(i) = NaN;
     
     % Logical linear indices for in-range parameters
-    i = (~i & epsilon < Inf & lambda_u < Inf & lambda_s < Inf);
+    i = (~i & epsilon < Inf & lambda_u < Inf);
     
     % If any values in-range
     if any(i)
@@ -187,15 +189,22 @@ else
             else
                 warning('SHCTools:stoneholmespassagetime:DeltaEpsilonScaling',...
                        ['One or more Epsilon values is greater than the '...
-                        'Delta value(s), but the Stone-Holmes distribution '...
-                        'defines Epsilon << Delta.']);
+                        'corresponding Delta value(s), but the Stone-Holmes '...
+                        'distribution defines Epsilon << Delta.']);
             end
+        end
+        
+        if any(lambda_u >= lambda_s)
+            warning('SHCTools:stoneholmespassagetime:LambdaScaling',...
+                   ['One or more Lambda_U values is greater than or equal '...
+                    'to the corresponding Lambda_S value(s), but the '...
+                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.'])
         end
         
         % Compute mean passage time of Stone-Holmes distribution in-range values
         de = delta./epsilon;
-        desls = de.*sqrt(lambda_s);
-        deslu = de.*sqrt(lambda_u);
+        desls = de.*sqrt(lambda_s)
+        deslu = de.*sqrt(lambda_u)
         eulergamma = 0.577215664901533;
         
         % Use fast small noise (and/or large Lambda) approximation by default
@@ -205,14 +214,18 @@ else
             ideslu2 = 1./(4*deslu.^2);
             s = ideslu2.*(2-ideslu2.*(6-ideslu2.*(40-ideslu2.*(420 ...
                 -ideslu2.*(6048-ideslu2.*(110880-2436480*ideslu2))))));
-            tau(i) = (s+log(4*lambda_u.*lambda_s./(lambda_u+lambda_s))...
-                +eulergamma+2*log(de))./(2*lambda_u);
+            tau(i) = (s+log(4*lambda_u)-log1p(lambda_u./lambda_s)...
+                     +eulergamma+2*log(de))./(2*lambda_u);
         end
         
+        % Logical linear indices for in-range parameters
+        il = (deslu > 5 | desls < sqrt(realmax));
+        i = (i & il);
+        tau(~il) = NaN;
+        ii = (~ii & il);
+        
         % Recalculate using full analytical solution for any large noise cases
-        if any(~ii)
-            ii = ~ii;
-            
+        if any(ii)
             if ~isscalar(lambda_u)
                 lambda_u = lambda_u(ii);
             end
@@ -266,9 +279,9 @@ else
                 end
             end
             
-            tau(ii) = (S(:)-erf(desls).*log1p(lambda_s./lambda_u)...
-                +(4/sqrt(pi))*desls.*hypergeomq([1/2 1/2],[3/2 3/2],...
-                -desls2))./(2*lambda_u);
+            tau(ii) = (S(:)-erf(desls).*log(1+lambda_s./lambda_u)...
+                      +(4/sqrt(pi))*desls.*hypergeomq([1/2 1/2],[3/2 3/2],...
+                      -desls2))./(2*lambda_u);
         end
         
         % Resolve any possible underflow and error conditions

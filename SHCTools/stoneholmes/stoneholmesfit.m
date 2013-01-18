@@ -1,21 +1,30 @@
 function varargout=stoneholmesfit(x,varargin)
 %STONEHOLMESFIT  Parameter estimates for Stone-Holmes distribution data.
-%   [DELTAHAT,EPSILONHAT,LAMBDA_UHAT] = STONEHOLMESFIT(X) returns estimated
-%   parameters for the Stone-Holmes distribution with using the default
-%   DELTA = DELTAHAT = 1. Delta is the size of the neighborhood, Epsilon
-%   (Epsilon << Delta) is the root-mean-square of the noise, and Lambda_U is the
-%   eigenvalue with the largest positive real part.
+%   [DELTAHAT,EPSILONHAT,LAMBDA_UHAT,LAMBDA_SHAT] = STONEHOLMESFIT(X) returns
+%   estimated parameters for the Stone-Holmes distribution with using the
+%   default Delta = DeltaHat = 1 and Lambda_S = Lambda_SHat = Inf. Delta is the
+%   size of the neighborhood, Epsilon (Epsilon << Delta) is the root-mean-square
+%   of the noise, and Lambda_U and Lambda_S (Lambda_U < Lambda_S) are the
+%   absolute value of the eigenvalues with the largest positive and negative
+%   real parts, respectively.
 %
-%   [THETAHAT,LAMBDA_UHAT] = STONEHOLMESFIT(X) returns estimated parameters for
-%   the two parameter Stone-Holmes distribution. Theta = Epsilon/Delta
-%   (Theta << 1) is the size of the noise relative to that of the neighborhood.
+%   [THETAHAT,LAMBDA_UHAT,LAMBDA_SHAT] = STONEHOLMESFIT(X) returns estimated
+%   parameters for the two parameter Stone-Holmes distribution
+%   Theta = Epsilon/Delta (Theta << 1) is the size of the noise relative to that
+%   of the neighborhood.
 %
-%   PARAMSHAT = STONEHOLMESFIT(X) returns a row vector of the estimated
-%   parameters containing [THETAHAT,LAMBDA_UHAT].
+%   [...] = STONEHOLMESFIT(X,DELTA) specifies alternative (scalar) value of
+%   Delta. DeltaHat is always equal to Delta. For the two parameter Stone-Holmes
+%   distribution, ThetaHat = EpsilonHat/DeltaHat.
 %
-%   [...] = STONEHOLMESFIT(X,DELTA) specifies alternative value of Delta.
-%   DELTAHAT is always equal to DELTA. For the two parameter Stone-Holmes
-%   distribution, THETAHAT = EPSILONHAT/DELTAHAT.
+%   [...] = STONEHOLMESFIT(X,DELTA,LAMBDA_S) specifies alternative (scalar)
+%   values for Delta and Lambda_S. DeltaHat and Lambda_SHat are always equal to
+%   Delta and Lambda_S, respectively.
+%
+%   PARAMSHAT = STONEHOLMESFIT(X,...) returns a row vector of the estimated
+%   parameters containing [THETAHAT,LAMBDA_UHAT,LAMBDA_SHAT] or
+%   [DELTAHAT,EPSILONHAT,LAMBDA_UHAT,LAMBDA_SHAT] if an alternate value of delta
+%   is specified.
 %
 %   [...] = STONEHOLMESFIT(X,...,CENSORING,...) accepts a Boolean vector of the
 %   same size as X that is 1 for observations that are right-censored and 0 for
@@ -33,15 +42,18 @@ function varargout=stoneholmesfit(x,varargin)
 %
 %   Example:
 %       % Generate random samples, fit data, and plot PDF of fitted parameters
-%       delta=1; epsilon=0.01; lambda_u=0.5; n=1e4; x=0:0.01:25;
-%       r=stoneholmesrnd(delta,epsilon,lambda_u,n,1);
-%       [delhat ephat lamhat]=stoneholmesfit(r,delta);
-%       y=stoneholmespdf(x,delhat,ephat,lamhat);
+%       delta=1; epsilon=0.01; lambda_u=0.5; lambda_s=1; n=1e4; x=0:0.01:25;
+%       r=stoneholmesrnd(delta,epsilon,lambda_u,lambda_s,n,1);
+%       [delhat,ephat,lamuhat,lamshat]=stoneholmesfit(r,delta,lambda_s);
+%       y=stoneholmespdf(x,delhat,ephat,lamuhat,lamshat);
 %       binx=0.2; edges=x(1):binx:x(end)-binx; nc=histc(r,edges);
-%       bar(edges+binx/2,nc/(binx*n),1); shading flat; hold on;
-%       plot(x,y,'r'); xlabel('x'); ylabel('f(x)');
-%       title(['Stone-Holmes Fit: \epsilon = ' num2str(ephat) ...
-%           ', \lambda_u = ' num2str(lamhat)]);
+%       figure; bar(edges+binx/2,nc/(binx*n),1); shading flat; hold on;
+%       plot(x,y,'r'); h=xlabel('$x$'); h(2)=ylabel('f($x$)');
+%       h(3)=title(['Stone-Holmes Distribution Fit: $\hat{\epsilon}$ = ' ...
+%           num2str(ephat) ' ($\epsilon$ = ' num2str(epsilon) ...
+%           '), $\hat{\lambda_\mathrm{u}}$ = ' num2str(lamuhat) ...
+%           ' ($\lambda_\mathrm{u}$ = ' num2str(lambda_u) ...
+%           ')$~~~~~~~~~~~~~~~~~~~~$']); set(h,'Interpreter','latex');
 %   
 %   See also:
 %       STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESINV, STONEHOLMESLIKE,
@@ -63,14 +75,14 @@ function varargout=stoneholmesfit(x,varargin)
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 8-10-12
+%   Revision: 1.0, 1-16-13
 
 
 % Check number of input and output arguments
-if nargin > 5
+if nargin > 6
     error('SHCTools:stoneholmesfit:TooManyInputs','Too many input arguments.');
 end
-if nargout > 3
+if nargout > 4
     error('SHCTools:stoneholmesfit:TooManyOutputs',...
           'Too many output arguments.');
 end
@@ -84,6 +96,7 @@ sx=size(x);
 
 % Check variable inputs
 deltaset=true;
+lambda_sset=true;
 censoringset=true;
 freqset=true;
 optsset=true;
@@ -97,6 +110,13 @@ for i=1:nargin-1
         end
         delta=v;
         deltaset=false;
+    elseif  i == 2 && isscalar(v)
+        if ~isreal(v) || ~isnumeric(v) || v <= 0 || isnan(v)
+            error('SHCTools:stoneholmesfit:Lambda_SInvalid',...
+                  'Lambda_S must be a real positive scalar.')
+        end
+        lambda_s=v;
+        lambda_sset=false;
     elseif censoringset && (islogical(v) || all(v == 0 | v == 1))
         if ~isequal(size(v),sx)
             error('SHCTools:stoneholmesfit:FreqInvalid',...
@@ -138,8 +158,11 @@ for i=1:nargin-1
 end
 
 % Set optional inputs if not specified, handle censoring and frequency data
-if deltaset && nargout == 3
+if deltaset && (nargout <= 1 || nargout == 4)
     delta=1;
+end
+if lambda_sset
+    lambda_s=Inf;
 end
 isNoCensoring=(censoringset || ~any(censoring));
 if freqset
@@ -170,13 +193,22 @@ end
 
 % Generate options structure for fzero
 if isempty(options)
-    options=struct('Display','off','TolX',1e-9,'FunValCheck','off');
+    if isa(x,'single')
+        options=struct('Display','iter','TolX',eps('single'),...
+                       'FunValCheck','off');
+    else
+        options=struct('Display','iter','TolX',1e-9,'FunValCheck','off');
+    end
 else
     if ~isfield(options,'Display')
         options.('Display')='off';
     end
     if ~isfield(options,'TolX')
-        options.('TolX')=1e-9;
+        if isa(x,'single')
+            options.('TolX')=eps('single');
+        else
+            options.('TolX')=1e-9;
+        end
     end
     if ~isfield(options,'FunValCheck')
         options.('FunValCheck')='off';
@@ -195,7 +227,7 @@ if n == 0 || any(x < 0) || any(x == Inf)
     else
         varargout{1}=NaN(classX);
         varargout{2}=NaN(classX);
-        if nargout == 3
+        if nargout == 4
             varargout{3}=NaN(classX);
         end
     end
@@ -226,12 +258,16 @@ else
         [p,xp]=ecdf(x,'censoring',censoring,'frequency',freq);
     end
     [Q,R]=qr([log(-log(0.5*(p(1:end-1)+p(2:end)))) ones(n,1,classX)],0);
-    lambda_uhat=R(1)*R(4)/(xp(2:end)'*Q*[-R(4);R(3)]);  % = -1./(R\(Q'*xp))
+    lambda_uhat=R(1)*R(4)/(xp(2:end)'*Q*[-R(4);R(3)]);	% = -1./(R\(Q'*xp))
     wtx=sum(frequncensored.*xuncensored)/n;
 end
 
-% Create function handle for Lambda_U likelihood equation
-likelihood=@(lambda_u)likeeq(lambda_u,x,6/n,2*wtx,freq);
+% Create function handles for FZERO
+if isinf(lambda_s)
+    likelihood=@(lambda_u)likeeq_UInf(lambda_u,x,3/n,4*wtx,freq);
+else
+    likelihood=@(lambda_u)likeeq_US(lambda_u,lambda_s,x,3/n,4*wtx,freq);
+end
 
 % Bracket the root of the Lambda_U likelihood equation
 bnds=bracketroot(likelihood,lambda_uhat,...
@@ -239,6 +275,7 @@ bnds=bracketroot(likelihood,lambda_uhat,...
 
 % Find root of of the likelihood equation, MLE for Lambda_U
 [lambda_uhat,likelihoodval,err]=fzero(likelihood,bnds,options);
+
 if err < 0
     error('SHCTools:stoneholmesfit:NoSolution',...
           'Unable to reach a maximum likelihood solution.');
@@ -246,33 +283,63 @@ elseif eps(likelihoodval) > options.TolX
     warning('SHCTools:stoneholmesfit:IllConditioned',...
             'The likelihood equation may be ill-conditioned.');
 end
-lambda_uhat=cast(lambda_uhat,classX);
 
 % Calculate explicit MLE for Theta (Epsilon/Delta) in terms of Lambda_U
-theta=sqrt(2*lambda_uhat*sum(freq./expm1(2*lambda_uhat*x))/n);
+theta=sqrt(2*lambda_uhat*sum(freq./((1+...
+      lambda_uhat/lambda_s)*exp(2*lambda_uhat*x)-1))/n);
 
 % Output fitted parameters
 if nargout <= 1
     if deltaset
-        varargout{1}=[theta lambda_uhat];
+        varargout{1}=[theta lambda_uhat lambda_s];
     else
-        varargout{1}=[delta delta*theta lambda_uhat];
+        varargout{1}=[cast(delta,classX) delta*theta lambda_uhat lambda_s];
     end
 elseif nargout == 2
-    varargout{1}=theta;
-    varargout{2}=lambda_uhat;
+    if deltaset
+        varargout{1}=theta;
+        varargout{2}=lambda_uhat;
+    else
+        varargout{1}=cast(delta,classX);
+        varargout{2}=delta*theta;
+    end
+elseif nargout == 3
+    if deltaset
+        varargout{1}=theta;
+        varargout{2}=lambda_uhat;
+        varargout{3}=lambda_s;
+    else
+        varargout{1}=cast(delta,classX);
+        varargout{2}=delta*theta;
+        varargout{3}=lambda_uhat;
+    end
 else
-    varargout{1}=delta;
+    varargout{1}=cast(delta,classX);
     varargout{2}=delta*theta;
     varargout{3}=lambda_uhat;
+    varargout{4}=lambda_s;
 end
 
 
-% Likelihood equation for Lambda_U, actually negative of it
-function z=likeeq(lambda_u,x,n,wtx,freq)
 
-lam2x=2*lambda_u*x;
-exi=1./expm1(lam2x);
-fexi=freq.*exi;
-s=sum(fexi.*exi.*(1+exp(lam2x).*(lam2x-1)));
-z=n*sum(fexi.*x)+wtx-(3+s/sum(fexi))/lambda_u;
+% Negative likelihood equation for Lambda_U, Lambda_S = Inf
+function z=likeeq_UInf(lambda_u,x,n,wtx,freq)
+ex=exp(2*lambda_u*x);
+ex1=1./(ex-1);
+s1=2*x.*ex.*ex1;
+
+% Times -2/n
+z=-3/lambda_u+n*sum(freq.*s1)-wtx ...
+    -sum(freq.*(lambda_u*s1-1).*ex1)/(lambda_u*sum(freq.*ex1));
+ 
+
+% Negative likelihood equation for Lambda_U given Lambda_S
+function z=likeeq_US(lambda_u,lambda_s,x,n,wtx,freq)
+lam1=1+lambda_u/lambda_s;
+ex=exp(2*lambda_u*x);
+ex1=1./(lam1*ex-1);
+s1=(1/lambda_s+2*lam1*x).*ex.*ex1;
+
+% Times -2/n
+z=-2/(lambda_u+lambda_s)-3/lambda_u+n*sum(freq.*s1)-wtx ...
+     -sum(freq.*(lambda_u*s1-1).*ex1)/(lambda_u*sum(freq.*ex1));

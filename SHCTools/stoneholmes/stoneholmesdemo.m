@@ -5,7 +5,7 @@ function stoneholmesdemo(varargin)
 %   (Eq. 2.10 in Stone & Holmes, 1990) using default parameters of Delta = 1,
 %   Epsilon = 0.03, Lambda_U = 0.5, Lambda_S = 1. Delta is the size of the 
 %   neighborhood, Epsilon (0 <= Epsilon << Delta) is the root-mean-square of the
-%   noise, and Lambda_U and Lambda_S (Lambda_U <= Lambda_S) are the eigenvalues
+%   noise, and Lambda_U and Lambda_S (Lambda_U < Lambda_S) are the eigenvalues
 %   with the largest positive and negative real parts, respectively.
 %
 %   STONEHOLMESDEMO(DELTA,EPSILON,LAMBDA_U,LAMBDA_S,N) runs N simulations of the
@@ -27,7 +27,7 @@ function stoneholmesdemo(varargin)
 %   http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-25-12
-%   Revision: 1.0, 8-10-12
+%   Revision: 1.0, 1-14-13
 
 
 if nargin == 0
@@ -102,6 +102,11 @@ else
              ['Lambda_S must be a finite real floating point scalar greater '...
               'than zero.'])
     end
+    if lambda_u >= lambda_s
+        error('SHCTools:stoneholmesdemo:LambdaScaling',...
+             ['Lambda_U is greater than or equal to Lambda_S, but the '...
+              'Stone-Holmes distribution defines Lambda_U < Lambda_S.'])
+    end
     if ~isscalar(N) || isempty(N) || ~isreal(N) || ~isnumeric(N) ...
             || ~isfinite(N) || N < 1 || N-floor(N) ~= 0
         error('SHCTools:stoneholmesdemo:NInvalid',...
@@ -124,7 +129,7 @@ Nd = min(Np,50);	% Number of passage time simulations to plot
 Ne = N;             % Number of exit distribution simulations
 Nr = 20;            % Number of exit distribution re-injections
 
-% set up figure with four subplots
+% Set up figure with four subplots
 figure
 hfp = get(gcf,'Position');
 set(gcf,'Position',[hfp(1:2) 1.9*hfp([4 4])],'Renderer','painters')
@@ -144,24 +149,24 @@ plot(delta*[-0.1 1],delta*[1 1],'k--',delta*[1 1],delta*[-0.1 1],'k--')
 axis(delta*[-1 11 -1 11]*0.1)
 axis square
 grid on
-xlabel('$a_s(t)$','Interpreter','latex','FontSize',11)
-ylabel('$a_u(t)$','Interpreter','latex','FontSize',11)
+xlabel('$a_\mathrm{s}(t)$','Interpreter','latex','FontSize',11)
+ylabel('$a_\mathrm{u}(t)$','Interpreter','latex','FontSize',11)
 title(['Stone-Holmes Passage Time: ' int2str(Nd) ' Simulations'],'FontSize',11)
 
 subplot(223)
 hold on
 axis square
 box off
-xlabel('$\tau_p$','Interpreter','latex','FontSize',11)
-ylabel('$P(\tau_p)$','Interpreter','latex','FontSize',11)
+xlabel('$\tau_\mathrm{p}$','Interpreter','latex','FontSize',11)
+ylabel('P$(\tau_\mathrm{p})$','Interpreter','latex','FontSize',11)
 title('Stone-Holmes Passage Time Distribution Fit','FontSize',11)
 
 subplot(224)
 hold on
 axis square
 box off
-xlabel('$a_s$','Interpreter','latex','FontSize',11)
-ylabel('$P(a_s)$','Interpreter','latex','FontSize',11)
+xlabel('$a_\mathrm{s}$','Interpreter','latex','FontSize',11)
+ylabel('P$(a_\mathrm{s})$','Interpreter','latex','FontSize',11)
 title('Stone-Holmes Exit Distribution Fit','FontSize',11)
 drawnow('expose')
 
@@ -311,12 +316,12 @@ n = histc(tp,edges);
 ybar = n/(binx*sum(n));
 
 waittext('Passage Time Distribution... Fitting Data.')
-[delhat ephat lamhat] = stoneholmesfit(tp,delta);
-yexact = stoneholmespdf(x,delta,epsilon,lambda_u);
-yfit = stoneholmespdf(x,delhat,ephat,lamhat);
+[delhat,ephat,lamhat] = stoneholmesfit(tp,delta);
+yexact = stoneholmespdf(x,delta,epsilon,lambda_u,lambda_s);
+yfit = stoneholmespdf(x,delhat,ephat,lamhat,lambda_s);
 
 [hypoth,pvalue,stats] = chi2gof(tp,'cdf',@(x)stoneholmescdf(x,delta,epsilon,...
-    lambda_u));	%#ok<ASGLU>
+    lambda_u,lambda_s));	%#ok<ASGLU>
 
 waittext('Passage Time Distribution... Plotting.')
 subplot(223)
@@ -326,9 +331,10 @@ hf = plot(x,yfit,'m');
 axis([x(1) x(end) 0 1.4*max([max(yexact) max(yfit) max(ybar)])])
 hl = legend([hb he hf 0],[' ' int2str(Np) ' Simulations'],...
     [' Exact: $\delta$ = ' num2str(delta) ', $\epsilon$ = ' num2str(epsilon) ...
-    ', $\lambda_u$ = ' num2str(lambda_u)],[' Fit:  $\hat{\epsilon}$ = '...
-    num2str(ephat) ', $\hat{\lambda_u}$ = ' num2str(lamhat)],...
-    [' $\chi^2$ = ' num2str(stats.chi2stat) ', $p$-value = ' num2str(pvalue)]);
+    ', $\lambda_\mathrm{u}$ = ' num2str(lambda_u)],...
+    [' Fit:  $\hat{\epsilon}$ = ' num2str(ephat) ...
+    ', $\hat{\lambda_\mathrm{u}}$ = ' num2str(lamhat)],[' $\chi^2$ = ' ...
+    num2str(stats.chi2stat) ', $p$-value = ' num2str(pvalue)]);
 set(hl,'Interpreter','latex','Box','off','FontSize',10,'Location','NorthWest')
 set(hb,'EdgeColor','none','FaceColor',[0 0 1],'ShowBaseLine','off')
 drawnow('expose')
@@ -344,7 +350,7 @@ n = histc(px,edges);
 ybar = n/(binx*sum(n));
 
 waittext('Exit Distribution... Fitting Data.')
-[muhat sighat] = normfit(px);
+[muhat,sighat] = normfit(px);
 mu = 0;
 sig = sqrt(0.5*epsilon^2/lambda_s);
 yexact = normpdf(x,mu,sig);
@@ -360,12 +366,12 @@ plot([0 0],[0 max([max(yexact) max(yfit) max(ybar)])],'k--')
 axis([x(1) x(end) 0 1.5*max([max(yexact) max(yfit) max(ybar)])])
 hl = legend([hb he 0 hf 0],[' ' int2str(Ne) ' Simulations (' int2str(Nr) ...
     ' Re-injections)'],[' Exact: $\delta$  = ' num2str(delta) ...
-    ', $\epsilon$ = ' num2str(epsilon) ', $\lambda_s$ = ' num2str(lambda_s)],...
-    [' $\mu$ = ' num2str(mu) ...
-    ', $\sigma$ = $\sqrt{\epsilon^2/2\lambda_s}~~~~~$ = ' num2str(sig)],...
-    [' Fit:  $\hat{\mu}$ = ' num2str(muhat) ', $\hat{\sigma}$ = '...
-    num2str(sighat)],[' $\chi^2$ = ' num2str(stats.chi2stat) ', $p$-value = '...
-    num2str(pvalue)]);
+    ', $\epsilon$ = ' num2str(epsilon) ', $\lambda_\mathrm{s}$ = ' ...
+    num2str(lambda_s)],[' $\mu$ = ' num2str(mu) ...
+    ', $\sigma$ = $\sqrt{\epsilon^2/2\lambda_\mathrm{s}}~~~$ = ' ...
+    num2str(sig)],[' Fit:  $\hat{\mu}$ = ' num2str(muhat) ...
+    ', $\hat{\sigma}$ = ' num2str(sighat)],[' $\chi^2$ = ' ...
+    num2str(stats.chi2stat) ', $p$-value = ' num2str(pvalue)]);
 set(hl,'Interpreter','latex','Box','off','FontSize',10,'Location','NorthWest')
 set(hb,'EdgeColor','none','FaceColor',[0 0 1],'ShowBaseLine','off')
 waittext('Exit Distribution... Done.')

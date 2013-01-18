@@ -4,16 +4,16 @@ function epsilon=stoneholmesinvpassagetime(tau,varargin)
 %   root-mean-square of the noise, Epsilon, for the Stone-Holmes distribution
 %   with mean passage time Tau and positive parameters Delta, Lambda_U, and
 %   Lambda_S. Delta is the size of the neighborhood (0 <= Epsilon << Delta) and
-%   Lambda_U and Lambda_S (Lambda_S >= Lambda_U) are the eigenvalues with the
+%   Lambda_U and Lambda_S (Lambda_U < Lambda_S) are the eigenvalues with the
 %   largest positive and negative real parts, respectively. NaN is returned for
-%   any Tau < 0, Delta <= 0, Lambda_U <= 0, Lambda_U = Inf, Lambda_S <= 0,
-%   Lambda_S = Inf, or certain illconditioned parameter combinations. The
-%   parameters must be scalars, length M column vectors, or M-by-N-by-... size
-%   arrays. If any combination of Tau, Delta, Lambda_U, or Lambda_S are column
-%   vectors, they will be applied across the N-dimensional columns of Epsilon.
-%   The size of the output Epsilon is that of Tau, Delta, Lambda_U, and Lambda_S
-%   if all are equal size arrays. If any subset of the parameters are scalars or
-%   column vectors, the size of Epsilon is the size of the other parameter(s).
+%   any Tau < 0, Delta <= 0, Lambda_U <= 0, Lambda_U = Inf, Lambda_S <= 0, or
+%   certain illconditioned parameter combinations. The parameters must be
+%   scalars, length M column vectors, or M-by-N-by-... size arrays. If any
+%   combination of Tau, Delta, Lambda_U, or Lambda_S are column vectors, they
+%   will be applied across the N-dimensional columns of Epsilon. The size of the
+%   output Epsilon is that of Tau, Delta, Lambda_U, and Lambda_S if all are
+%   equal size arrays. If any subset of the parameters are scalars or column
+%   vectors, the size of Epsilon is the size of the other parameter(s).
 %
 %   THETA = STONEHOLMESINVPASSAGETIME(TAU,LAMBDA_U,LAMBDA_S) returns the
 %   scaled root-mean-square of the noise, Theta, for the Stone-Holmes
@@ -34,19 +34,21 @@ function epsilon=stoneholmesinvpassagetime(tau,varargin)
 %
 %   Example:
 %       % Plot inverse passage time solution for wide range of Tau and Lambda_U
-%       delta = 1; epsilon_dx = logspace(-50,-1,20); lambda_ux = 0.05:0.05:1;
-%       lambda_s = 1; [lambda_u,epsilon_d] = meshgrid(lambda_ux,epsilon_dx);
-%       tau = stoneholmespassagetime(delta,epsilon_d,lambda_u,lambda_s);
-%       epsilon = stoneholmesinvpassagetime(tau,delta,lambda_u,lambda_s);
+%       delta=1; epsilon_dx=logspace(-50,-1,20); lambda_ux=0.05:0.05:0.95;
+%       lambda_s=1; [lambda_u,epsilon_d]=meshgrid(lambda_ux,epsilon_dx);
+%       tau=stoneholmespassagetime(delta,epsilon_d,lambda_u,lambda_s);
+%       epsilon=stoneholmesinvpassagetime(tau,delta,lambda_u,lambda_s);
 %       figure; imagesc(log10(epsilon_dx),lambda_ux,tau); colormap(jet(256));
-%       colorbar; xlabel('Log_1_0(\epsilon)'); ylabel('\lambda_u');
-%       title('\tau, Stone-Holmes mean passge time');
+%       colorbar; h=title('$\tau_\mathrm{p}$, Stone-Holmes Mean Passge Times');
+%       h(2)=xlabel('Log$_{10}(\epsilon)$');
+%       h(3)=ylabel('$\lambda_\mathrm{u}$'); set(h,'Interpreter','latex');
 %
 %       % Evaluate numerical accuracy of inverse passage time solution 
-%       abserr = abs(epsilon_d-epsilon); err = max(abserr,abserr./epsilon);
-%       figure; imagesc(log10(epsilon_dx),lambda_ux,log10(err));
-%       colormap(jet(256)); colorbar; xlabel('Log_1_0(\epsilon)');
-%       ylabel('\lambda_u'); title('Log_1_0(Max(Abs. Error, Rel. Error))');
+%       abserr=abs(epsilon_d-epsilon); err=max(abserr,abserr./epsilon);
+%       figure; imagesc(log10(epsilon_dx),lambda_ux,log10(err)); colorbar;
+%       colormap(jet(256)); h=title('Log$_{10}$(Max(Abs. Error, Rel. Error))');
+%       h(2)=xlabel('Log$_{10}(\epsilon)$');
+%       h(3)=ylabel('$\lambda_\mathrm{u}$'); set(h,'Interpreter','latex');
 %
 %   See also:
 %       STONEHOLMESPASSAGETIME, STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESRND,
@@ -59,7 +61,7 @@ function epsilon=stoneholmesinvpassagetime(tau,varargin)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-6-12
-%   Revision: 1.0, 11-26-12
+%   Revision: 1.0, 1-16-13
 
 
 % Check variable inputs
@@ -130,11 +132,9 @@ lambda_u = lambda_u(:);
 lambda_s = lambda_s(:);
 
 % Logical linear indices for out-of-range parameters
-itau = (tau < 0 | isnan(tau));                      % Tau:      [0, Inf]
-idelta = (delta <= 0 | isnan(delta));             	% Delta:    (0, Inf]
-ilambda_u = (lambda_u <= 0 | isnan(lambda_u));     	% Lambda_U: (0, Inf)
-ilambda_s = (lambda_s <= 0 | isnan(lambda_s));      % Lambda_S: (0, Inf)
-i = (itau | idelta | ilambda_u | ilambda_s);
+% Tau: [0, Inf], Delta: (0, Inf], Lambda_U: (0, Inf), Lambda_S: (0, Inf]
+i = (tau < 0 | isnan(tau) | delta <= 0 | isnan(delta) | ...
+    lambda_u <= 0 | isnan(lambda_u) | lambda_s <= 0 | isnan(lambda_s));
 
 % Check for empty output or if all values of any parameter is out-of-range
 dtype = superiorfloat(tau,delta,lambda_u,lambda_s);
@@ -149,7 +149,7 @@ else
     epsilon(i) = NaN;
     
     % Logical linear indices for in-range parameters
-    i = (~i & lambda_u < Inf & lambda_s < Inf);
+    i = (~i & lambda_u < Inf);
     
     % If any values in-range
     if any(i)
@@ -168,17 +168,41 @@ else
             end
         end
         
+        if any(lambda_u >= lambda_s)
+            warning('SHCTools:stoneholmesinvpassagetime:LambdaScaling',...
+                   ['One or more Lambda_U values is greater than or equal '...
+                    'to the corresponding Lambda_S value(s), but the '...
+                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.'])
+        end
+        
         % Options structure for fzero
         options = struct('Display','off','TolX',eps(dtype));
         
         % Initial quess for delta/epsilon assuming small noise
         eulergamma = 0.577215664901533;
         de0 = max(real(1./sqrt(-2*lambda_u.*wrightOmegaq(eulergamma...
-            +log(-2*lambda_s./(lambda_u+lambda_s))-2*lambda_u.*tau))),0);
+            +log(2)+pi*1i-log1p(lambda_u./lambda_s)-2*lambda_u.*tau))),0);
+        n = length(de0);
+        
+        if any(~isfinite(de0))
+            if n == 1
+                error('SHCTools:stoneholmesinvpassagetime:InvalidInitialGuess',...
+                     ['Unable solve for Epsilon. The input parameters '...
+                      'appear to be illconditioned.']);
+            elseif all(~isfinite(de0))
+                error('SHCTools:stoneholmesinvpassagetime:InvalidInitialGuessAll',...
+                     ['Unable solve for any Epsilon. The input parameters '...
+                      'appear to be illconditioned.']);
+            else
+                error('SHCTools:stoneholmesinvpassagetime:InvalidInitialGuessSome',...
+                     ['Unable to solve for one or more Epsilon values. The '...
+                      'input parameters appear to be illconditioned.']);
+            end
+        end
         
         desls = de0.*sqrt(lambda_s);
         deslu = de0.*sqrt(lambda_u);
-        n = length(de0);
+        
         for j = n:-1:1
             tauj = tau((j-1)*(~isscalar(tau))+1);
             lambda_uj = lambda_u((j-1)*(~isscalar(lambda_u))+1);
@@ -191,10 +215,12 @@ else
                 % Fast small noise (and/or large Lambda) approximation
                 eprootfun = @(de)epsilonroot_small(de,tauj,lambda_uj,lambda_sj);
             else
+                deltaj = delta((j-1)*(~isscalar(delta))+1);
                 derng = eps([realmin(dtype) realmax(dtype)]);
                 
                 % Full analytical solution for large noise (and/or small Lambda)
-                eprootfun = @(de)epsilonroot(de,tauj,lambda_uj,lambda_sj);
+                eprootfun = @(de)epsilonroot(de,tauj,deltaj,lambda_uj,...
+                                             lambda_sj);
             end
             
             % Bracket and find delta/epsilon via root of first passage time
@@ -245,8 +271,8 @@ else
             else
                 warning('SHCTools:stoneholmesinvpassagetime:DeltaEpsilonScaling',...
                        ['One or more Epsilon value is greater than the '...
-                        'Delta value(s), but the Stone-Holmes distribution '...
-                        'defines Epsilon << Delta.']);
+                        'corresponding Delta value(s), but the Stone-Holmes '...
+                        'distribution defines Epsilon << Delta.']);
             end
         end
     end
@@ -260,12 +286,13 @@ ideslu2 = 1./(4*lambda_u*de^2);
 s = ideslu2.*(2-ideslu2.*(6-ideslu2.*(40-ideslu2.*(420-ideslu2.*(6048 ...
     -ideslu2.*(110880-2436480*ideslu2))))));
 eulergamma = 0.577215664901533;
-z = (s+log(4*lambda_u*lambda_s/(lambda_u+lambda_s))+eulergamma...
+z = (s+log(4*lambda_u)-log1p(lambda_u/lambda_s)+eulergamma...
     +2*log(de))/(2*lambda_u)-tau;
 
 
-function z=epsilonroot(de,tau,lambda_u,lambda_s)
+function z=epsilonroot(de,tau,delta,lambda_u,lambda_s)
 % Based on full analytical solution to Stone-Holmes mean passage time
+de = max(de,delta);
 desls = de*sqrt(lambda_s);
 deslu = de*sqrt(lambda_u);
 desls2 = desls^2;
@@ -279,6 +306,6 @@ s = (gamma(0.5+k).*gammainc(deslu2,0.5+k)./dk ...
     -gammaincNegative(desls2,0.5-k,'upper')))./(sqrt(pi)*k);
 s = s(isfinite(s));
 
-z = (-sum(s(diff(abs(s))>=0))-erf(desls)*log1p(lambda_s/lambda_u)...
+z = (-sum(s(diff(abs(s))>=0))-erf(desls)*log(1+lambda_s/lambda_u)...
     +(4/sqrt(pi))*desls*hypergeomq([0.5 0.5],[1.5 1.5],-desls2))/(2*lambda_u)...
     -tau;

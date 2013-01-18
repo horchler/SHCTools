@@ -1,17 +1,19 @@
 function nlogL=stoneholmeslike(x,varargin)
 %STONEHOLMESLIKE  Negative log-likelihood for the Stone-Holmes distribution.
-%   NLOGL = STONEHOLMESLIKE(X,DELTA,EPSILON,LAMBDA_U) returns the negative
-%   log-likelihood for the Stone-Holmes distribution evaluated at the positive
-%   parameters Delta, Epsilon, and Lambda_U, given data X. Delta is the size of
-%   the neighborhood, Epsilon (Epsilon << Delta) is the root-mean-square of the
-%   noise, and Lambda_U is the eigenvalue with the largest positive real part.
-%   X is an M-by-N-by-... array. The parameters must be scalars or 1-by-N-by-...
-%   size arrays. The size of the output NLOGL is 1-by-the number of columns of
-%   X, Delta, Epsilon, and Lambda_U if all have the same number of columns. If
-%   any subset of the parameters or X are scalars, the size of NLOGL is 1-by-the
-%   number of columns of the other parameter(s) or X.
+%   NLOGL = STONEHOLMESLIKE(X,DELTA,EPSILON,LAMBDA_U,LAMBDA_S) returns the
+%   negative log-likelihood for the Stone-Holmes distribution evaluated at the
+%   positive parameters Delta, Epsilon, Lambda_U, and Lambda_S, given data X.
+%   Delta is the size of the neighborhood, Epsilon (Epsilon << Delta) is the
+%   root-mean-square of the noise, and Lambda_U and Lambda_S 
+%   (Lambda_U < Lambda_S) are the absolute value of the eigenvalues with the
+%   largest positive and negative real parts, respectively. X is an
+%   M-by-N-by-... array. The parameters must be scalars or 1-by-N-by-... size
+%   arrays. The size of the output NLOGL is 1-by-the number of columns of X,
+%   Delta, Epsilon, Lambda_U, and Lambda_S if all have the same number of
+%   columns. If any subset of the parameters or X are scalars, the size of NLOGL
+%   is 1-by-the number of columns of the other parameter(s) or X.
 %
-%   NLOGL = STONEHOLMESLIKE(X,THETA,LAMBDA_U) returns the negative
+%   NLOGL = STONEHOLMESLIKE(X,THETA,LAMBDA_U,LAMBDA_S) returns the negative
 %   log-likelihood for the two parameter Stone-Holmes distribution, where
 %   Theta = Epsilon/Delta (Theta << 1) is the size of the noise relative to that
 %   of the neighborhood.
@@ -27,11 +29,17 @@ function nlogL=stoneholmeslike(x,varargin)
 %
 %   Example:
 %       % Plot negative log-likelihood of sample data for a range of parameters
-%       delta=1; epsilon=0.03; lambda_u=0.5; n=1e4; ep_hat=0.01:0.001:0.05;
-%       x=stoneholmesrnd(delta,epsilon,lambda_u,n,1);
-%       nlogL=stoneholmeslike(x,delta,ep_hat(ones(1,n),:),lambda_u);
-%       [minL iL]=min(nlogL); plot(ep_hat,nlogL,'b',ep_hat(iL),minL,'r.');
-%       xlabel('\epsilon'); ylabel('Negative Log-likelihood(x|\epsilon)');
+%       delta=1; epsilon=0.03; lambda_u=0.5; lambda_s=1;
+%       n=1e4; ep_hat=0.01:0.0001:0.05;
+%       x=stoneholmesrnd(delta,epsilon,lambda_u,lambda_s,n,1);
+%       nlogL=stoneholmeslike(x,delta,ep_hat(ones(1,n),:),lambda_u,lambda_s);
+%       [mL,iL]=min(nlogL); figure; plot(ep_hat,nlogL,'b',ep_hat(iL),mL,'r.');
+%       h=xlabel('$\epsilon$'); h(2)=ylabel('-ln(L($x|\epsilon$))');
+%       h(3)=title(['Negative Log-likelihood of Stone-Holmes Distribution ' ...
+%           '$|\epsilon$ ($\delta$ = ' num2str(delta) ...
+%           ', $\lambda_\mathrm{u}$ = ' num2str(lambda_u) ...
+%           ', $\lambda_\mathrm{s}$ = ' num2str(lambda_s) ')']);
+%           set(h,'Interpreter','latex');
 %
 %   See also:
 %       STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESFIT, STONEHOLMESINV,
@@ -43,7 +51,7 @@ function nlogL=stoneholmeslike(x,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 8-10-12
+%   Revision: 1.0, 1-17-13
 
 
 % Check X
@@ -57,19 +65,21 @@ sx=size(x);
 deltaset=true;
 censoringset=true;
 freqset=true;
-if nargin >= 4 && nargin <= 6
-    v=varargin{3};
+if nargin >= 5 && nargin <= 7
+    v=varargin{4};
     if size(v,1) <= 1 && isfloat(v)
         delta=varargin{1};
         epsilon=varargin{2};
         lambda_u=varargin{3};
-        offset=4;
+        lambda_s=varargin{4};
+        offset=5;
     else
         delta=1;
         epsilon=varargin{1};
         lambda_u=varargin{2};
+        lambda_s=varargin{3};
         deltaset=false;
-        offset=3;
+        offset=4;
     end
     for i=offset:nargin-1
         v=varargin{i};
@@ -112,12 +122,13 @@ if nargin >= 4 && nargin <= 6
                   'Unknown input argument.')
         end
     end
-elseif nargin == 3
+elseif nargin == 4
     delta=1;
     epsilon=varargin{1};
     lambda_u=varargin{2};
+    lambda_s=varargin{3};
     deltaset=false;
-elseif nargin < 3
+elseif nargin < 4
 	error('SHCTools:stoneholmeslike:TooFewInputs','Not enough input arguments.')
 else
 	error('SHCTools:stoneholmeslike:TooManyInputs','Too many input arguments.')
@@ -141,13 +152,18 @@ if ~isreal(lambda_u) || ~isfloat(lambda_u)
 	error('SHCTools:stoneholmeslike:Lambda_uInvalid',...
           'Lambda_U must be a real floating point array.')
 end
+if ~isreal(lambda_s) || ~isfloat(lambda_s)
+	error('SHCTools:stoneholmeslike:Lambda_sInvalid',...
+          'Lambda_S must be a real floating point array.')
+end
 
 % Check that sizes of X and parameter inputs are consistent, return size of L
 if deltaset
     [szL,expansion]=stoneholmesargs('like',sx,size(delta),size(epsilon),...
-                                    size(lambda_u));
+                                    size(lambda_u),size(lambda_s));
 else
-    [szL,expansion]=stoneholmesargs('like',sx,size(epsilon),size(lambda_u));
+    [szL,expansion]=stoneholmesargs('like',sx,size(epsilon),size(lambda_u),...
+                                    size(lambda_s));
 end
 
 % Set optional inputs if not specified, handle censoring and frequency data
@@ -167,7 +183,7 @@ else
 end
 
 % Check for empty output
-dtype=superiorfloat(x,delta,epsilon,lambda_u);
+dtype=superiorfloat(x,delta,epsilon,lambda_u,lambda_s);
 if any(szL == 0)
     nlogL=zeros([min(szL(1),1) szL(2:end)],dtype);
 else
@@ -183,10 +199,10 @@ else
         end
     end
     
-    % Logical column indices for X and in-range parameters  % Delta:    (0, Inf]
-    iepsilon=(epsilon >= 0 & epsilon < Inf);                % Epsilon:  [0, Inf)
-    ilambda_u=(lambda_u > 0 & lambda_u < Inf);              % Lambda_U: (0, Inf)
-    j=(all(x > 0) & all(delta > 0) & all(iepsilon) & all(ilambda_u));% X:(0,Inf]
+    % Logical column indices for X and in-range parameters, X: (0,Inf]
+    % Delta: (0, Inf], Epsilon: [0, Inf), Lambda_U: (0, Inf), Lambda_S: (0, Inf]
+    j=(all(x > 0,1) & all(delta > 0,1) & all(epsilon >= 0 & epsilon < Inf,1) ...
+        & all(lambda_u > 0 & lambda_u < Inf,1) & all(lambda_s > 0,1));
     
     % If all values for a column are in-range
     if any(j)
@@ -203,15 +219,18 @@ else
             epsilon=epsilon(1,j);
         end
         if ~isscalar(lambda_u)
-            lambda_u=lambda_u(ones(1,szL(1)),j);
+            lambda_u=lambda_u(1,j);
+        end
+        if ~isscalar(lambda_s)
+            lambda_s=lambda_s(1,j);
         end
         
         if any(epsilon > delta)
             if deltaset
                 warning('SHCTools:stoneholmeslike:DeltaEpsilonScaling',...
                        ['One or more Epsilon values is greater than the '...
-                        'Delta value(s), but the Stone-Holmes distribution '...
-                        'defines Epsilon << Delta.'])
+                        'corresponding Delta value(s), but the Stone-Holmes '...
+                        'distribution defines Epsilon << Delta.'])
             else
                 warning('SHCTools:stoneholmeslike:ThetaScaling',...
                        ['One or more Theta = Epsilon/Delta values is '...
@@ -220,14 +239,23 @@ else
             end
         end
         
-        % Calculate negative log-likelihood of in-range columns using EXPM1
-        lam2x=2*lambda_u.*x;
-        ex=lambda_u./expm1(lam2x);
-        k=delta./epsilon;
-        nlogL(j)=k.^2.*sum(freq.*ex)-n.*log((2/sqrt(pi))*k)...
-                 -1.5*sum(freq.*log(ex))-sum(freq.*lam2x);
+        if any(lambda_u >= lambda_s)
+            warning('SHCTools:stoneholmeslike:LambdaScaling',...
+                   ['One or more Lambda_U values is greater than or equal '...
+                    'to the corresponding Lambda_S value(s), but the '...
+                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.'])
+        end
+        
+        % Calculate negative log-likelihood of in-range columns
+        lam2x=2*bsxfun(@times,lambda_u,x);
+        lam1=1+lambda_u./lambda_s;
+        ex=bsxfun(@rdivide,lambda_u,(bsxfun(@times,lam1,exp(lam2x))-1));
+        th=delta./epsilon;
+        
+        nlogL(j)=th.^2.*sum(freq.*ex)-1.5*sum(freq.*log(ex)) ...
+            -sum(freq.*lam2x)-n*log((2/sqrt(pi))*th.*lam1);
         
         % Resolve NaNs from overflows
-        nlogL(any(x == Inf) | k == Inf)=Inf;
+        nlogL(any(x == Inf) | th == Inf)=Inf;
     end
 end
