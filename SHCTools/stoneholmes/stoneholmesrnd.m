@@ -27,8 +27,8 @@ function r=stoneholmesrnd(delta,epsilon,lambda_u,lambda_s,varargin)
 %       % Plot histogram of Stone-Holmes samples and PDF of the distributution
 %       delta=1; epsilon=[0.1;0.01]; lambda_u=0.5; lambda_s = 1;
 %       r=stoneholmesrnd(delta,epsilon,lambda_u,lambda_s,2,1e4);
-%       x=0:0.02:25; binx=0.1; edges=x(1):binx:x(end)-binx;
-%       n=histc(r',edges); p=bsxfun(@rdivide,n,binx*sum(n));
+%       x=0:0.01:25; binx=0.2; edges=x(1):binx:x(end);
+%       n=histc(r',edges-0.5*binx); p=bsxfun(@rdivide,n,binx*sum(n));
 %       figure; bar(edges,p(:,2),1); hold on; hb=bar(edges,p(:,1),1);
 %       shading flat; set(hb,'FaceColor',[0.5 0 0]);
 %       y=stoneholmespdf(x([1 1],:),delta,epsilon,lambda_u,lambda_s);
@@ -55,7 +55,7 @@ function r=stoneholmesrnd(delta,epsilon,lambda_u,lambda_s,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-6-12
-%   Revision: 1.0, 1-14-13
+%   Revision: 1.0, 1-18-13
 
 
 % Check four parameters
