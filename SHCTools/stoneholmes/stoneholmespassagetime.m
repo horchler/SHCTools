@@ -62,7 +62,7 @@ function tau=stoneholmespassagetime(varargin)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-19-12
-%   Revision: 1.0, 1-18-13
+%   Revision: 1.0, 1-22-13
 
 
 % Check variable inputs
@@ -208,7 +208,7 @@ else
         eulergamma = 0.577215664901533;
         
         % Use fast small noise (and/or large Lambda) approximation by default
-        ii = (desls > 5 & deslu > 5);
+        ii = (deslu > 5);
         if any(ii)
             % Asymptotic series expansion of 2F2(1/2,1/2;3/2,3/2;-Z^2) at Z=Inf
             ideslu2 = 1./(4*deslu.^2);
@@ -218,14 +218,10 @@ else
                      +eulergamma+2*log(de))./(2*lambda_u);
         end
         
-        % Logical linear indices for in-range parameters
-        il = (deslu > 5 | desls < sqrt(realmax));
-        i = (i & il);
-        tau(~il) = NaN;
-        ii = (~ii & il);
-        
         % Recalculate using full analytical solution for any large noise cases
-        if any(ii)
+        if any(~ii)
+            ii = ~ii;
+            
             if ~isscalar(lambda_u)
                 lambda_u = lambda_u(ii);
             end
@@ -279,9 +275,9 @@ else
                 end
             end
             
-            tau(ii) = (S(:)-erf(desls).*log(1+lambda_s./lambda_u)...
-                      +(4/sqrt(pi))*desls.*hypergeomq([1/2 1/2],[3/2 3/2],...
-                      -desls2))./(2*lambda_u);
+            tau(ii) = (S(:)-erf(desls).*log1p(lambda_u./lambda_s)...
+                      +(4/sqrt(pi))*deslu.*hypergeomq([0.5 0.5],[1.5 1.5],...
+                      -deslu2))./(2*lambda_u);
         end
         
         % Resolve any possible underflow and error conditions

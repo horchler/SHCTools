@@ -61,7 +61,7 @@ function epsilon=stoneholmesinvpassagetime(tau,varargin)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-6-12
-%   Revision: 1.0, 1-16-13
+%   Revision: 1.0, 1-22-13
 
 
 % Check variable inputs
@@ -200,7 +200,6 @@ else
             end
         end
         
-        desls = de0.*sqrt(lambda_s);
         deslu = de0.*sqrt(lambda_u);
         
         for j = n:-1:1
@@ -209,7 +208,7 @@ else
             lambda_sj = lambda_s((j-1)*(~isscalar(lambda_s))+1);
             
             % Create function handle
-            if desls(j) > 5 && deslu(j) > 5
+            if deslu(j) > 5
                 derng = [1 eps(realmax(dtype))];
                 
                 % Fast small noise (and/or large Lambda) approximation
@@ -295,7 +294,6 @@ function z=epsilonroot(de,tau,delta,lambda_u,lambda_s)
 de = max(de,delta);
 desls = de*sqrt(lambda_s);
 deslu = de*sqrt(lambda_u);
-desls2 = desls^2;
 deslu2 = deslu^2;
 
 % Terms for infinite series, sum from small to large avoiding non-finite values
@@ -303,9 +301,9 @@ k = 172:-1:1;
 dk = (-deslu2).^k;
 s = (gamma(0.5+k).*gammainc(deslu2,0.5+k)./dk ...
     +dk.*(gammaincNegative(deslu2,0.5-k,'upper')...
-    -gammaincNegative(desls2,0.5-k,'upper')))./(sqrt(pi)*k);
+    -gammaincNegative(desls^2,0.5-k,'upper')))./(sqrt(pi)*k);
 s = s(isfinite(s));
 
-z = (-sum(s(diff(abs(s))>=0))-erf(desls)*log(1+lambda_s/lambda_u)...
-    +(4/sqrt(pi))*desls*hypergeomq([0.5 0.5],[1.5 1.5],-desls2))/(2*lambda_u)...
+z = (-sum(s(diff(abs(s))>=0))-erf(desls)*log1p(lambda_u/lambda_s)...
+    +(4/sqrt(pi))*deslu*hypergeomq([0.5 0.5],[1.5 1.5],-deslu2))/(2*lambda_u)...
     -tau;
