@@ -62,7 +62,7 @@ function tau=stoneholmespassagetime(varargin)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-19-12
-%   Revision: 1.0, 1-22-13
+%   Revision: 1.0, 2-5-13
 
 
 % Check variable inputs
@@ -251,7 +251,7 @@ else
                     s = isk.*(t-dk.*gammaincNegative(desls2(j),0.5-k,'upper'));
                     
                     s = s(isfinite(s));
-                    S(j) = sum(s(diff(abs(s))>=0));
+                    S(j) = sum(s([diff(abs(s))>=0 true]));
                 end
             elseif isscalar(desls2)
                 t = gammaincNegative(desls2,0.5-k,'upper');
@@ -261,7 +261,7 @@ else
                         +dk.*(gammaincNegative(deslu2(j),0.5-k,'upper')-t));
                     
                     s = s(isfinite(s));
-                    S(j) = sum(s(diff(abs(s))>=0));
+                    S(j) = sum(s([diff(abs(s))>=0 true]));
                 end
             else
                 for j = length(deslu2):-1:1
@@ -271,7 +271,7 @@ else
                         -gammaincNegative(desls2(j),0.5-k,'upper')));
                     
                     s = s(isfinite(s));
-                    S(j) = sum(s(diff(abs(s))>=0));
+                    S(j) = sum(s([diff(abs(s))>=0 true]));
                 end
             end
             

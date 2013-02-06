@@ -61,7 +61,7 @@ function epsilon=stoneholmesinvpassagetime(tau,varargin)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-6-12
-%   Revision: 1.0, 1-22-13
+%   Revision: 1.0, 2-5-13
 
 
 % Check variable inputs
@@ -304,6 +304,6 @@ s = (gamma(0.5+k).*gammainc(deslu2,0.5+k)./dk ...
     -gammaincNegative(desls^2,0.5-k,'upper')))./(sqrt(pi)*k);
 s = s(isfinite(s));
 
-z = (-sum(s(diff(abs(s))>=0))-erf(desls)*log1p(lambda_u/lambda_s)...
+z = (-sum(s([diff(abs(s))>=0 true]))-erf(desls)*log1p(lambda_u/lambda_s)...
     +(4/sqrt(pi))*deslu*hypergeomq([0.5 0.5],[1.5 1.5],-deslu2))/(2*lambda_u)...
     -tau;
