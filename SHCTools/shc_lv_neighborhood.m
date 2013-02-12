@@ -1,5 +1,5 @@
 function delta=shc_lv_neighborhood(net,delta_hat,epsilon,N)
-%SHC_LV_NEIGHBORHOODSIZE    
+%SHC_LV_NEIGHBORHOOD  Simulate Lotka-Volterra system to fit neighborhood size.    
 %
 %   DELTA = SHC_LV_NEIGHBORHOOD(NET,DELTA_HAT,EPSILON,N)
 %

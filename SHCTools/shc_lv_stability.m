@@ -1,5 +1,5 @@
 function nu=shc_lv_stability(net,M)
-%SHC_LV_STABILITY  Reyn stability criterion of Lotka-Volterra system nodes.
+%SHC_LV_STABILITY  Saddle values of Lotka-Volterra system nodes.
 %   NU = SHC_LV_STABILITY(NET,M) returns the saddle value, Nu, corresponding to
 %   the M-th node of the N-dimensional Lotka-Volterra SHC network described by
 %   the connection matrix NET. The Reyn stability criterion for an SHC cycle

@@ -1,5 +1,5 @@
 %SHCTools
-%  Version 1.0, 8-10-12
+%  Version 1.0, 2-12-13
 %
 %  SHC network creation, modification, and visualization, and conversion.
 %      buildrho               - Create RHO matrix from SHC network structure.
@@ -16,13 +16,18 @@
 %
 %  Lotka-Volterra SHC network tools.
 %      shc_lv_eigs            - Eigenvalues/vectors of Lotka-Volterra system.
-%      shc_lv_ic              - Generate initial conditions on the SHC manifold.
+%      shc_lv_ic              - Find initial conditions close to SHC manifold.
 %      shc_lv_integrate       - Solve Lotka-Volterra SDEs numerically.
-%      shc_lv_invpassagetime  - Find noise magnitude from SHC network structure. 
+%      shc_lv_invpassagetime  - Find noise magnitude from SHC network structure.
+%      shc_lv_iscycle         - Check if Lotka-Volterra system is an SHC cycle.
+%      shc_lv_isstable        - Check stability of Lotka-Volterra system nodes.
 %      shc_lv_jacobian        - Jacobian of N-dimensional Lotka-Volterra system.
+%      shc_lv_lambda_us       - Dominant unstable and stable eigenvalues.
+%      shc_lv_neighborhood    - Simulate to fit linear neighborhood size.
 %      shc_lv_ode         	  - ODEs for N-dimensional Lotka-Volterra system.
 %      shc_lv_params          - Find RHO matrix parameters from description.
-%      shc_lv_passagetime     - Find passage times from SHC network structure. 
+%      shc_lv_passagetime     - Find passage times from SHC network structure.
+%      shc_lv_stability       - Saddle values of Lotka-Volterra system nodes.
 %      shc_lv_symequilibria   - Solve for all equlibrium points symbolically.
 %
 %  Stone-Holmes distribution.
@@ -42,12 +47,12 @@
 %      shc.dtd                - Document Type Definition.
 %      shc.xsd                - XML Schema.
 
-%  This version tested with Matlab 7.14.0.739 (R2012a)
-%  Mac OS X 10.6.8 (Build: 10K549), Java 1.6.0_33-b03-424-10M3720
+%  This version tested with Matlab 8.0.0.783 (R2012b)
+%  Mac OS X 10.8.2 (Build: 12C2034), Java 1.6.0_37-b06-434-11M3909
 %  Compatibility maintained back through Matlab 7.4 (R2007a)
 
 %  Andrew D. Horchler, adh9 @ case . edu
-%  Created: 1-4-12, Revision: 1.0, 8-10-12
+%  Created: 1-4-12, Revision: 1.0, 2-12-13
 
 
 %  Acknowledgment of support: This material is based upon work supported by the
@@ -57,7 +62,7 @@
 %  of the National Science Foundation.
 
 
-%  Copyright © 2012, Andrew D. Horchler
+%  Copyright © 2012-2013, Andrew D. Horchler
 %  All rights reserved.
 %
 %  Redistribution and use in source and binary forms, with or without

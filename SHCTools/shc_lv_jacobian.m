@@ -17,7 +17,7 @@ function J=shc_lv_jacobian(rho,eqpt)
 %       SHC_LV_LAMBDA_US
 
 %   Andrew D. Horchler, adh9@case.edu, Created 12-1-10
-%   Revision: 1.0, 8-30-12
+%   Revision: 1.0, 2-12-13
 
 
 % Check Rho matrix
@@ -35,7 +35,7 @@ if isstruct(rho) && isfield(rho,'rho')
                   'a finite real symbolic or floating-point vector.']);
         end
         p = rho.rho;
-        [m n] = size(p);
+        [m,n] = size(p);
         if size(alpv,1) ~= n
             error('SHCTools:shc_lv_jacobian:AlphaVectorDimensionMismatch',...
                  ['The ''alpha'' field of the SHC network structure must be '...
@@ -44,7 +44,7 @@ if isstruct(rho) && isfield(rho,'rho')
     else
         p = rho.rho;
         alpv = diag(p);
-        [m n] = size(p);
+        [m,n] = size(p);
     end
     if ~(isfloat(p) || isa(p,'sym'))
         error('SHCTools:shc_lv_jacobian:InvalidRhoStruct',...
@@ -69,7 +69,7 @@ else
               'finite real symbolic or floating-point matrix.']);
     end
     alpv = diag(p);
-    [m n] = size(p);
+    [m,n] = size(p);
 end
 if isempty(p) || ~shc_ismatrix(p) || m ~= n
     error('SHTools:shc_lv_jacobian:RhoDimensionMismatch',...

@@ -2,10 +2,10 @@ function tf=shc_lv_iscycle(net)
 %SHC_LV_ISCYCLE  Check if Lotka-Volterra system is an SHC cycle.
 %   SHC_LV_ISCYCLE(NET) returns a logical 1 (true) if the N-dimensional
 %   Lotka-Volterra SHC network described by the connection matrix NET is an SHC
-%   cycle (stable or unstable), and logical 0 (false) otherwise. Each node of an
-%   SHC cycle must have exactly one unstable (positive) eigenvalue and N-1
-%   stable (negative) ones. NET is a floating-point SHC network structure
-%   (symbolic networks are not supported).
+%   cycle (stable or unstable), and logical 0 (false) otherwise. An SHC cycle
+%   must have at least three nodes. Each node must have exactly one unstable
+%   (positive) eigenvalue and N-1 stable (negative) ones. NET is a
+%   floating-point SHC network structure (symbolic networks are not supported).
 %
 %   See also:
 %       SHC_LV_ISSTABLE, SHC_LV_STABILITY, SHC_LV_LAMBDA_US, SHC_LV_JACOBIAN,
@@ -57,11 +57,15 @@ if isempty(rho) || ~shc_ismatrix(rho) || m ~= n
           'RHO must be a non-empty square matrix.');
 end
 
-% Check that each node has exactly one unstable eigenvalue and N-1 stable ones
-E = shc_lv_eigs(net);
-for i = m:-1:1
-    tf = length(E(E(:,i) > 0,i)) == 1 && length(E(E(:,i) < 0,i)) == n-1;
-    if ~tf
-        break;
+if n < 3
+    tf = false; % An SHC cycle must have at least three nodes
+else
+    % Check that each node has one unstable eigenvalue and N-1 stable ones
+    E = shc_lv_eigs(net);
+    for i = n:-1:1
+        tf = length(E(E(:,i) > 0,i)) == 1 && length(E(E(:,i) < 0,i)) == n-1;
+        if ~tf
+            break;
+        end
     end
 end

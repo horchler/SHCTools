@@ -23,10 +23,10 @@ function [lambda_u,lambda_s]=shc_lv_lambda_us(rho,M)
 %       BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA
 
 %   Andrew D. Horchler, adh9@case.edu, Created 8-29-12
-%   Revision: 1.0, 12-16-12
+%   Revision: 1.0, 2-12-13
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the
-%   Phase Plane," Nieuw Archief Voor Wiskunde (3), Vol. 27, 1979, pp. 238?254.
+%   Phase Plane," Nieuw Archief Voor Wiskunde (3), Vol. 27, 1979, pp. 238-254.
 
 
 % Check Rho matrix
