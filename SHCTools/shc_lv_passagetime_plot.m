@@ -7,7 +7,7 @@ function shc_lv_passagetime_plot(ti,varargin)
 %   SHC_LV_PASSAGETIME_PLOT(...,C)
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-4-12
-%   Revision: 1.0, 7-9-12
+%   Revision: 1.0, 2-11-13
 
 
 if nargin < 2
@@ -204,13 +204,13 @@ h = 3;
 % Adjust axes
 if isempty(ax{1})
     mint = min(ti);
-    [mt mi] = max(ti);
+    [mt,mi] = max(ti);
     maxt = mt+tau(mi);
     maxfreq = 1./min(tau);
 else
     xy = get(ha,{'XLim','YLim'});
     mint = min(min(ti),xy{1}(1));
-    [mt mi] = max(ti);
+    [mt,mi] = max(ti);
     maxt = max(mt+tau(mi),xy{1}(2));
     maxfreq = max(1./min(tau),xy{2}(2));
 end
@@ -229,7 +229,7 @@ scx = p(3)/(maxt-mint);
 scy = p(4)/maxfreq;
 
 % Sort by time and save index
-[tis tii] = sort(ti);
+[tis,tii] = sort(ti);
 
 % Colors
 c = get(ha,'ColorOrder');

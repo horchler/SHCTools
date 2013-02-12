@@ -52,7 +52,7 @@ function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,rho,eta,mu,options)
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.0, 1-12-13
+%   Revision: 1.0, 2-10-13
 
 
 % Check inputs and outputs
@@ -166,16 +166,43 @@ if ~shc_ismatrix(rho) || ~all(size(rho) == N)
 end
 
 % Check Eta
-if ~isvector(eta) || ~any(length(eta) == [1 N])
-    error('SHCTools:shc_lv_integrate:EtaDimensionMismatch',...
-          'ETA must be a scalar or a vector the same length as A0.');
+if isa(eta,'function_handle')
+    try
+        eta0 = feval(eta,t0);
+    catch err
+        switch err.identifier
+            case 'MATLAB:TooManyInputs'
+                error('SHCTools:shc_lv_integrate:EtaFUNTooFewInputs',...
+                      'The Eta function must have at least one input.');
+            case 'MATLAB:TooManyOutputs'
+                error('SHCTools:shc_lv_integrate:EtaFUNNoOutput',...
+                     ['The output of the Eta function was not specified. It '...
+                      'must return a non-empty matrix.']);
+            case 'MATLAB:unassignedOutputs'
+                error('SHCTools:shc_lv_integrate:EtaFUNUnassignedOutput',...
+                      'The first output of the Eta function was not assigned.');
+            case 'MATLAB:minrhs'
+                error('SHCTools:shc_lv_integrate:EtaFUNTooManyInputs',...
+                      'The Eta function must not require more than one input.');
+            otherwise
+                rethrow(err);
+        end
+    end
+    eta0 = eta0(:)';
+    EtaFUN = true;
+else
+    if ~isvector(eta) || ~any(length(eta) == [1 N])
+        error('SHCTools:shc_lv_integrate:EtaDimensionMismatch',...
+              'ETA must be a scalar or a vector the same length as A0.');
+    end
+    if ~isfloat(eta) || ~isreal(eta) || ~all(isfinite(eta))
+        error('SHCTools:shc_lv_integrate:InvalidEta',...
+              'ETA must be a finite real floating-point vector.');
+    end
+    eta0 = eta(:)';
+    EtaFUN = false;
 end
-if ~isfloat(eta) || ~isreal(eta) || ~all(isfinite(eta))
-    error('SHCTools:shc_lv_integrate:InvalidEta',...
-          'ETA must be a finite real floating-point vector.');
-end
-eta = eta(:)';
-D = length(eta);
+D = length(eta0);
 
 % Check optional Mu and Options structure inputs
 if nargin >= 5
@@ -199,12 +226,12 @@ if nargin >= 5
         end
         
         % Determine the dominant data type, single or double
-        if ~all(strcmp(class(t0),{class(a0),class(rho),class(eta),class(mu)}))
+        if ~all(strcmp(class(t0),{class(a0),class(rho),class(eta0),class(mu)}))
             warning('SHCTools:shc_lv_integrate:InconsistentDataType',...
                    ['Mixture of single and double datatypes for inputs '...
                     'TSPAN, A0, RHO, ETA, and MU.']);
         end
-        dataType = superiorfloat(t0,a0,rho,eta,mu);
+        dataType = superiorfloat(t0,a0,rho,eta0,mu);
     elseif isstruct(mu) || isempty(mu) && (isnumeric(mu) || iscell(mu))
         options = mu;
         mu = 0;
@@ -215,12 +242,12 @@ if nargin >= 5
         end
         
         % Determine the dominant data type, single or double
-        if ~all(strcmp(class(t0),{class(a0),class(rho),class(eta)}))
+        if ~all(strcmp(class(t0),{class(a0),class(rho),class(eta0)}))
             warning('SHCTools:shc_lv_integrate:InconsistentDataType',...
                    ['Mixture of single and double datatypes for inputs '...
                     'TSPAN, A0, RHO, and ETA.']);
         end
-        dataType = superiorfloat(t0,a0,rho,eta);
+        dataType = superiorfloat(t0,a0,rho,eta0);
     else
         error('SHCTools:shc_lv_integrate:UnknownInput',...
              ['Fifth input argument is not valid MU parameter or OPTIONS '...
@@ -229,7 +256,7 @@ if nargin >= 5
 else
     options = [];
     mu = 0;
-    dataType = superiorfloat(t0,a0,rho,eta);
+    dataType = superiorfloat(t0,a0,rho,eta0);
 end
 
 % Check for events function
@@ -337,7 +364,7 @@ else
 end
 
 % Generate Wiener increments if not all eta values are zero
-if any(eta ~= 0)
+if any(eta0 ~= 0) || EtaFUN
     RandFUN = getknownfield(options,'RandFUN',[]);
     if ~isempty(RandFUN)
         if ~isa(RandFUN,'function_handle')
@@ -380,10 +407,18 @@ if any(eta ~= 0)
         end
 
         % Calculate Wiener increments from normal variates
-        if D == 1 && ConstStep
-            A(2:end,:) = eta*sh*r;
+        if EtaFUN
+            if ConstStep
+                A(2:end,:) = sh*r;
+            else
+                A(2:end,:) = bsxfun(@times,sh,r);
+            end
         else
-            A(2:end,:) = bsxfun(@times,sh*eta,r);
+            if D == 1 && ConstStep
+                A(2:end,:) = eta0*sh*r;
+            else
+                A(2:end,:) = bsxfun(@times,sh*eta0,r);
+            end
         end
 
         % remove large temporary variable to save memory 
@@ -420,10 +455,18 @@ if any(eta ~= 0)
         ResetStream = onCleanup(@()reset_stream(Stream));
 
         % Calculate Wiener increments from normal variates
-        if D == 1 && ConstStep
-            A(2:end,:) = eta*sh*feval(RandFUN,lt-1,N);
+        if EtaFUN
+            if ConstStep
+                A(2:end,:) = sh*feval(RandFUN,lt-1,N);
+            else
+                A(2:end,:) = bsxfun(@times,sh,feval(RandFUN,lt-1,N));
+            end
         else
-            A(2:end,:) = bsxfun(@times,sh*eta,feval(RandFUN,lt-1,N));
+            if D == 1 && ConstStep
+                A(2:end,:) = eta0*sh*feval(RandFUN,lt-1,N);
+            else
+                A(2:end,:) = bsxfun(@times,sh*eta0,feval(RandFUN,lt-1,N));
+            end
         end
     end
     
@@ -438,9 +481,14 @@ if any(eta ~= 0)
     for i = 1:lt-1
         if ~ConstStep
             dt = h(i);
-        end 
-        A(i+1,:) = min(max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt+A(i+1,:),0),betv);
-        %A(i+1,:) = min(max(A(i,:)+(A(i,:).*alpv-A(i,:).*(A(i,:)*rho)+mu)*dt+A(i+1,:),0),betv);
+        end
+        if EtaFUN
+            etai = feval(eta,tspan(i));
+            etai = etai(:).'.*A(i+1,:);
+        else
+            etai = A(i+1,:);
+        end
+        A(i+1,:) = min(max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt+etai,0),betv);
         
         % Check for and handle zero-crossing events
         if isEvents
@@ -489,7 +537,6 @@ else
             dt = h(i);
         end
         A(i+1,:) = min(max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt,0),betv);
-        %A(i+1,:) = min(max(A(i,:)+(A(i,:).*alpv-A(i,:).*(A(i,:)*rho)+mu)*dt,0),betv);
         
         % Check for and handle zero-crossing events
         if isEvents
