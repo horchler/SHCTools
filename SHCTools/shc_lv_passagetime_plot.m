@@ -2,12 +2,12 @@ function shc_lv_passagetime_plot(ti,varargin)
 %SHC_LV_PASSAGETIME_PLOT  
 %
 %   SHC_LV_PASSAGETIME_PLOT(TI,TAU)
-%   SHC_LV_PASSAGETIME_PLOT(TI,TP,TD)
+%   SHC_LV_PASSAGETIME_PLOT(TI,TP,TT)
 %   SHC_LV_PASSAGETIME_PLOT(...,PLOTTYPE)
 %   SHC_LV_PASSAGETIME_PLOT(...,C)
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-4-12
-%   Revision: 1.0, 2-11-13
+%   Revision: 1.0, 2-12-13
 
 
 if nargin < 2
@@ -17,7 +17,7 @@ elseif nargin == 2
     tau = varargin{1};
 elseif nargin == 3
     tp = varargin{1};
-    td = varargin{2};
+    tt = varargin{2};
 else
     error('SHCTools:shc_lv_passagetime_plot:TooManyInputs',...
           'Too many input arguments.');
@@ -78,28 +78,28 @@ if iscell(ti)
                   '');
         end
         
-        if ~all(cellfun(@(x)isvector(x) | isempty(x),td))
-            error('SHCTools:shc_lv_passagetime_plot:NonVectorCellTd',...
+        if ~all(cellfun(@(x)isvector(x) | isempty(x),tt))
+            error('SHCTools:shc_lv_passagetime_plot:NonVectorCellTt',...
                   '');
         end
-        if ~all(cellfun(@isfloat,td))
-            error('SHCTools:shc_lv_passagetime_plot:NonFloatCellTd',...
+        if ~all(cellfun(@isfloat,tt))
+            error('SHCTools:shc_lv_passagetime_plot:NonFloatCellTt',...
                   '');
         end
-        if ~all(cellfun(@(x,y)isequal(numel(x),numel(y)),ti,td))
-            error('SHCTools:shc_lv_passagetime_plot:DimensionMismatchCellTd',...
+        if ~all(cellfun(@(x,y)isequal(numel(x),numel(y)),ti,tt))
+            error('SHCTools:shc_lv_passagetime_plot:DimensionMismatchCellTt',...
                   '');
         end
-        if all(cellfun(@(x)size(x,2) == 1 | isempty(x),td))
-            td = vertcat(td{:});
+        if all(cellfun(@(x)size(x,2) == 1 | isempty(x),tt))
+            tt = vertcat(tt{:});
         else
-            td = horzcat(td{:});
+            tt = horzcat(tt{:});
         end
-        if ~isreal(td) || ~all(isfinite(td)) || ~all(td > 0)
-            error('SHCTools:shc_lv_passagetime_plot:InvalidCellTd',...
+        if ~isreal(tt) || ~all(isfinite(tt)) || ~all(tt > 0)
+            error('SHCTools:shc_lv_passagetime_plot:InvalidCellTt',...
                   'td err');
         end
-        tau = tp+td;
+        tau = tp+tt;
     end
     
     if length(ti) > 1
@@ -157,20 +157,20 @@ else
                   '');
         end
         
-        if ~isvector(td)
-            error('SHCTools:shc_lv_passagetime_plot:NonVectorTd',...
+        if ~isvector(tt)
+            error('SHCTools:shc_lv_passagetime_plot:NonVectorTt',...
                   '');
         end
-        if length(td) ~= n
+        if length(tt) ~= n
             error('SHCTools:shc_lv_passagetime_plot:DimensionMismatchTd',...
                   '');
         end
-        if ~isreal(td) || ~isfloat(td) || ~all(isfinite(td)) || ~all(td > 0)
-            error('SHCTools:shc_lv_passagetime_plot:InvalidTd',...
+        if ~isreal(tt) || ~isfloat(tt) || ~all(isfinite(tt)) || ~all(tt > 0)
+            error('SHCTools:shc_lv_passagetime_plot:InvalidTt',...
                   '');
         end
         
-        tau = tp+td;
+        tau = tp+tt;
     end
 end
 
@@ -245,7 +245,7 @@ y = (1/scy)*bsxfun(@plus,round(scy./tau(tii(:,[1 1 1 1]))),[-h h h -h])';
 rti = scx*tis;
 if nargin == 3
     rtitp = rti+ceil(scx*tp(tii));
-    rtitau = rtitp+ceil(scx*td(tii));
+    rtitau = rtitp+ceil(scx*tt(tii));
     
     x1 = (1/scx)*floor([[rti(1,[1 1]);rtitau(1:end-1,[1 1])] rtitp(:,[1 1])])';
     x2 = (1/scx)*floor([rtitp(:,[1 1]) rtitau(:,[1 1])])'; 
