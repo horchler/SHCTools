@@ -1,17 +1,18 @@
-function varargout=shc_lv_passagetime(net,eta,method)
-%SHC_LV_PASSAGETIME  
+function varargout=shc_lv_passagetime(net,delta,epsilon,varargin)
+%SHC_LV_PASSAGETIME  Find passage times from SHC network structure.
 %
-%   TAU = SHC_LV_PASSAGETIME(NET,ETA)
-%   [TP,TD] = SHC_LV_PASSAGETIME(NET,ETA)
-%   [TAU,TP,TD] = SHC_LV_PASSAGETIME(NET,ETA)
-%   [...] = SHC_LV_PASSAGETIME(NET,ETA,METHOD)
+%   TAU = SHC_LV_PASSAGETIME(NET,DELTA,EPSILON)
+%   [TP,TD] = SHC_LV_PASSAGETIME(NET,DELTA,EPSILON)
+%   [TAU,TP,TT] = SHC_LV_PASSAGETIME(NET,DELTA,EPSILON)
+%   [...] = SHC_LV_PASSAGETIME(...,METHOD)
+%   [...] = SHC_LV_PASSAGETIME(...,OPTIONS)
 %
 %   See also:
 %       SHC_LV_INVPASSAGETIME, SHC_LV_PASSAGETIME_MU, SHC_LV_INVPASSAGETIME_MU,
 %       STONEHOLMESPASSAGETIME, QUAD, INTEGRAL, PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-28-12
-%   Revision: 1.0, 12-17-12
+%   Revision: 1.0, 2-12-13
 
 
 if nargout > 3
@@ -19,231 +20,271 @@ if nargout > 3
           'Too many output arguments.');
 end
 
-% Handle inputs to get Alpha, Beta, Gamma, Delta, and Method
-if nargin < 2
+% Handle inputs
+if nargin < 3
     error('SHCTools:shc_lv_passagetime:TooFewInputs',...
 	      'Not enough input arguments.');
-elseif nargin > 3
-    error('SHCTools:shc_lv_passagetime:TooManyInputs',...
-    	  'Too many input arguments.');
-else
-    if nargin == 2
-        method = 'default';
-    end
-    if isstruct(net) && isfield(net,'rho')
-        alp = net.alpha;
-        bet = net.beta;
-        gam = net.gamma;
-        del = net.delta;
-    else
-        error('SHCTools:shc_lv_passagetime:NetworkStructOrRhoInvalid',...
-              'Input must be a valid SHC network structure or RHO matrix.');
-    end
 end
 
-% Check types
-if ~isvector(alp) || isempty(alp) || ~isfloat(alp)
-    error('SHCTools:shc_lv_passagetime:AlphaInvalid',...
-          'Alpha must be a non-empty floating-point vector.');
-end
-if ~isreal(alp) || ~all(isfinite(alp)) || any(alp < 0)
-    error('SHCTools:shc_lv_passagetime:AlphaNonFiniteReal',...
-          'Alpha must be a positive finite real floating-point vector.');
+% Check network
+if ~isstruct(net) || ~isfield(net,'rho')
+    error('SHCTools:shc_lv_passagetime:NetworkStructOrRhoInvalid',...
+          'Input must be a valid SHC network structure.');
 end
 
-if ~isvector(bet) || isempty(bet) || ~isfloat(bet)
-    error('SHCTools:shc_lv_passagetime:BetaInvalid',...
-          'Beta must be a non-empty floating-point vector.');
-end
-if ~isreal(bet) || ~all(isfinite(bet)) || any(bet <= 0)
-    error('SHCTools:shc_lv_passagetime:BetaNonFiniteReal',...
-          'Beta must be a positive finite real floating-point vector.');
-end
-
-if ~isvector(gam) || isempty(gam) || ~isfloat(gam)
-    error('SHCTools:shc_lv_passagetime:GammaInvalid',...
-          'Gamma must be a non-empty floating-point vector.');
-end
-if ~isreal(gam) || ~all(isfinite(gam)) || any(gam <= 0)
-    error('SHCTools:shc_lv_passagetime:GammaNonFiniteReal',...
-          'Gamma must be a positive finite real floating-point vector.');
-end
-
-if ~isvector(del) || isempty(del) || ~isfloat(del)
+% Check Delta
+if ~isvector(delta) || isempty(delta) || ~isfloat(delta)
     error('SHCTools:shc_lv_passagetime:DeltaInvalid',...
-          'Delta must be a non-empty floating-point vector.');
-end
-if ~isreal(del) || ~all(isfinite(del)) || any(del < 0)
-    error('SHCTools:shc_lv_passagetime:DeltaNonFiniteReal',...
-          'Delta must be a non-negative finite real floating-point vector.');
-end
-
-if ~isvector(eta) || isempty(eta) || ~isfloat(eta)
-    error('SHCTools:shc_lv_passagetime:EtaInvalid',...
-         ['The noise magnitude, Eta, must be a non-empty floating-point '...
+         ['The neighborhood size, Delta, must be a non-empty floating-point '...
           'vector.']);
 end
-if ~isreal(eta) || ~all(isfinite(eta)) || any(eta <= 0)
-    error('SHCTools:shc_lv_passagetime:EtaNonFiniteReal',...
-         ['The noise magnitude, Eta, must be a positive finite real '...
+if ~isreal(delta) || ~all(isfinite(delta)) || any(delta <= 0)
+    error('SHCTools:shc_lv_passagetime:DeltaNonFiniteReal',...
+         ['The neighborhood size, Delta, must be a positive finite real '...
+          'floating-point vector.']);
+end
+
+% Check Epsilon
+if ~isvector(epsilon) || isempty(epsilon) || ~isfloat(epsilon)
+    error('SHCTools:shc_lv_passagetime:EpsilonInvalid',...
+         ['The noise magnitude, Epsilon, must be a non-empty floating-point '...
+          'vector.']);
+end
+if ~isreal(epsilon) || ~all(isfinite(epsilon)) || any(epsilon <= 0)
+    error('SHCTools:shc_lv_passagetime:EpsilonNonFiniteReal',...
+         ['The noise magnitude, Epsilon, must be a positive finite real '...
           'floating-point vector.']);
 end
 
 % Check lengths
-lv = [length(alp) length(bet) length(gam) length(del) length(eta)];
-n = max(lv);
-lv = lv(lv ~= 1);
-if length(lv) > 1 && ~all(lv(2:end) == lv(1))
-    error('SHCTools:shc_lv_passagetime:DimensionMismatch',...
-         ['If any combination of Alpha, Beta, Gamma, Delta, and Eta are '...
-          'non-scalar vectors, they must have the same lengths.']);
+n = net.size;
+if ~isscalar(delta) || ~isscalar(epsilon)
+    lv = [n length(delta) length(epsilon)];
+    n = max(lv);
+    lv = lv(lv ~= 1);
+    if length(lv) > 1 && ~all(lv(2:end) == lv(1))
+        error('SHCTools:shc_lv_passagetime:DimensionMismatch',...
+             ['If any combination of Delta and Epsilon are non-scalar '...
+              'vectors,  they must have the same length as the network '...
+              'dimension.']);
+    end
+    delta = delta(:);
+    epsilon = epsilon(:);
+end
+
+% Get and check method and options
+if nargin > 3
+    if nargin > 5
+        error('SHCTools:shc_lv_passagetime:TooManyInputs',...
+              'Too many input arguments.');
+    end
+    if nargin == 4
+        if ischar(varargin{1})
+            method = varargin{1};
+            options = [];
+        else
+            options = varargin{1};
+            method = 'default';
+        end
+    else
+        method = varargin{1};
+        options = varargin{2};
+    end
+    if ~isstruct(options) && ~(isempty(options) && isnumeric(options))
+        error('SHCTools:shc_lv_passagetime:InvalidOptions',...
+              'Options should be a structure created using OPTIMSET.');
+    end
+else
+    method = 'default';
+    options = [];
+end
+
+% Get tolerance from options structure
+if isempty(options) || ~isfield(options,'TolX')
+    tol = 1e-6;
+else
+    tol = options.('TolX');
 end
 
 % Stable and unstable eigenvalues
 [lambda_u,lambda_s] = shc_lv_lambda_us(net);
 
-% If elements of vector inputs are equal, collapse to n = 1, re-expand at end
+% SHC network parameters
+alp = net.alpha;
+bet = net.beta;
+gam = net.gamma;
+del = net.delta;
+
+% If elements of vector inputs equal, collapse to n = 1, re-expand at end
 N = n;
-if n > 1 && all(alp(1) == alp) && all(bet(1) == bet) && all(gam(1) == gam) ...
-         && all(del(1) == del) && all(eta(1) == eta)
+if n > 1 && all(alp(1) == alp) && all(bet(1) == bet) ...
+        && all(gam(1) == gam(:)) && all(del(1) == del(:)) ...
+        && all(delta(1) == delta) && all(epsilon(1) == epsilon)
     lambda_u = lambda_u(1);
     lambda_s = lambda_s(1);
     alp = alp(1);
     bet = bet(1);
     gam = gam(1);
     del = del(1);
-    eta = eta(1);
+    delta = delta(1);
+    epsilon = epsilon(1);
     n = 1;
-end
-
-% Neighborhood size
-d = shc_lv_neighborhood(bet);
-d_eta = d./eta;
-tol = 1e-6;
-
-% Create function handles, specify integration method
-warningCaught = false;
-switch lower(method)
-    case {'default','stoneholmes'}
-        % Stone-Holmes mean first passage time using analytical solution
-        tp = stoneholmespassagetime(d,eta,lambda_u,lambda_s);
-    case {'quad'}
-        % Start try-catch of warning in quad function
-        catchID = 'MATLAB:quad:MinStepSize';
-        CatchWarningObj = catchwarning(catchID);
-        
-        try
-            % Stone-Holmes mean first passage time via quad function
-            tp = stoneholmes_passagetime(lambda_u,lambda_s,d_eta,n,tol);
-        catch ME
-            if strcmp(ME.identifier,catchID)
-                % Disable warning and re-perform calculation to get output
-                set(CatchWarningObj,'',catchID)
-                tp = stoneholmes_passagetime(lambda_u,lambda_s,d_eta,n,tol);
-                warningCaught = true;
-            else
-                rethrow(ME);
-            end
-        end
-    case {'quadgk','integral'}
-        % Start try-catch of warning in integral function
-        catchIDs = {'MATLAB:integral:MinStepSize',...
-                  'MATLAB:integral:NonFiniteValue'};
-        CatchWarningObj = catchwarning(catchIDs);
-        
-        try
-            % Stone-Holmes mean first passage time via integral function
-            tp = stoneholmes_passagetimegk(lambda_u,lambda_s,d_eta,(n~=1),tol);
-        catch ME
-            if any(strcmp(ME.identifier,catchIDs))
-                % Disable warnings and re-perform calculation to get output
-                set(CatchWarningObj,'',catchIDs)
-                tp = stoneholmes_passagetime(lambda_u,lambda_s,d_eta,n,tol);
-                warningCaught = true;
-            else
-                rethrow(ME);
-            end
-        end
-    case {'pchip','fast','quick','interp'}
-        % Stone-Holmes mean first passage time via fast PCHIP interpolation
-        tp = stoneholmes_passagetimeq(lambda_u,lambda_s,d_eta);
-    otherwise
-        error('SHCTools:shc_lv_passagetime:UnknownMethod',...
-             ['Unknown method. Valid methods are: ''quad'' (default), '...
-              '''quadgk'', and ''pchip''.']);
-end
-
-% Handle bad values or any caught warning
-if any(tp <= 0) || ~all(isfinite(tp))
-    error('SHCTools:shc_lv_passagetime:NegativePassgeTime',...
-         ['Input specifications may be illconditioned. Specify a different '...
-          'integration method or adjust the noise magnitude, Eta.']);
-elseif warningCaught
-    if n == 1
-        warning('SHCTools:shc_lv_passagetime:PossibleIllconditioned1D',...
-               ['TP may not meet tolerances. Input specifications may be '...
-                'illconditioned.']);
-    else
-        warning('SHCTools:shc_lv_passagetime:PossibleIllconditioned',...
-               ['TP values may not meet tolerances. Input specifications '...
-                'may be illconditioned.']);
+elseif n > 1
+    if isscalar(delta)
+        delta = delta(ones(n,1));
+    end
+    if isscalar(epsilon)
+        epsilon = epsilon(ones(n,1));
     end
 end
 
-% Inter-passage decay time, estimate dt from passage time
-td = interpassage_decaytime(alp,bet,gam,del,d,eta,n,tp,tol);
-if any(td <= 0)
-    error('SHCTools:shc_lv_passagetime:NegativeDecayTime',...
-         ['Cannot find valid inter-passage decay time, TD. Input '...
+if nargin == 3 || any(strcmp(method,{'default','stoneholmes'}))
+    % Stone-Holmes mean first passage time using analytical solution
+	tp = stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
+else
+    % Scale noise by neighborhood size
+    d_ep = delta./epsilon;
+    
+    % Specify integration method
+    switch lower(method)
+        case 'quad'
+            % Stone-Holmes mean first passage time via quad function
+            f = @()stoneholmes_passagetime(d_ep,lambda_u,lambda_s,n,tol);
+            msgid = 'MATLAB:quad:MinStepSize';
+    	case 'quadl'
+            % Stone-Holmes mean first passage time via quadl function
+            f = @()stoneholmes_passagetimel(d_ep,lambda_u,lambda_s,n,tol);
+            msgid = 'MATLAB:quadl:MinStepSize';
+        case {'quadgk','integral'}
+            % Stone-Holmes mean first passage time via integral function
+            f = @()stoneholmes_passagetimegk(d_ep,lambda_u,lambda_s,n,tol);
+            msgid = {'MATLAB:integral:MinStepSize',...
+                     'MATLAB:integral:NonFiniteValue'};
+        case {'pchip','fast','quick','interp'}
+            % Stone-Holmes mean first passage time via fast PCHIP interpolation
+            f = @()stoneholmes_passagetimeq(d_ep,lambda_u,lambda_s);
+            msgid = '';
+        otherwise
+            error('SHCTools:shc_lv_passagetime:UnknownMethod',...
+                 ['Unknown method. Valid methods are: ''stoneholmes'' '...
+                  '(default), ''quad'', ''quadl'', ''quadgk'', and '...
+                  '''pchip''.']);
+    end
+    
+    % Start try-catch to disable warnings in quad/quadl functions
+    if ~isempty(msgid)
+        CatchWarningObj = catchwarning(msgid);
+    end
+    
+    % Create function handles, specify integration method
+    caughtwarning = false;
+    try
+        tp = f();
+    catch ME
+        caughtwarning = any(strcmp(ME.identifier,msgid));
+        if caughtwarning
+            % Disable warning and re-perform calculation to get output
+            set(CatchWarningObj,'',msgid)
+            tp = f();
+        else
+            rethrow(ME);
+        end
+    end
+    
+    % Handle bad values or any caught warning
+    if any(tp <= 0) || ~all(isfinite(tp))
+        error('SHCTools:shc_lv_passagetime:NegativePassgeTime',...
+             ['Input specifications may be illconditioned. Specify a '...
+              'different integration method or adjust the noise magnitude, '...
+              'Epsilon.']);
+    elseif caughtwarning
+        if n == 1
+            warning('SHCTools:shc_lv_passagetime:PossibleIllconditioned1D',...
+                   ['TP may not meet tolerances. Input specifications may '...
+                    'be illconditioned.']);
+        else
+            warning('SHCTools:shc_lv_passagetime:PossibleIllconditioned',...
+                   ['TP values may not meet tolerances. Input '...
+                    'specifications may be illconditioned.']);
+        end
+    end
+end
+
+% Inter-passage transition time, estimate dt from passage time
+tt = interpassage_transitiontime(alp,bet,gam,del,delta,epsilon,n,tp,tol);
+if any(tt <= 0)
+    error('SHCTools:shc_lv_passagetime:NegativeTransitionTime',...
+         ['Cannot find valid inter-passage transition time, Tt. Input '...
           'specifications may be illconditioned.']);
 end
 
 % Re-expand dimensions if needed
 if n ~= N
     tp(1:N,1) = tp;
-    td(1:N,1) = td;
+    tt(1:N,1) = tt;
 end
 
 % Handle variable output
 if nargout <= 1
-    varargout{1} = tp+td;
+    varargout{1} = tp+tt;
 elseif nargout == 2
     varargout{1} = tp;
-    varargout{2} = td;
+    varargout{2} = tt;
 else
-    varargout{1} = tp+td;
+    varargout{1} = tp+tt;
     varargout{2} = tp;
-    varargout{3} = td;
+    varargout{3} = tt;
 end
 
 
 
-function tp=stoneholmes_passagetime(lambda_u,lambda_s,d_eta,n,tol)
-lim = d_eta.*sqrt(lambda_s);
-d_etalambda_u = d_eta.^2.*lambda_u;
+function tp=stoneholmes_passagetime(d_ep,lambda_u,lambda_s,n,tol)
+lim = d_ep.*sqrt(lambda_s);
+id_eplambda_u = 1./(d_ep.^2.*lambda_u);
 
-% Stone-Holmes mean first passage time using quadrature integration
+% Stone-Holmes mean first passage time: Simpson quadrature integration
 for i = n:-1:1
-    q(i) = quad(@(x)f(x,d_etalambda_u(i)),0,lim(i),tol);
+    tp(i) = quad(@(x)intfun(x,id_eplambda_u(i)),0,lim(i),tol);
 end
-tp = ((2/sqrt(pi))*q-erf(lim).*log1p(lambda_u./lambda_s))./(2*lambda_u);
+tp = tp(:)./lambda_u;
 
 
-function tp=stoneholmes_passagetimegk(lambda_u,lambda_s,d_eta,nd,tol)
-% Stone-Holmes mean first passage time using quadrature integration
-q = (2/sqrt(pi))*integral(@(x)f(x,d_eta.^2.*lambda_u),0,Inf,...
-    'ArrayValued',nd,'RelTol',tol,'AbsTol',tol^1.5);
-tp = (q-erf(d_eta.*sqrt(lambda_s)).*log1p(lambda_u./lambda_s))./(2*lambda_u);
+function tp=stoneholmes_passagetimel(d_ep,lambda_u,lambda_s,n,tol)
+lim = d_ep.*sqrt(lambda_s);
+id_eplambda_u = 1./(d_ep.^2.*lambda_u);
+
+% Stone-Holmes mean first passage time: Lobatto quadrature integration
+for i = n:-1:1
+    tp(i) = quadl(@(x)intfun(x,id_eplambda_u(i)),0,lim(i),tol);
+end
+tp = tp(:)./lambda_u;
 
 
-function y=f(x,d_etalambda_u)
-% Quadrature integration integrand
-y = log1p(d_etalambda_u.*x.^-2).*exp(-x.^2);
+function tp=stoneholmes_passagetimegk(d_ep,lambda_u,lambda_s,n,tol)
+lim = d_ep.*sqrt(lambda_s);
+id_eplambda_u = 1./(d_ep.^2.*lambda_u);
+
+% Stone-Holmes mean first passage time: Gauss-Kronrod quadrature integration
+if isscalar(d_ep) && isscalar(lambda_s)
+    tp = integral(@(x)intfun(x,id_eplambda_u),0,lim,'ArrayValued',n~=1,...
+        'RelTol',tol,'AbsTol',tol^1.5)./lambda_u;
+else
+    for i = n:-1:1
+        tp(i) = integral(@(x)intfun(x,id_eplambda_u(i)),0,lim(i),...
+            'RelTol',tol,'AbsTol',tol^1.5);
+    end
+    tp = tp(:)./lambda_u;
+end
 
 
-function tp=stoneholmes_passagetimeq(lambda_u,lambda_s,d_eta)
-% Stone-Holmes mean first passage time using PCHIP interpolation
-xs = log2(lambda_u.*d_eta.^2);
+function y=intfun(x,id_eplambda_u)
+% Quadrature integration integrand for quad, quadl, and integral/quadgk
+y = erf(x)./(x.*(1+id_eplambda_u.*x.^2));
+
+
+function tp=stoneholmes_passagetimeq(d_ep,lambda_u,lambda_s)
+% Stone-Holmes mean first passage time: PCHIP interpolation
+xs = log2(lambda_u.*d_ep.^2);
 fxs = floor(xs);
 xs = xs-fxs;
 c = stoneholmespassagetimelookuptable(min(max(fxs+53,1),959));
@@ -251,11 +292,11 @@ f = c(:,1);
 for i = 2:4
 	f = xs(:).*f+c(:,i);
 end
-tp = ((2/sqrt(pi))*f...
-    -erf(d_eta.*sqrt(lambda_s)).*log1p(lambda_u./lambda_s))./(2*lambda_u);
+tp = (f*2/sqrt(pi)...
+    -erf(d_ep.*sqrt(lambda_s)).*log1p(lambda_u./lambda_s))./(2*lambda_u);
 
 
-function td=interpassage_decaytime(alp,bet,gam,del,d,eta,n,tp,tol)
+function tt=interpassage_transitiontime(alp,bet,gam,del,delta,epsilon,n,tp,tol)
 alp2 = alp([2:end 1]);
 bet2 = bet([2:end 1]);
 gam2 = gam([2:end 1]);
@@ -263,17 +304,19 @@ del2 = del([2:end 1]);
 
 % Estimate a1(0) by assuming slope parallel to a1 eigenvector, a2(0) = d
 aab = alp+alp2.*bet;
-rad = aab.*(d^2*gam.*(bet2.*gam.*aab-4*alp.*alp2)...
-      +2*d*alp.*bet2.*gam.*(2*alp2-aab)+alp.^2.*bet2.*aab);
-a10 = (bet.*(sqrt(bet2).*(alp-d*gam).*aab...
-      +sign(rad).*sqrt(abs(rad))))./(2*alp.*sqrt(bet2).*aab);
-
 for i = n:-1:1
+    d = delta(i);
+    rad = aab.*(d^2*gam.*(bet2.*gam.*aab-4*alp.*alp2)...
+        +2*d*alp.*bet2.*gam.*(2*alp2-aab)+alp.^2.*bet2.*aab);
+    a10 = (bet.*(sqrt(bet2).*(alp-d*gam).*aab...
+        +sign(rad).*sqrt(abs(rad))))./(2*alp.*sqrt(bet2).*aab);
+    
+    a = [a10(i);d;epsilon(i)];
+    
     rho = [alp(i)/bet(i) gam(i)        gam(i);
            del(i)        alp(i)/bet(i) gam(i);
            gam2(i)    	 del2(i)       alp2(i)/bet2(i)];
     alpv = [alp(i);alp(i);alp2(i)];
-    a = [a10(i);d;eta];
     
     % Find time step
     dt = 0.01*tp(i);
@@ -283,7 +326,7 @@ for i = n:-1:1
     end
     dt = max(dt,16*eps);
     
-    % Integrate for over one period (tau+td) to find a2(td) on manifold
+    % Integrate for over one period (tau+tt) to find a2(tt) on manifold
     while a(3) <= d
         ap = a;
         f1 = a.*(alpv-rho*a);
@@ -311,5 +354,6 @@ for i = n:-1:1
         a = max(a+a.*(alpv-rho*a)*dt,0);
         nt = nt+1;
     end
-    td(i) = nt*dt;
+    tt(i) = nt*dt;
 end
+tt = tt(:);

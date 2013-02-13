@@ -2,7 +2,7 @@ function epsilon=shc_lv_invpassagetime(net,delta,tp,varargin)
 %SHC_LV_INVPASSAGETIME  Find noise magnitude from SHC network structure.
 %
 %   EPSILON = SHC_LV_INVPASSAGETIME(NET,DELTA,TP)
-%   EPSILON = SHC_LV_INVPASSAGETIME(NET,DELTA,TP,METHOD)
+%   EPSILON = SHC_LV_INVPASSAGETIME(...,METHOD)
 %   EPSILON = SHC_LV_INVPASSAGETIME(...,OPTIONS)
 %
 %   See also:
@@ -93,7 +93,7 @@ end
 % Stable and unstable eigenvalues
 [lambda_u,lambda_s] = shc_lv_lambda_us(net);
 
-if nargin == 3 || strcmp(method,'default')
+if nargin == 3 || any(strcmp(method,{'default','stoneholmes'}))
     % Solve for Epsilon(i+1) = F(Delta(i),Lambda_U(i),Lambda_S(i),Tp(i))
     epsilon = stoneholmesinvpassagetime(tp,delta,lambda_u,lambda_s);
 else
@@ -166,8 +166,8 @@ else
             msgid = '';
         otherwise
             error('SHCTools:shc_lv_invpassagetime:UnknownMethod',...
-                 ['Unknown method. Valid methods are: ''quad'' (default), '...
-                  '''quadgk'', and ''pchip''.']);
+                 ['Unknown method. Valid methods are: ''stoneholmes'' '...
+                  '(default), ''quad'', ''quadl'', and ''pchip''.']);
     end
     
     % Start try-catch to disable warnings in quad/quadl functions
@@ -260,18 +260,18 @@ epsilon = epsilon([n 1:n-1]);
 function z=eproot(d_ep,delta,lambda_u,lambda_s,tp,tol)
 % Zero of Stone-Holmes first passage time: Simpson quadrature integration
 lim = d_ep*sqrt(lambda_s);
-q = (2/sqrt(pi))*quad(@(x)f(x,delta^2*lambda_u,(delta/d_ep)^2),0,lim,tol);
+q = (2/sqrt(pi))*quad(@(x)intfun(x,delta^2*lambda_u,(delta/d_ep)^2),0,lim,tol);
 z = tp+(erf(lim)*log1p(lambda_u/lambda_s)-q)/(2*lambda_u);
 
 
 function z=eprootl(d_ep,delta,lambda_u,lambda_s,tp,tol)
 % Zero of Stone-Holmes first passage time: Lobatto quadrature integration
 lim = d_ep*sqrt(lambda_s);
-q = (2/sqrt(pi))*quadl(@(x)f(x,delta^2*lambda_u,(delta/d_ep)^2),0,lim,tol);
+q = (2/sqrt(pi))*quadl(@(x)intfun(x,delta^2*lambda_u,(delta/d_ep)^2),0,lim,tol);
 z = tp+(erf(lim)*log1p(lambda_u/lambda_s)-q)/(2*lambda_u);
 
 
-function y=f(x,d2lambda_u,ep2)
+function y=intfun(x,d2lambda_u,ep2)
 % Quadrature integration integrand for eproot() and eprootl()
 y = (log(d2lambda_u+ep2*x.^2)-log(ep2*x.^2)).*exp(-x.^2);
 

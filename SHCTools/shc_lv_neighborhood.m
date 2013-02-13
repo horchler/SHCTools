@@ -34,27 +34,40 @@ if ~isreal(delta_hat) || ~all(isfinite(delta_hat)) || any(delta_hat <= 0)
          ['The nominal or estimated neighborhood size, Delta_Hat, must be a '...
           'positive finite real floating-point vector.']);
 end
-delta_hat = delta_hat(:);
 
 % Check Epsilon
 if nargin > 2
     if ~isvector(epsilon) || isempty(epsilon) || ~isfloat(epsilon)
-        error('SHCTools:shc_lv_integrate:EpsilonInvalid',...
+        error('SHCTools:shc_lv_neighborhoodsize:EpsilonInvalid',...
               'Epsilon must be a scalar or a vector the same length as A0.');
     end
     if ~isreal(epsilon) || ~all(isfinite(epsilon)) || any(epsilon <= 0)
-        error('SHCTools:shc_lv_integrate:EpsilonNonFiniteReal',...
+        error('SHCTools:shc_lv_neighborhoodsize:EpsilonNonFiniteReal',...
               'Epsilon must be a finite real floating-point vector.');
     end
-    epsilon = epsilon(:);
 else
     epsilon = 1e-5*delta_hat;
+end
+
+% Check lengths
+if ~isscalar(delta_hat) || ~isscalar(epsilon)
+    lv = [n length(delta_hat) length(epsilon)];
+    n = max(lv);
+    lv = lv(lv ~= 1);
+    if length(lv) > 1 && ~all(lv(2:end) == lv(1))
+        error('SHCTools:shc_lv_neighborhoodsize:DimensionMismatch',...
+             ['If any combination of Delta_Hat and Epsilon are non-scalar '...
+              'vectors, they must have the same length as the network '...
+              'dimension.']);
+    end
+    delta_hat = delta_hat(:);
+    epsilon = epsilon(:);
 end
 
 % Check N
 if nargin > 3
     if ~validateindex(N) || ~isnumeric(N) || N <= n
-        error('SHTools:shc_lv_stability:InvalidN',...
+        error('SHTools:shc_lv_neighborhoodsize:InvalidN',...
              ['N must be a finite real integer greater than the dimension '...
               'of the network.']);
     end
@@ -62,6 +75,7 @@ else
     N = 30;
 end
 
+% Time vector for integration
 t0 = 0;
 dt = 1e-3;
 tf = 1e3;
@@ -72,8 +86,9 @@ tspan = t0:dt:tf;
 bet = net.beta;
 
 % Simplified case if all nodes are identical
-if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) && all(lambda_s(1) == lambda_s) ...
-        && all(delta_hat(1) == delta_hat) && all(epsilon(1) == epsilon)
+if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
+        && all(lambda_s(1) == lambda_s) && all(delta_hat(1) == delta_hat) ...
+        && all(epsilon(1) == epsilon)
     ep = epsilon(1);
     a0 = shc_lv_ic(net,delta_hat(1),epsilon(1));
     
