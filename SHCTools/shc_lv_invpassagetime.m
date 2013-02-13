@@ -1,5 +1,5 @@
 function epsilon=shc_lv_invpassagetime(net,delta,tp,varargin)
-%SHC_LV_INVPASSAGETIME  
+%SHC_LV_INVPASSAGETIME  Find noise magnitude from SHC network structure.
 %
 %   EPSILON = SHC_LV_INVPASSAGETIME(NET,DELTA,TP)
 %   EPSILON = SHC_LV_INVPASSAGETIME(NET,DELTA,TP,METHOD)
@@ -86,6 +86,8 @@ if ~isscalar(delta) || ~isscalar(tp)
              ['If any combination of Delta and Tp are non-scalar vectors, '...
               'they must have the same length as the network size.']);
     end
+    delta = delta(:);
+    tp = tp(:);
 end
 
 % Stable and unstable eigenvalues

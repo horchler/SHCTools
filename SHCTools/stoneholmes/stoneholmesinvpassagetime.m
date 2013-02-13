@@ -61,7 +61,7 @@ function epsilon=stoneholmesinvpassagetime(tau,varargin)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-6-12
-%   Revision: 1.0, 2-5-13
+%   Revision: 1.0, 2-12-13
 
 
 % Check variable inputs
@@ -259,7 +259,7 @@ else
         end
         
         % Solve for Epsilon
-        epsilon(i) = delta./de;
+        epsilon(i) = delta./de(:);
         
         if any(epsilon > delta)
             if isTheta
