@@ -7,7 +7,7 @@ function varargout=shc_lv_passagetime_data(net,delta,t,a)
 %   [...,TI] = SHC_LV_PASSAGETIME_DATA(NET,DELTA,T,A)
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-2-12
-%   Revision: 1.0, 2-12-13
+%   Revision: 1.0, 2-13-13
 
 
 if nargout > 4
@@ -64,7 +64,8 @@ if length(t) ~= M
           'rows of the data matrix, A.']);
 end
 
-dagtd = diff(a > delta)';
+bet = net.beta(1);
+dagtd = diff(a < bet-delta)';
 [j1,i1] = find([false(n,1) (dagtd < 0)]);
 [j2,i2] = find([false(n,1) (dagtd > 0)]);
 if i1(1) > i2(1)
@@ -84,7 +85,7 @@ if lt > 0
         ti = num2cell(NaN(lt,n),1);
     end
     ic(1,n) = 0;
-    ti1 = t(i1(1)-1)+(t(i1(1))-t(i1(1)-1))*(delta-a(i1(1)...
+    ti1 = t(i1(1)-1)+(t(i1(1))-t(i1(1)-1))*(bet-delta-a(i1(1)...
         -1,j1(1)))/(a(i1(1),j1(1))-a(i1(1)-1,j1(1)));
     for i = 1:lt
         j1i = j1(i);
@@ -93,13 +94,13 @@ if lt > 0
         
         i1i2 = i1(i+1);
         j1i2 = j1(i+1);
-        ti12 = t(i1i2-1)+(t(i1i2)-t(i1i2-1))*(delta-a(i1i2...
+        ti12 = t(i1i2-1)+(t(i1i2)-t(i1i2-1))*(bet-delta-a(i1i2...
             -1,j1i2))/(a(i1i2,j1i2)-a(i1i2-1,j1i2));
         if nargout ~= 1
             i2i = i2(i);
             j2i = j2(i);
-            ti2 = t(i2i-1)+(t(i2i)-t(i2i-1))*(delta-a(i2i-1,j2i))/(a(i2i,j2i)...
-                -a(i2i-1,j2i));
+            ti2 = t(i2i-1)+(t(i2i)-t(i2i-1))*(bet-delta-a(i2i...
+                -1,j2i))/(a(i2i,j2i)-a(i2i-1,j2i));
             tp{j1i}(icj) = ti2-ti1;
             tt{j1i}(icj) = ti12-ti2;
             if nargout == 4

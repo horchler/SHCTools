@@ -10,7 +10,7 @@ function epsilon=shc_lv_invpassagetime(net,delta,tp,varargin)
 %       STONEHOLMESINVPASSAGETIME, FZERO, QUAD, QUADL, PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-25-12
-%   Revision: 1.0, 2-12-13
+%   Revision: 1.0, 2-13-13
 
 
 if nargin < 3
@@ -93,7 +93,7 @@ end
 % Stable and unstable eigenvalues
 [lambda_u,lambda_s] = shc_lv_lambda_us(net);
 
-if nargin == 3 || any(strcmp(method,{'default','stoneholmes'}))
+if nargin == 3 || any(strcmp(method,{'default','analytic','stoneholmes'}))
     % Solve for Epsilon(i+1) = F(Delta(i),Lambda_U(i),Lambda_S(i),Tp(i))
     epsilon = stoneholmesinvpassagetime(tp,delta,lambda_u,lambda_s);
 else
@@ -166,7 +166,7 @@ else
             msgid = '';
         otherwise
             error('SHCTools:shc_lv_invpassagetime:UnknownMethod',...
-                 ['Unknown method. Valid methods are: ''stoneholmes'' '...
+                 ['Unknown method. Valid methods are: ''analytic'' '...
                   '(default), ''quad'', ''quadl'', and ''pchip''.']);
     end
     
@@ -253,7 +253,7 @@ else
 end
 
 % Epsilon(i) = F(Delta(i-1),Lambda_U(i-1),Lambda_S(i-1),Tp(i-1))
-epsilon = epsilon([n 1:n-1]);
+epsilon = epsilon([end 1:end-1]);
 
 
 

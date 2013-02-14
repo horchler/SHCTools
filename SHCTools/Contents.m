@@ -1,5 +1,5 @@
 %SHCTools
-%  Version 1.0, 2-12-13
+%  Version 1.0, 2-13-13
 %
 %  SHC network creation, modification, and visualization, and conversion.
 %      buildrho               - Create RHO matrix from SHC network structure.
@@ -16,6 +16,7 @@
 %
 %  Lotka-Volterra SHC network tools.
 %      shc_lv_eigs            - Eigenvalues/vectors of Lotka-Volterra system.
+%      shc_lv_globalpassagetime - Find passage times from SHC network structure.
 %      shc_lv_ic              - Find initial conditions close to SHC manifold.
 %      shc_lv_integrate       - Solve Lotka-Volterra SDEs numerically.
 %      shc_lv_invpassagetime  - Find noise magnitude from SHC network structure.
@@ -26,9 +27,10 @@
 %      shc_lv_neighborhood    - Simulate to fit linear neighborhood size.
 %      shc_lv_ode         	  - ODEs for N-dimensional Lotka-Volterra system.
 %      shc_lv_params          - Find RHO matrix parameters from description.
-%      shc_lv_passagetime     - Find passage times from SHC network structure.
+%      shc_lv_passagetime     - Mean first passage times of SHC network.
 %      shc_lv_stability       - Saddle values of Lotka-Volterra system nodes.
 %      shc_lv_symequilibria   - Solve for all equlibrium points symbolically.
+%      shc_lv_transitiontime  - Inter-passage transition times of SHC network.
 %
 %  Stone-Holmes distribution.
 %      stoneholmescdf    	  - Cummulative distribution function.
@@ -52,7 +54,7 @@
 %  Compatibility maintained back through Matlab 7.4 (R2007a)
 
 %  Andrew D. Horchler, adh9 @ case . edu
-%  Created: 1-4-12, Revision: 1.0, 2-12-13
+%  Created: 1-4-12, Revision: 1.0, 2-13-13
 
 
 %  Acknowledgment of support: This material is based upon work supported by the

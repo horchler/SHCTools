@@ -1,24 +1,17 @@
-function varargout=shc_lv_passagetime(net,delta,epsilon,varargin)
-%SHC_LV_PASSAGETIME  Find passage times from SHC network structure.
+function tp=shc_lv_passagetime(net,delta,epsilon,varargin)
+%SHC_LV_PASSAGETIME  Mean first passage times of noisy Lotka-Volterra system.
 %
-%   TAU = SHC_LV_PASSAGETIME(NET,DELTA,EPSILON)
-%   [TP,TD] = SHC_LV_PASSAGETIME(NET,DELTA,EPSILON)
-%   [TAU,TP,TT] = SHC_LV_PASSAGETIME(NET,DELTA,EPSILON)
-%   [...] = SHC_LV_PASSAGETIME(...,METHOD)
-%   [...] = SHC_LV_PASSAGETIME(...,OPTIONS)
+%   TP = SHC_LV_PASSAGETIME(NET,DELTA,EPSILON)
+%   TP = SHC_LV_PASSAGETIME(...,METHOD)
+%   TP = SHC_LV_PASSAGETIME(...,OPTIONS)
 %
 %   See also:
 %       SHC_LV_INVPASSAGETIME, SHC_LV_PASSAGETIME_MU, SHC_LV_INVPASSAGETIME_MU,
-%       STONEHOLMESPASSAGETIME, QUAD, INTEGRAL, PCHIP
+%       STONEHOLMESPASSAGETIME, QUAD, QUADL, INTEGRAL, PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-28-12
-%   Revision: 1.0, 2-12-13
+%   Revision: 1.0, 2-13-13
 
-
-if nargout > 3
-    error('SHCTools:shc_lv_passagetime:TooManyOutputs',...
-          'Too many output arguments.');
-end
 
 % Handle inputs
 if nargin < 3
@@ -109,39 +102,20 @@ end
 % Stable and unstable eigenvalues
 [lambda_u,lambda_s] = shc_lv_lambda_us(net);
 
-% SHC network parameters
-alp = net.alpha;
-bet = net.beta;
-gam = net.gamma;
-del = net.delta;
+% Tp(i) = F(Epsilon(i+1))
+epsilon = epsilon([2:end 1]);
 
-% If elements of vector inputs equal, collapse to n = 1, re-expand at end
-N = n;
-if n > 1 && all(alp(1) == alp) && all(bet(1) == bet) ...
-        && all(gam(1) == gam(:)) && all(del(1) == del(:)) ...
-        && all(delta(1) == delta) && all(epsilon(1) == epsilon)
-    lambda_u = lambda_u(1);
-    lambda_s = lambda_s(1);
-    alp = alp(1);
-    bet = bet(1);
-    gam = gam(1);
-    del = del(1);
-    delta = delta(1);
-    epsilon = epsilon(1);
-    n = 1;
-elseif n > 1
-    if isscalar(delta)
-        delta = delta(ones(n,1));
-    end
-    if isscalar(epsilon)
-        epsilon = epsilon(ones(n,1));
-    end
-end
-
-if nargin == 3 || any(strcmp(method,{'default','stoneholmes'}))
+if nargin == 3 || any(strcmp(method,{'default','analytic','stoneholmes'}))
     % Stone-Holmes mean first passage time using analytical solution
 	tp = stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
 else
+    if any(lambda_u >= lambda_s)
+        warning('SHCTools:shc_lv_passagetime:LambdaScaling',...
+               ['One or more Lambda_U values is greater than or equal '...
+                'to the corresponding Lambda_S value(s), but the '...
+                'Stone-Holmes distribution defines Lambda_U < Lambda_S.'])
+    end
+    
     % Scale noise by neighborhood size
     d_ep = delta./epsilon;
     
@@ -166,12 +140,12 @@ else
             msgid = '';
         otherwise
             error('SHCTools:shc_lv_passagetime:UnknownMethod',...
-                 ['Unknown method. Valid methods are: ''stoneholmes'' '...
+                 ['Unknown method. Valid methods are: ''analytic'' '...
                   '(default), ''quad'', ''quadl'', ''quadgk'', and '...
                   '''pchip''.']);
     end
     
-    % Start try-catch to disable warnings in quad/quadl functions
+    % Start try-catch to disable warnings in quad/quadl and integral/quadgk
     if ~isempty(msgid)
         CatchWarningObj = catchwarning(msgid);
     end
@@ -193,7 +167,7 @@ else
     
     % Handle bad values or any caught warning
     if any(tp <= 0) || ~all(isfinite(tp))
-        error('SHCTools:shc_lv_passagetime:NegativePassgeTime',...
+        error('SHCTools:shc_lv_passagetime:NonFinitePositivePassageTime',...
              ['Input specifications may be illconditioned. Specify a '...
               'different integration method or adjust the noise magnitude, '...
               'Epsilon.']);
@@ -208,32 +182,6 @@ else
                     'specifications may be illconditioned.']);
         end
     end
-end
-
-% Inter-passage transition time, estimate dt from passage time
-tt = interpassage_transitiontime(alp,bet,gam,del,delta,epsilon,n,tp,tol);
-if any(tt <= 0)
-    error('SHCTools:shc_lv_passagetime:NegativeTransitionTime',...
-         ['Cannot find valid inter-passage transition time, Tt. Input '...
-          'specifications may be illconditioned.']);
-end
-
-% Re-expand dimensions if needed
-if n ~= N
-    tp(1:N,1) = tp;
-    tt(1:N,1) = tt;
-end
-
-% Handle variable output
-if nargout <= 1
-    varargout{1} = tp+tt;
-elseif nargout == 2
-    varargout{1} = tp;
-    varargout{2} = tt;
-else
-    varargout{1} = tp+tt;
-    varargout{2} = tp;
-    varargout{3} = tt;
 end
 
 
@@ -294,66 +242,3 @@ for i = 2:4
 end
 tp = (f*2/sqrt(pi)...
     -erf(d_ep.*sqrt(lambda_s)).*log1p(lambda_u./lambda_s))./(2*lambda_u);
-
-
-function tt=interpassage_transitiontime(alp,bet,gam,del,delta,epsilon,n,tp,tol)
-alp2 = alp([2:end 1]);
-bet2 = bet([2:end 1]);
-gam2 = gam([2:end 1]);
-del2 = del([2:end 1]);
-
-% Estimate a1(0) by assuming slope parallel to a1 eigenvector, a2(0) = d
-aab = alp+alp2.*bet;
-for i = n:-1:1
-    d = delta(i);
-    rad = aab.*(d^2*gam.*(bet2.*gam.*aab-4*alp.*alp2)...
-        +2*d*alp.*bet2.*gam.*(2*alp2-aab)+alp.^2.*bet2.*aab);
-    a10 = (bet.*(sqrt(bet2).*(alp-d*gam).*aab...
-        +sign(rad).*sqrt(abs(rad))))./(2*alp.*sqrt(bet2).*aab);
-    
-    a = [a10(i);d;epsilon(i)];
-    
-    rho = [alp(i)/bet(i) gam(i)        gam(i);
-           del(i)        alp(i)/bet(i) gam(i);
-           gam2(i)    	 del2(i)       alp2(i)/bet2(i)];
-    alpv = [alp(i);alp(i);alp2(i)];
-    
-    % Find time step
-    dt = 0.01*tp(i);
-    rdt = norm(a.*(alpv-rho*a)./max(a,1),Inf)/(0.8*(bet(i)*tol)^0.2);
-    if dt*rdt > 1
-        dt = 1/rdt;
-    end
-    dt = max(dt,16*eps);
-    
-    % Integrate for over one period (tau+tt) to find a2(tt) on manifold
-    while a(3) <= d
-        ap = a;
-        f1 = a.*(alpv-rho*a);
-        a = ap+0.5*dt*f1;
-        f2 = a.*(alpv-rho*a);
-        a = ap+0.5*dt*f2;
-        f3 = a.*(alpv-rho*a);
-        a = ap+dt*f3;
-        f4 = a.*(alpv-rho*a);
-        a = max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0);
-    end
-    
-    % Linearly interpolate for a(2) at a(3) = d
-    a20(i) = ap(2)+(a(2)-ap(2))*(d-ap(3))/(a(3)-ap(3));
-    
-    % Linearly interpolate for a(1) at a(3) = d
-    a30(i) = ap(1)+(a(1)-ap(1))*(d-ap(3))/(a(3)-ap(3));
-    
-    a = [a20(i);d;a30(i)];
-    
-    % Integrate to find number of time-steps to a(1) = d
-    dt = 0.01*dt;
-    nt = 0;
-    while a(1) >= d
-        a = max(a+a.*(alpv-rho*a)*dt,0);
-        nt = nt+1;
-    end
-    tt(i) = nt*dt;
-end
-tt = tt(:);
