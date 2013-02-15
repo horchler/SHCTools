@@ -9,7 +9,7 @@ function tt=shc_lv_transitiontime(net,delta,mu)
 %       STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 12-17-12
-%   Revision: 1.0, 2-13-13
+%   Revision: 1.0, 2-14-13
 
 
 % Check network
@@ -72,15 +72,15 @@ bet = net.beta;
 [lambda_u,lambda_s] = shc_lv_lambda_us(net);
 
 tol = eps;
-d = bet-delta;
 
 % If all nodes identical, collapse to n = 1, re-expand at end
 N = n;
 if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
-        && all(lambda_s == lambda_s(1)) && all(d == d(1)) && all(mu == mu(1))
+        && all(lambda_s == lambda_s(1)) && all(delta == delta(1)) ...
+        && all(mu == mu(1))
     alp = alp(1);
     bet = bet(1);
-    d = d(1);
+    d = bet-delta(1);
     mu = mu(1);
     
     % Guess initial conditions
@@ -123,6 +123,13 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
     % Re-expand identical nodes
     tt = tt(ones(N,1));
 else
+    if isscalar(bet)
+        bet = bet(ones(n,1));
+    end
+    d = bet-delta;
+    if isscalar(mu)
+        mu = mu(ones(n,1));
+    end
     for i = n:-1:1
         j = mod(i,n)+1;
         
