@@ -11,7 +11,7 @@ function varargout=shc_lv_globalpassagetime(net,delta,epsilon,mu)
 %       SHC_LV_PASSAGETIME_MU, SHC_LV_INVPASSAGETIME_MU, STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 2-13-13
-%   Revision: 1.0, 2-13-13
+%   Revision: 1.0, 2-15-13
 
 
 if nargout > 3
@@ -80,7 +80,7 @@ if ~isscalar(delta) || ~isscalar(epsilon) || ~isscalar(mu)
     if length(lv) > 1 && ~all(lv(2:end) == lv(1))
         error('SHCTools:shc_lv_globalpassagetime:DimensionMismatch',...
              ['If any combination of Delta, Epsilon, and Mu are non-scalar '...
-              'vectors,  they must have the same length as the network '...
+              'vectors, they must have the same length as the network '...
               'dimension.']);
     end
     delta = delta(:);

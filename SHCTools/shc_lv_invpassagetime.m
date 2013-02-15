@@ -10,7 +10,7 @@ function epsilon=shc_lv_invpassagetime(net,delta,tp,varargin)
 %       STONEHOLMESINVPASSAGETIME, FZERO, QUAD, QUADL, PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-25-12
-%   Revision: 1.0, 2-13-13
+%   Revision: 1.0, 2-15-13
 
 
 if nargin < 3
@@ -79,7 +79,6 @@ end
 n = net.size;
 if ~isscalar(delta) || ~isscalar(tp)
     lv = [n length(delta) length(tp)];
-    n = max(lv);
     lv = lv(lv ~= 1);
     if length(lv) > 1 && ~all(lv(2:end) == lv(1))
         error('SHCTools:shc_lv_invpassagetime:DimensionMismatch',...

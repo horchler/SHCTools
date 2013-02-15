@@ -10,7 +10,7 @@ function tp=shc_lv_passagetime(net,delta,epsilon,varargin)
 %       STONEHOLMESPASSAGETIME, QUAD, QUADL, INTEGRAL, PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-28-12
-%   Revision: 1.0, 2-13-13
+%   Revision: 1.0, 2-15-13
 
 
 % Handle inputs
@@ -53,7 +53,6 @@ end
 n = net.size;
 if ~isscalar(delta) || ~isscalar(epsilon)
     lv = [n length(delta) length(epsilon)];
-    n = max(lv);
     lv = lv(lv ~= 1);
     if length(lv) > 1 && ~all(lv(2:end) == lv(1))
         error('SHCTools:shc_lv_passagetime:DimensionMismatch',...

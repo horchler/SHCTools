@@ -36,7 +36,7 @@ function varargout=shc_lv_eigs(rho,M)
 %       SHC_LV_LAMBDA_US
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-6-12
-%   Revision: 1.0, 12-16-12
+%   Revision: 1.0, 2-15-12
 
 
 if nargout > 2
@@ -45,60 +45,10 @@ end
 
 % Check Rho matrix
 if isstruct(rho) && isfield(rho,'rho')
-    if isfield(rho,'alpha')
-        alpv = rho.alpha;
-        if ~isvector(alpv) || ~(isfloat(alpv) || isa(alpv,'sym'))
-            error('SHCTools:shc_lv_eigs:AlphaVectorInvalid',...
-                 ['The ''alpha'' field of the SHC network structure must be '...
-                  'a symbolic or floating-point vector.']);
-        end
-        if ~isreal(alpv) || any(abs(alpv) == Inf) || any(isnan(alpv))
-            error('SHCTools:shc_lv_eigs:AlphaVectorNonFiniteReal',...
-                 ['The ''alpha'' field of the SHC network structure must be '...
-                  'a finite real symbolic or floating-point vector.']);
-        end
-        p = rho.rho;
-        [m,n] = size(p);
-        if size(alpv,1) ~= n
-            error('SHCTools:shc_lv_eigs:AlphaVectorDimensionMismatch',...
-                 ['The ''alpha'' field of the SHC network structure must be '...
-                  'a column vector the same dimension as RHO.']);
-        end
-    else
-        p = rho.rho;
-        alpv = diag(p);
-        [m,n] = size(p);
-    end
-    if isfield(rho,'beta')
-        betv = rho.beta;
-        if ~isvector(betv) || ~(isfloat(betv) || isa(betv,'sym'))
-            error('SHCTools:shc_lv_eigs:BetaVectorInvalid',...
-                 ['The ''beta'' field of the SHC network structure must be '...
-                  'a symbolic or floating-point vector.']);
-        end
-        if ~isreal(betv) || any(abs(betv) == Inf) || any(isnan(betv))
-            error('SHCTools:shc_lv_eigs:BetaVectorNonFiniteReal',...
-                 ['The ''beta'' field of the SHC network structure must be '...
-                  'a finite real symbolic or floating-point vector.']);
-        end
-        if size(betv,1) ~= n
-            error('SHCTools:shc_lv_eigs:BetaVectorDimensionMismatch',...
-                 ['The ''beta'' field of the SHC network structure must be '...
-                  'a column vector the same dimension as RHO.']);
-        end
-    else
-        betv = ones(n,1);
-    end
-    if ~(isfloat(p) || isa(p,'sym'))
-        error('SHCTools:shc_lv_eigs:InvalidRhoStruct',...
-             ['The ''rho'' field of the SHC network structure must be a '...
-              'symbolic or floating-point matrix.']);
-    end
-    if isnumeric(p) && ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
-        error('SHCTools:shc_lv_eigs:RhoStructNonFiniteReal',...
-             ['The ''rho'' field of the SHC network structure must be a '...
-              'finite real symbolic or floating-point matrix.']);
-    end
+    p = rho.rho;
+ 	n = rho.size;
+    alpv = rho.alpha;
+    betv = rho.beta;
 else
     p = rho;
     if ~(isfloat(p) || isa(p,'sym'))
@@ -107,23 +57,24 @@ else
               'symbolic or floating-point matrix.']);
     end
     if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
-        error('SHCTools:shc_lv_jacobian:RhoNonFiniteReal',...
+        error('SHCTools:shc_lv_eigs:RhoNonFiniteReal',...
              ['The ''rho'' field of the SHC network structure must be a '...
               'finite real symbolic or floating-point matrix.']);
     end
-    alpv = diag(p);
     [m,n] = size(p);
+    if isempty(p) || ~shc_ismatrix(p) || m ~= n
+        error('SHTools:shc_lv_eigs:RhoDimensionMismatch',...
+             ['RHO must be a non-empty square matrix the same dimension as '...
+              'the equilibrium point vector.']);
+    end
+    
+    alpv = diag(p);
     betv = ones(n,1);
-end
-if isempty(p) || ~shc_ismatrix(p) || m ~= n
-    error('SHTools:shc_lv_eigs:RhoDimensionMismatch',...
-         ['RHO must be a non-empty square matrix the same dimension as the '...
-          'equilibrium point vector.']);
 end
 
 if nargin == 2 && ~ischar(M)
     % Check M
-    if ~validateindex(M) || ~isnumeric(M) || M > m
+    if ~validateindex(M) || ~isnumeric(M) || M > n
         error('SHTools:shc_lv_eigs:InvalidM',...
              ['M must be a finite real integer greater than or equal to one '...
               'and less than or equal to the dimension of RHO. Use the '...
@@ -131,15 +82,15 @@ if nargin == 2 && ~ischar(M)
               'than those for the N nodes.']);
     end
     
-    eqpt(m,1) = 0;
+    eqpt(n,1) = 0;
     if isa(p,'sym') || isa(alpv,'sym') || isa(betv,'sym')
         eqpt = sym(eqpt);
     end
     eqpt(M) = -betv(M);
     
     % Calculate Jacobian
-    J = p.*eqpt(:,ones(1,m));
-    J(1:m+1:end) = alpv.*(1+eqpt)+p*eqpt;
+    J = p.*eqpt(:,ones(1,n));
+    J(1:n+1:end) = alpv.*(1+eqpt)+p*eqpt;
     
     % Calculate eigenvalues/eigenvectors
     if nargout == 2
@@ -158,18 +109,19 @@ else
         
         % Solve for equilibrium points
         eqpt = -shc_lv_symequilibria(rho);
-        n = size(eqpt,2);
+        m = size(eqpt,2);
     else
         % Generate equilibrium point matrix
         eqpt = diag(-betv);
+        m = n;
     end
     
-    z = ones(1,m);
-    for i = n:-1:1
+    z = ones(1,n);
+    for i = m:-1:1
         % Calculate Jacobian
         v = eqpt(:,i);
         J = p.*v(:,z);
-        J(1:m+1:end) = alpv.*(1+v)+p*v;
+        J(1:n+1:end) = alpv.*(1+v)+p*v;
         
         % Calculate eigenvalues/eigenvectors
         if nargout == 2

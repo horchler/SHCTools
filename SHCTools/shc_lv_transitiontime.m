@@ -9,7 +9,7 @@ function tt=shc_lv_transitiontime(net,delta,mu)
 %       STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 12-17-12
-%   Revision: 1.0, 2-14-13
+%   Revision: 1.0, 2-15-13
 
 
 % Check network
@@ -53,7 +53,6 @@ mu = max(mu,sqrt(realmin));
 n = net.size;
 if ~isscalar(delta) || ~isscalar(mu)
     lv = [n length(delta) length(mu)];
-    n = max(lv);
     lv = lv(lv ~= 1);
     if length(lv) > 1 && ~all(lv(2:end) == lv(1))
         error('SHCTools:shc_lv_transitiontime:DimensionMismatch',...

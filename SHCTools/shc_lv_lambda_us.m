@@ -23,65 +23,32 @@ function [lambda_u,lambda_s]=shc_lv_lambda_us(rho,M)
 %       BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA
 
 %   Andrew D. Horchler, adh9@case.edu, Created 8-29-12
-%   Revision: 1.0, 2-12-13
+%   Revision: 1.0, 2-15-13
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the
 %   Phase Plane," Nieuw Archief Voor Wiskunde (3), Vol. 27, 1979, pp. 238-254.
 
 
-% Check Rho matrix
+% Check Connection matrix
 if isstruct(rho) && isfield(rho,'rho')
-    if isfield(rho,'alpha')
-        alpv = rho.alpha;
-        if ~isvector(alpv) || ~isfloat(alpv)
-            error('SHCTools:shc_lv_lambda_us:AlphaVectorInvalid',...
-                 ['The ''alpha'' field of the SHC network structure must be '...
-                  'a floating-point vector.']);
-        end
-        if ~isreal(alpv) || any(abs(alpv) == Inf) || any(isnan(alpv))
-            error('SHCTools:shc_lv_lambda_us:AlphaVectorNonFiniteReal',...
-                 ['The ''alpha'' field of the SHC network structure must be '...
-                  'a finite real floating-point vector.']);
-        end
-        p = rho.rho;
-        [m,n] = size(p);
-        if size(alpv,1) ~= n
-            error('SHCTools:shc_lv_lambda_us:AlphaVectorDimensionMismatch',...
-                 ['The ''alpha'' field of the SHC network structure must be '...
-                  'a column vector the same dimension as RHO.']);
-        end
-    else
-        p = rho.rho;
-        [m,n] = size(p);
-    end
-    if ~isfloat(p)
-        error('SHCTools:shc_lv_lambda_us:InvalidRhoStruct',...
-             ['The ''rho'' field of the SHC network structure must be a '...
-              'floating-point matrix.']);
-    end
-    if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
-        error('SHCTools:shc_lv_lambda_us:RhoStructNonFiniteReal',...
-             ['The ''rho'' field of the SHC network structure must be a '...
-              'finite real floating-point matrix.']);
-    end
+ 	m = rho.size;
 else
-    p = rho;
-    if ~isfloat(p)
+    if ~(isfloat(rho) || isa(rho,'sym'))
         error('SHCTools:shc_lv_lambda_us:InvalidRho',...
              ['The ''rho'' field of the SHC network structure must be a '...
-              'floating-point matrix.']);
+              'symbolic or floating-point matrix.']);
     end
-    if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
+    if ~isreal(rho) || any(abs(rho(:)) == Inf) || any(isnan(rho(:)))
         error('SHCTools:shc_lv_lambda_us:RhoNonFiniteReal',...
              ['The ''rho'' field of the SHC network structure must be a '...
-              'finite real floating-point matrix.']);
+              'finite real symbolic or floating-point matrix.']);
     end
-    [m,n] = size(p);
-end
-if isempty(p) || ~shc_ismatrix(p) || m ~= n
-    error('SHTools:shc_lv_lambda_us:RhoDimensionMismatch',...
-         ['RHO must be a non-empty square matrix the same dimension as the '...
-          'equilibrium point vector.']);
+    [m,n] = size(rho);
+    if isempty(rho) || ~shc_ismatrix(rho) || m ~= n
+        error('SHTools:shc_lv_lambda_us:RhoDimensionMismatch',...
+             ['RHO must be a non-empty square matrix the same dimension as '...
+              'the equilibrium point vector.']);
+    end
 end
 
 % Get eigenvalues

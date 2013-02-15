@@ -8,7 +8,7 @@ function net=shc_createnetwork(nettype,params,varargin)
 %   NET = SHC_CREATENETWORK('custom',PARAMS,T)
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-28-12
-%   Revision: 1.0, 11-19-12
+%   Revision: 1.0, 2-15-13
 
 
 % Handle network type
@@ -210,7 +210,6 @@ if isNuNet
         alp = alp(1);
         bet = bet(1);
         nu = nu(1);
-        n = 1;
     else
         z = ones(n,1);
         if isscalar(alp)
@@ -237,7 +236,6 @@ else
         bet = bet(1);
         gam = gam(1);
         del = del(1);
-        n = 1;
     else
         z = ones(n,1);
         if isscalar(alp)

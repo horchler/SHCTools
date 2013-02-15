@@ -9,7 +9,7 @@ function delta=shc_lv_neighborhood(net,delta_hat,epsilon,N)
 %       SHC_LV_INVPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.0, 2-12-13
+%   Revision: 1.0, 2-15-13
 
 
 % Check network
@@ -21,7 +21,6 @@ if ~shc_lv_iscycle(net)
     error('SHCTools:shc_lv_neighborhoodsize:NotCycle',...
           'The network must be an SHC cycle.');
 end
-n = net.size;
 
 % Check Delta_Hat
 if ~isvector(delta_hat) || isempty(delta_hat) || ~isfloat(delta_hat)
@@ -39,20 +38,22 @@ end
 if nargin > 2
     if ~isvector(epsilon) || isempty(epsilon) || ~isfloat(epsilon)
         error('SHCTools:shc_lv_neighborhoodsize:EpsilonInvalid',...
-              'Epsilon must be a scalar or a vector the same length as A0.');
+             ['The noise magnitude, Epsilon, must be a scalar or a vector '...
+              'the same length as A0.']);
     end
     if ~isreal(epsilon) || ~all(isfinite(epsilon)) || any(epsilon <= 0)
         error('SHCTools:shc_lv_neighborhoodsize:EpsilonNonFiniteReal',...
-              'Epsilon must be a finite real floating-point vector.');
+             ['The noise magnitude, Epsilon, must be a finite real '...
+              'floating-point vector.']);
     end
 else
     epsilon = 1e-5*delta_hat;
 end
 
 % Check lengths
+n = net.size;
 if ~isscalar(delta_hat) || ~isscalar(epsilon)
     lv = [n length(delta_hat) length(epsilon)];
-    n = max(lv);
     lv = lv(lv ~= 1);
     if length(lv) > 1 && ~all(lv(2:end) == lv(1))
         error('SHCTools:shc_lv_neighborhoodsize:DimensionMismatch',...
@@ -75,10 +76,13 @@ else
     N = 30;
 end
 
+% Find global mean first passage time to estimate integration time
+tau = shc_lv_globalpassagetime(net,delta_hat,epsilon);
+
 % Time vector for integration
 t0 = 0;
 dt = 1e-3;
-tf = 1e3;
+tf = min(5*N*max(tau),1e3);
 tspan = t0:dt:tf;
 
 % Find unstable and stable eigenvalues for network
@@ -89,12 +93,12 @@ bet = net.beta;
 if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
         && all(lambda_s(1) == lambda_s) && all(delta_hat(1) == delta_hat) ...
         && all(epsilon(1) == epsilon)
-    ep = epsilon(1);
-    a0 = shc_lv_ic(net,delta_hat(1),epsilon(1));
+    epsilon1 = epsilon(1);
+    a0 = shc_lv_ic(net,delta_hat(1));
     
     opts = sdeset('EventsFUN',@(t,y)events(t,y,bet(1)-delta_hat(1)));
     
-    [~,~,TE] = shc_lv_integrate(tspan,a0,net,ep,0,opts);
+    [~,~,TE] = shc_lv_integrate(tspan,a0,net,epsilon1,0,opts);
     lte = length(TE);
     if lte < 4
         error('SHCTools:shc_lv_neighborhoodsize:TooFewCyclesIdenticalNodes',...
@@ -114,7 +118,7 @@ if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
     
     tp = mean(vertcat(TEj{:}));
 else
-    a0 = shc_lv_ic(net,delta_hat,epsilon);
+    a0 = shc_lv_ic(net,delta_hat);
     
     opts = sdeset('EventsFUN',@(t,y)events(t,y,bet-delta_hat));
     
