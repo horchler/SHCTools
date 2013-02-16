@@ -12,7 +12,7 @@ function [alp,bet,varargout]=shc_lv_params(delta,epsilon,mag,nu,tau,options)
 %       FZERO, FSOLVE, STONEHOLMESPASSAGETIME, SHC_LV_TRANSITIONTIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
-%   Revision: 1.0, 2-14-13
+%   Revision: 1.0, 2-15-13
 
 
 % Check variable outputs
@@ -194,8 +194,11 @@ CatchWarningObj = catchwarning('',...
 % If elements of vector inputs identical, collapse to n = 1, expand at end
 if n == 1 || all(delta(1) == delta) && all(epsilon(1) == epsilon) ...
         && all(bet(1) == bet) && all(nu(1) == nu) && all(tau(1) == tau)
+    % Create 3-node connection matrix from parameters
+    net = shc_create('contour',{1,bet(1),nu(1)},3);
+    
     % Create function handle for FZERO
-    afun = @(alp)alproot1d(delta(1),epsilon(1),alp(1),bet(1),nu(1),tau(1));
+    afun = @(alp)alproot1d(net,delta(1),epsilon(1),alp(1),bet(1),nu(1),tau(1));
     
     % Find root of Stone-Holmes mean first passage time in terms of Alpha
     bounds = bracketroot(afun,alp0(1),[eps eps(realmax)],'+');
@@ -236,9 +239,12 @@ else
         options.('Algorithm') = 'levenberg-marquardt';
     end
     
+    % Create N-node connection matrix from parameters
+    N = max([length(alp0) length(bet) length(nu) 3]);
+    net = shc_create('contour',{1,bet,nu},N);
+    
     % Create function handle for FSOLVE
-    afun = @(alp)alproot(delta,epsilon,alp,bet,nu,tau,...
-        max([length(bet) length(nu) 3]));
+    afun = @(alp)alproot(net,delta,epsilon,alp,bet,nu,tau,N);
     
     % Find root of Stone-Holmes mean first passage time in terms of Alpha
     [alp,fval,exitflag] = fsolve(afun,alp0,options);
@@ -284,7 +290,7 @@ end
 if nargout == 3
     varargout{1} = nu;
 else
-    % Find Delta as function of Alpha solution, Beta, and Nu
+    % Find Gamma and Delta as function of Alpha solution, Beta, and Nu
     varargout{1} = alp./bet([2:end 1])+alp([2:end 1]).*nu([2:end 1]);
     varargout{2} = alp./bet([end 1:end-1])...
         -alp([end 1:end-1])./nu([end 1:end-1]);
@@ -292,29 +298,36 @@ end
 
 
 
-function z=alproot(delta,epsilon,alp,bet,nu,tau,n)
-% Create N-node connection matrix from parameters
-net = shc_create('contour',{alp,bet,nu},n);
+function z=alproot(net,delta,epsilon,alp,bet,nu,tau,n)
+% Stable and unstable eigenvalues
+lambda_s = alp.*bet;
+lambda_u = lambda_s./nu;
+
+% Adjust network structure, build connection matrix
+rho = (alp([2:end 1]).*nu([2:end 1]))*ones(1,n);
+rho([2:n+1:end n*(n-1)+1]) = -alp./nu;
+rho(1:n+1:end) = 0;
+net.rho = bsxfun(@plus,rho,lambda_s);
+net.alpha = alp;
 
 % Inter-passage transition time
 tt = shc_lv_transitiontime(net,delta);
-
-% Stable and unstable eigenvalues
-[lambda_u,lambda_s] = shc_lv_lambda_us(net);
 
 % Zero of Stone-Holmes mean first passage time using analytical solution
 z = tau-tt-stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
 
 
-function z=alproot1d(delta,epsilon,alp,bet,nu,tau)
-% Create 3-node connection matrix from parameters
-net = shc_create('contour',{alp,bet,nu},3);
+function z=alproot1d(net,delta,epsilon,alp,bet,nu,tau)
+% Stable and unstable eigenvalues
+lambda_s = alp*bet;
+lambda_u = lambda_s/nu;
+
+% Adjust network structure
+net.rho = alp*net.rho;
+net.alpha(:) = alp;
 
 % Inter-passage transition time
 tt = shc_lv_transitiontime(net,delta);
-
-% Stable and unstable eigenvalues
-[lambda_u,lambda_s] = shc_lv_lambda_us(net,1);
 
 % Zero of Stone-Holmes mean first passage time using analytical solution
 z = tau-tt(1)-stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
