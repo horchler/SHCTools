@@ -85,7 +85,7 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
     % Guess initial conditions
     a = [d;sqrt(tol);mu(ones(N-2,1)).^2];
     
-    % Find time step using approximation based on neutrally-stable case
+    % Find time step using approximation based on marginally-stable case
     dt = 0.1*2*log(bet/delta(1)-1)/alp;
     rdt = norm((a.*(alp-rho*a)+mu)./max(a,1),Inf)/(0.8*(bet*tol)^0.2);
     if dt*rdt > 1
@@ -108,7 +108,6 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
 
     % Linearly interpolate for other a at a(1) = bet-delta
     a = ap+(a-ap)*(d-ap(1))/(a(1)-ap(1));
-    a(1) = d;
     
     % Integrate to find number of time-steps to a(2) = bet-delta
     tt = 0;
@@ -135,9 +134,6 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
     % Re-expand identical nodes
     tt = tt(ones(N,1));
 else
-    if isscalar(bet)
-        bet = bet(ones(n,1));
-    end
     d = bet-delta;
     if isscalar(mu)
         mu = mu(ones(n,1));
@@ -148,7 +144,7 @@ else
         % Guess initial conditions
         a = circshift([d(i);sqrt(tol);mu(i+zeros(N-2,1)).^2],i-1);
 
-        % Find time step using approximation based on neutrally-stable case
+        % Find time step using approximation based on marginally-stable case
         dt = 0.1*2*log(bet(i)/delta(i)-1)/alp(i);
         rdt = norm((a.*(alp-rho*a)+mu)./max(a,1),Inf)/(0.8*(bet(i)*tol)^0.2);
         if dt*rdt > 1
@@ -171,7 +167,6 @@ else
 
         % Linearly interpolate for other a at a(i) = bet(i)-delta(i)
         a = ap+(a-ap)*(d(i)-ap(i))/(a(i)-ap(i));
-        a(i) = d(i);
         
         % Integrate to find number of time-steps to a(i+1) = bet(i+1)-delta(i+1)
         tt(i) = 0;
