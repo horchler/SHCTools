@@ -178,12 +178,25 @@ end
 % Beta is state magnitude
 bet = mag;
 
-% First order estimate of Alpha in terms of Delta, Epsilon, Beta, Nu, and Tau
+% First order estimate of Alpha in terms of Tau, Delta, Epsilon, Beta, and Nu
 eulergamma = 0.577215664901533;
 alp0 = -nu.*wrightOmegaq(2*log(epsilon./delta)+log(0.5*tau)+log1p(1./nu)...
     -eulergamma-pi*1i)./(2*bet.*tau);
 if any(alp0 < eps) || any(alp0 > realmax/2) || any(isnan(alp0))
-    error('SHCTools:shc_lv_params:NoSolutionAlpha0',...
+    error('SHCTools:shc_lv_params:NoSolutionAlpha01',...
+          'Unable to reach a solution.');
+end
+
+% Use Alpha estimate to estimate inter-passage transition time, Tt
+net = shc_create('contour',{alp0,bet,nu},max(n,3));
+tt = shc_lv_transitiontime(net,delta);
+tp = tau-tt;
+
+% Re-estimate Alpha in terms of Tp with correction from Tt
+alp0 = -nu.*wrightOmegaq(2*log(epsilon./delta)+log(0.5*tp)+log1p(1./nu)...
+    -eulergamma-pi*1i)./(2*bet.*tp);
+if any(alp0 < eps) || any(alp0 > realmax/2) || any(isnan(alp0))
+    error('SHCTools:shc_lv_params:NoSolutionAlpha02',...
           'Unable to reach a solution.');
 end
 
@@ -192,8 +205,7 @@ CatchWarningObj = catchwarning('',...
     'SHCTools:stoneholmespassagetime:LambdaScaling');
 
 % If elements of vector inputs identical, collapse to n = 1, expand at end
-if n == 1 || all(delta(1) == delta) && all(epsilon(1) == epsilon) ...
-        && all(bet(1) == bet) && all(nu(1) == nu) && all(tau(1) == tau)
+if n == 1 || all(alp0(1) == alp0)
     % Create 3-node connection matrix from parameters
     net = shc_create('contour',{1,bet(1),nu(1)},3);
     

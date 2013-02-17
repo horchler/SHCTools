@@ -20,10 +20,10 @@ function adot=shc_lv_ode(t,a,rho,mu)
 %       No input validation is performed.
 %
 %   See also:
-%       SHC_LV_JACOBIAN, SHC_SYMEQUILIBRIA, SHC_LV_INTEGRATE, ODE45
+%       SHC_LV_JACOBIAN, SHC_LV_SYMEQUILIBRIA, SHC_LV_INTEGRATE, ODE45
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-28-12
-%   Revision: 1.0, 2-12-13
+%   Revision: 1.0, 2-15-13
 
 
 if isstruct(rho) && isfield(rho,'rho')

@@ -9,7 +9,7 @@ function tt=shc_lv_transitiontime(net,delta,mu)
 %       STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 12-17-12
-%   Revision: 1.0, 2-15-13
+%   Revision: 1.0, 2-16-13
 
 
 % Check network
@@ -70,7 +70,7 @@ bet = net.beta;
 % Stable and unstable eigenvalues
 [lambda_u,lambda_s] = shc_lv_lambda_us(net);
 
-tol = eps;
+tol = 1e-12;
 
 % If all nodes identical, collapse to n = 1, re-expand at end
 N = n;
@@ -85,8 +85,8 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
     % Guess initial conditions
     a = [d;sqrt(tol);mu(ones(N-2,1)).^2];
     
-    % Find time step
-    dt = 0.1*bet/alp;
+    % Find time step using approximation based on neutrally-stable case
+    dt = 0.1*2*log(bet/delta(1)-1)/alp;
     rdt = norm((a.*(alp-rho*a)+mu)./max(a,1),Inf)/(0.8*(bet*tol)^0.2);
     if dt*rdt > 1
         dt = 1/rdt;
@@ -111,13 +111,26 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
     a(1) = d;
     
     % Integrate to find number of time-steps to a(2) = bet-delta
-    dt2 = min(0.01*dt,tol^(1/3));
-    nt = 0;
-    while a(2) <= d
-        a = min(max(a+(a.*(alp-rho*a)+mu)*dt2,0),bet);
-        nt = nt+1;
+    tt = 0;
+    while dt >= 16*eps
+        dt = 0.125*dt;  % Reduce step-size
+        nt = 0;         % Set/reset time-step counter
+        while a(2) <= d
+            ap = a;
+            f1 = a.*(alp-rho*a)+mu;
+            a = ap+0.5*dt*f1;
+            f2 = a.*(alp-rho*a)+mu;
+            a = ap+0.5*dt*f2;
+            f3 = a.*(alp-rho*a)+mu;
+            a = ap+dt*f3;
+            f4 = a.*(alp-rho*a)+mu;
+            a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),bet);
+            nt = nt+1;
+        end
+        a = ap;             % Set next state to previous state
+        tt = tt+(nt-1)*dt;  % Increment transition time
     end
-    tt = nt*dt2;
+    tt = tt+0.5*dt;
     
     % Re-expand identical nodes
     tt = tt(ones(N,1));
@@ -135,8 +148,8 @@ else
         % Guess initial conditions
         a = circshift([d(i);sqrt(tol);mu(i+zeros(N-2,1)).^2],i-1);
 
-        % Find time step
-        dt = 0.1*bet(i)/alp(i);
+        % Find time step using approximation based on neutrally-stable case
+        dt = 0.1*2*log(bet(i)/delta(i)-1)/alp(i);
         rdt = norm((a.*(alp-rho*a)+mu)./max(a,1),Inf)/(0.8*(bet(i)*tol)^0.2);
         if dt*rdt > 1
             dt = 1/rdt;
@@ -159,15 +172,28 @@ else
         % Linearly interpolate for other a at a(i) = bet(i)-delta(i)
         a = ap+(a-ap)*(d(i)-ap(i))/(a(i)-ap(i));
         a(i) = d(i);
-
+        
         % Integrate to find number of time-steps to a(i+1) = bet(i+1)-delta(i+1)
-        dt2 = min(0.01*dt,tol^(1/3));
-        nt = 0;
-        while a(j) <= d(j)
-            a = min(max(a+(a.*(alp-rho*a)+mu)*dt2,0),bet);
-            nt = nt+1;
+        tt(i) = 0;
+        while dt >= 16*eps
+            dt = 0.125*dt;  % Reduce step-size
+            nt = 0;       	% Set/reset time-step counter
+            while a(j) <= d(j)
+                ap = a;
+                f1 = a.*(alp-rho*a)+mu;
+                a = ap+0.5*dt*f1;
+                f2 = a.*(alp-rho*a)+mu;
+                a = ap+0.5*dt*f2;
+                f3 = a.*(alp-rho*a)+mu;
+                a = ap+dt*f3;
+                f4 = a.*(alp-rho*a)+mu;
+                a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),bet);
+                nt = nt+1;
+            end
+            a = ap;                     % Set next state to previous state
+            tt(i) = tt(i)+(nt-1)*dt;    % Increment transition time
         end
-        tt(i) = nt*dt2;
+        tt(i) = tt(i)+0.5*dt;
     end
     tt = tt(:);
 end
