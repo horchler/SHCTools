@@ -7,7 +7,7 @@ function varargout=shc_lv_passagetime_data(net,delta,t,a)
 %   [...,TI] = SHC_LV_PASSAGETIME_DATA(NET,DELTA,T,A)
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-2-12
-%   Revision: 1.0, 2-13-13
+%   Revision: 1.0, 2-15-13
 
 
 if nargout > 4
@@ -65,7 +65,7 @@ if length(t) ~= M
 end
 
 bet = net.beta(1);
-dagtd = diff(a < bet-delta)';
+dagtd = diff(a < bet-delta).';
 [j1,i1] = find([false(n,1) (dagtd < 0)]);
 [j2,i2] = find([false(n,1) (dagtd > 0)]);
 if i1(1) > i2(1)

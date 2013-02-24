@@ -36,7 +36,7 @@ function varargout=shc_lv_eigs(rho,M)
 %       SHC_LV_LAMBDA_US
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-6-12
-%   Revision: 1.0, 2-15-12
+%   Revision: 1.0, 2-21-12
 
 
 if nargout > 2
@@ -46,26 +46,36 @@ end
 % Check Rho matrix
 if isstruct(rho) && isfield(rho,'rho')
     p = rho.rho;
- 	n = rho.size;
-    alpv = rho.alpha;
-    betv = rho.beta;
-else
-    p = rho;
     if ~(isfloat(p) || isa(p,'sym'))
-        error('SHCTools:shc_lv_eigs:InvalidRho',...
+        error('SHCTools:shc_lv_eigs:InvalidRhoStruct',...
              ['The ''rho'' field of the SHC network structure must be a '...
               'symbolic or floating-point matrix.']);
     end
     if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
-        error('SHCTools:shc_lv_eigs:RhoNonFiniteReal',...
+        error('SHCTools:shc_lv_eigs:RhoStructNonFiniteReal',...
              ['The ''rho'' field of the SHC network structure must be a '...
               'finite real symbolic or floating-point matrix.']);
+    end
+    
+    alpv = rho.alpha;
+    betv = rho.beta;
+    n = rho.size;
+else
+    p = rho;
+    if ~(isfloat(p) || isa(p,'sym'))
+        error('SHCTools:shc_lv_eigs:InvalidRho',...
+             ['The connection matrix, Rho, must be a symbolic or '...
+              'floating-point matrix.']);
+    end
+    if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
+        error('SHCTools:shc_lv_eigs:RhoNonFiniteReal',...
+             ['The connection matrix, Rho, must be a finite real symbolic '...
+              'or floating-point matrix.']);
     end
     [m,n] = size(p);
     if isempty(p) || ~shc_ismatrix(p) || m ~= n
         error('SHTools:shc_lv_eigs:RhoDimensionMismatch',...
-             ['RHO must be a non-empty square matrix the same dimension as '...
-              'the equilibrium point vector.']);
+              'The connection matrix, Rho, must be a non-empty square matrix.');
     end
     
     alpv = diag(p);
@@ -90,7 +100,7 @@ if nargin == 2 && ~ischar(M)
     
     % Calculate Jacobian
     J = p.*eqpt(:,ones(1,n));
-    J(1:n+1:end) = alpv.*(1+eqpt)+p*eqpt;
+    J(1:n+1:end) = alpv.*(1+eqpt./betv)+p*eqpt;
     
     % Calculate eigenvalues/eigenvectors
     if nargout == 2
@@ -121,7 +131,7 @@ else
         % Calculate Jacobian
         v = eqpt(:,i);
         J = p.*v(:,z);
-        J(1:n+1:end) = alpv.*(1+v)+p*v;
+        J(1:n+1:end) = alpv.*(1+v./betv)+p*v;
         
         % Calculate eigenvalues/eigenvectors
         if nargout == 2

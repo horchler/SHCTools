@@ -12,7 +12,7 @@ function [alp,bet,varargout]=shc_lv_params(delta,epsilon,mag,nu,tau,options)
 %       FZERO, FSOLVE, STONEHOLMESPASSAGETIME, SHC_LV_TRANSITIONTIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
-%   Revision: 1.0, 2-15-13
+%   Revision: 1.0, 2-21-13
 
 
 % Check variable outputs
@@ -175,26 +175,29 @@ else
     options = struct('Display','off','TolX',eps(dtype));
 end
 
-% Beta is state magnitude
-bet = mag;
+% Alpha(i) = F(Epsilon(i+1))
+epsilon = epsilon([2:end 1]);
 
-% First order estimate of Alpha in terms of Tau, Delta, Epsilon, Beta, and Nu
+% First order estimate of Alpha in terms of Tau, Delta, Epsilon, and Nu
 eulergamma = 0.577215664901533;
-alp0 = -nu.*wrightOmegaq(2*log(epsilon./delta)+log(0.5*tau)+log1p(1./nu)...
-    -eulergamma-pi*1i)./(2*bet.*tau);
+alp0 = -0.5*nu.*wrightOmegaq(2*log(epsilon./delta)+log(0.5*tau)+log1p(1./nu)...
+    -eulergamma-pi*1i)./tau;
 if any(alp0 < eps) || any(alp0 > realmax/2) || any(isnan(alp0))
     error('SHCTools:shc_lv_params:NoSolutionAlpha01',...
           'Unable to reach a solution.');
 end
 
-% Use Alpha estimate to estimate inter-passage transition time, Tt
+% Beta is state magnitude
+bet = mag;
+
+% Use initial Alpha estimate to estimate inter-passage transition time, Tt
 net = shc_create('contour',{alp0,bet,nu},max(n,3));
 tt = shc_lv_transitiontime(net,delta);
 tp = tau-tt;
 
 % Re-estimate Alpha in terms of Tp with correction from Tt
-alp0 = -nu.*wrightOmegaq(2*log(epsilon./delta)+log(0.5*tp)+log1p(1./nu)...
-    -eulergamma-pi*1i)./(2*bet.*tp);
+alp0 = -0.5*nu.*wrightOmegaq(2*log(epsilon./delta)+log(0.5*tp)+log1p(1./nu)...
+    -eulergamma-pi*1i)./tp;
 if any(alp0 < eps) || any(alp0 > realmax/2) || any(isnan(alp0))
     error('SHCTools:shc_lv_params:NoSolutionAlpha02',...
           'Unable to reach a solution.');
@@ -210,7 +213,7 @@ if n == 1 || all(alp0(1) == alp0)
     net = shc_create('contour',{1,bet(1),nu(1)},3);
     
     % Create function handle for FZERO
-    afun = @(alp)alproot1d(net,delta(1),epsilon(1),alp(1),bet(1),nu(1),tau(1));
+    afun = @(alp)alproot1d(net,delta(1),epsilon(1),alp(1),nu(1),tau(1));
     
     % Find root of Stone-Holmes mean first passage time in terms of Alpha
     bounds = bracketroot(afun,alp0(1),[eps eps(realmax)],'+');
@@ -303,23 +306,23 @@ if nargout == 3
     varargout{1} = nu;
 else
     % Find Gamma and Delta as function of Alpha solution, Beta, and Nu
-    varargout{1} = alp./bet([2:end 1])+alp([2:end 1]).*nu([2:end 1]);
-    varargout{2} = alp./bet([end 1:end-1])...
-        -alp([end 1:end-1])./nu([end 1:end-1]);
+    varargout{1} = (alp+alp([2:end 1]).*nu([2:end 1]))./bet([2:end 1]);
+    varargout{2} = (alp...
+        -alp([end 1:end-1])./nu([end 1:end-1]))./bet([end 1:end-1]);
 end
 
 
 
 function z=alproot(net,delta,epsilon,alp,bet,nu,tau,n)
 % Stable and unstable eigenvalues
-lambda_s = alp.*bet;
+lambda_s = alp;
 lambda_u = lambda_s./nu;
 
 % Adjust network structure, build connection matrix
-rho = (alp([2:end 1]).*nu([2:end 1]))*ones(1,n);
-rho([2:n+1:end n*(n-1)+1]) = -alp./nu;
+rho = ones(n,1)*(alp.*nu./bet).';
+rho([2:n+1:end n*(n-1)+1]) = -alp./(nu.*bet);
 rho(1:n+1:end) = 0;
-net.rho = bsxfun(@plus,rho,lambda_s);
+net.rho = rho+alp*(1./bet).';
 net.alpha = alp;
 
 % Inter-passage transition time
@@ -329,9 +332,9 @@ tt = shc_lv_transitiontime(net,delta);
 z = tau-tt-stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
 
 
-function z=alproot1d(net,delta,epsilon,alp,bet,nu,tau)
+function z=alproot1d(net,delta,epsilon,alp,nu,tau)
 % Stable and unstable eigenvalues
-lambda_s = alp*bet;
+lambda_s = alp;
 lambda_u = lambda_s/nu;
 
 % Adjust network structure

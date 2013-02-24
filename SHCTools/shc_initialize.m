@@ -4,7 +4,7 @@ function net=shc_initialize(net,reinit)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-14-12
-%   Revision: 1.0, 12-9-12
+%   Revision: 1.0, 2-21-13
 
 
 % Check for 'reset' mode to clear and reset 'children', 'index,' and 'T' fields
@@ -163,7 +163,7 @@ for i = 1:nnets
             for j = 1:s.size
                 for k = 1:s.size
                     if s.gamma(j,k) ~= 0
-                        s.gamma(j,k) = alp(j)./bet(k)+alp(k).*nu(k);
+                        s.gamma(j,k) = (alp(j)+alp(k).*nu(k))./bet(k);
                         if gamv
                             if gam2(j) == 0
                                 gam2(j) = s.gamma(j,k);
@@ -178,11 +178,11 @@ for i = 1:nnets
                 s.gamma = gam2;
             end
             
-            s.delta = alp./bet([end 1:end-1])...
-                -alp([end 1:end-1])./nu([end 1:end-1]); 
+            s.delta = (alp...
+                -alp([end 1:end-1])./nu([end 1:end-1]))./bet([end 1:end-1]); 
         else
-            s.gamma = alp/s.beta+alp*s.nu;
-            s.delta = alp/s.beta-alp/s.nu;
+            s.gamma = (1+s.nu)*alp/s.beta;
+            s.delta = (1-1/s.nu)*alp/s.beta;
         end
     end
     
