@@ -9,7 +9,7 @@ function delta=shc_lv_neighborhood(net,delta_hat,epsilon,N)
 %       SHC_LV_INVPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.0, 2-15-13
+%   Revision: 1.0, 3-9-13
 
 
 % Check network
@@ -111,7 +111,7 @@ if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
     TEj{1} = TE1(1:2:end);
     
     parfor j = 2:M
-        [~,~,TE] = shc_lv_integrate(tspan,a0,net,ep,0,opts);
+        [~,~,TE] = shc_lv_integrate(tspan,a0,net,epsilon1,0,opts);
         TE1 = diff(TE);
         TEj{j} = TE1(1:2:end);
     end
