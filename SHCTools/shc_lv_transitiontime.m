@@ -9,7 +9,7 @@ function tt=shc_lv_transitiontime(net,delta,mu)
 %       STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 12-17-12
-%   Revision: 1.0, 2-16-13
+%   Revision: 1.0, 4-5-13
 
 
 % Check network
@@ -31,13 +31,13 @@ if ~isreal(delta) || ~all(isfinite(delta)) || any(delta <= 0)
 end
 
 % Check Mu
-if nargin > 3
+if nargin > 2
     if ~isvector(mu) || isempty(mu) || ~isfloat(mu)
         error('SHCTools:shc_lv_transitiontime:MuInvalid',...
              ['The input magnitude, Mu, must be a non-empty floating-point '...
               'vector.']);
     end
-    if ~isreal(mu) || ~all(isfinite(mu)) || any(mu <= 0)
+    if ~isreal(mu) || ~all(isfinite(mu)) || any(mu < 0)
         error('SHCTools:shc_lv_transitiontime:MuNonFiniteReal',...
              ['The input magnitude, Mu, must be a positive finite real '...
               'floating-point vector.']);
@@ -78,22 +78,23 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
         && all(lambda_s == lambda_s(1)) && all(delta == delta(1)) ...
         && all(mu == mu(1))
     alp = alp(1);
-    bet = bet(1);
-    d = bet-delta(1);
+    lim = bet(1);
+    d = lim-delta(1);
     mu = mu(1);
     
     % Guess initial conditions
     a = [d;sqrt(tol);mu(ones(N-2,1)).^2];
     
     % Find time step using approximation based on marginally-stable case
-    dt = 0.1*2*log(bet/delta(1)-1)/alp;
-    rdt = norm((a.*(alp-rho*a)+mu)./max(a,1),Inf)/(0.8*(bet*tol)^0.2);
+    ttmin = shc_lv_mintransitiontime(net,delta(1));
+    dt = 0.1*ttmin(1);
+    rdt = norm((a.*(alp-rho*a)+mu)./max(a,1),Inf)/(0.8*(lim*tol)^0.2);
     if dt*rdt > 1
         dt = 1/rdt;
     end
     dt = max(dt,16*eps);
     
-    % Integrate from end of one transition time to start of next
+    % Integrate over passage time to start of transition
     while a(1) >= d
         ap = a;
         f1 = a.*(alp-rho*a)+mu;
@@ -103,9 +104,9 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
         f3 = a.*(alp-rho*a)+mu;
         a = ap+dt*f3;
         f4 = a.*(alp-rho*a)+mu;
-        a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),bet);
+        a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),lim);
     end
-
+    
     % Linearly interpolate for other a at a(1) = bet-delta
     a = ap+(a-ap)*(d-ap(1))/(a(1)-ap(1));
     
@@ -123,7 +124,7 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
             f3 = a.*(alp-rho*a)+mu;
             a = ap+dt*f3;
             f4 = a.*(alp-rho*a)+mu;
-            a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),bet);
+            a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),lim);
             nt = nt+1;
         end
         a = ap;             % Set next state to previous state
@@ -145,14 +146,14 @@ else
         a = circshift([d(i);sqrt(tol);mu(i+zeros(N-2,1)).^2],i-1);
 
         % Find time step using approximation based on marginally-stable case
-        dt = 0.1*2*log(bet(i)/delta(i)-1)/alp(i);
+        dt = 0.1*shc_lv_mintransitiontime(net,delta);
         rdt = norm((a.*(alp-rho*a)+mu)./max(a,1),Inf)/(0.8*(bet(i)*tol)^0.2);
         if dt*rdt > 1
             dt = 1/rdt;
         end
         dt = max(dt,16*eps);
 
-        % Integrate from end of one transition time to start of next
+        % Integrate over passage time to start of transition
         while a(i) >= d(i)
             ap = a;
             f1 = a.*(alp-rho*a)+mu;
