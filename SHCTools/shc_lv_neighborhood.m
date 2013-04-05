@@ -9,7 +9,7 @@ function delta=shc_lv_neighborhood(net,delta_hat,epsilon,N)
 %       SHC_LV_INVPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.0, 3-9-13
+%   Revision: 1.0, 3-29-13
 
 
 % Check network
@@ -93,12 +93,12 @@ bet = net.beta;
 if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
         && all(lambda_s(1) == lambda_s) && all(delta_hat(1) == delta_hat) ...
         && all(epsilon(1) == epsilon)
-    epsilon1 = epsilon(1);
+    epsilon = epsilon(1);
     a0 = shc_lv_ic(net,delta_hat(1));
     
-    opts = sdeset('EventsFUN',@(t,y)events(t,y,bet(1)-delta_hat(1)));
+    opts = struct('EventsFUN',@(t,y)events(t,y,bet(1)-delta_hat(1)));
     
-    [~,~,TE] = shc_lv_integrate(tspan,a0,net,epsilon1,0,opts);
+    [~,~,TE] = shc_lv_integrate(tspan,a0,net,epsilon,0,opts);
     lte = length(TE);
     if lte < 4
         error('SHCTools:shc_lv_neighborhoodsize:TooFewCyclesIdenticalNodes',...
@@ -111,7 +111,7 @@ if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
     TEj{1} = TE1(1:2:end);
     
     parfor j = 2:M
-        [~,~,TE] = shc_lv_integrate(tspan,a0,net,epsilon1,0,opts);
+        [~,~,TE] = shc_lv_integrate(tspan,a0,net,epsilon,0,opts);
         TE1 = diff(TE);
         TEj{j} = TE1(1:2:end);
     end
@@ -120,7 +120,7 @@ if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
 else
     a0 = shc_lv_ic(net,delta_hat);
     
-    opts = sdeset('EventsFUN',@(t,y)events(t,y,bet-delta_hat));
+    opts = struct('EventsFUN',@(t,y)events(t,y,bet-delta_hat));
     
     [~,~,TE] = shc_lv_integrate(tspan,a0,net,epsilon,0,opts);
     lte = length(TE);
