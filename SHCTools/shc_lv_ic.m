@@ -10,7 +10,7 @@ function a0=shc_lv_ic(net,a0,epsilon,mu)
 %       SHC_LV_INTEGRATE, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-11-12
-%   Revision: 1.0, 2-16-13
+%   Revision: 1.0, 4-5-13
 
 
 %{
@@ -122,7 +122,7 @@ if any(epsilon < sqrt(realmin) & mu < sqrt(realmin))
           '(2^%d for double precision).'],log2(sqrt(realmin)));
 end
 
-% Minimum mu to avoid getting trapped during Runge-Kutta integration
+% Minimum Mu to avoid getting trapped during Runge-Kutta integration
 mu = max(mu,sqrt(realmin));
 
 % Check lengths
@@ -153,11 +153,15 @@ tol = eps;
 if false && all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
         && all(lambda_s(1) == lambda_s) && all(epsilon(1) == epsilon) ...
         && all(mu(1) == mu)
+    % Find time step using approximation based on marginally-stable case
+    ttmin = shc_lv_mintransitiontime(net,delta(1));
+    dtt = 0.1*ttmin(1);
+
     % Find time step using estimate from mean first passage time
     dtp = stoneholmespassagetime(a0(i),max(epsilon(1),mu(1)),lambda_u(1),...
         lambda_s(1));
     
-    a0 = ic1d(rho,alp(1),bet(1),d,epsilon(1),mu(1),n,dtp,tol);
+    a0 = ic1d(rho,alp(1),bet(1),d,epsilon(1),mu(1),n,dtt,dtp,tol);
     if ~isscalar(a0)
         a0 = circshift(a0,i-1);
     end
@@ -171,22 +175,23 @@ else
         end
     end
     
+    % Find time step using approximation based on marginally-stable case
+    dtt = 0.1*shc_lv_mintransitiontime(net,delta);
+    
     % Find time step using estimate from mean first passage time
     dtp = stoneholmespassagetime(a0(i),max(epsilon,mu),lambda_u(i),...
         lambda_s(i));
     
-    a0 = ic(rho,alp(i),bet(i),d,i,epsilon,mu,n,dtp,tol);
+    a0 = ic(rho,alp(i),bet(i),d,i,epsilon,mu,n,dtt,dtp,tol);
 end
 
 
 
-function a0=ic1d(rho,alp,bet,d,epsilon,mu,n,dtp,tol)
+function a0=ic1d(rho,alp,bet,d,epsilon,mu,n,dt,dtp,tol)
 % Guess initial conditions
 em = max(epsilon,mu);
 a = [bet-d;em(ones(n-2,1)).^2;d];
 
-% Find time step using inter-passage transition time approximation
-dt = 0.1*2*log(d/(bet-d))/alp;
 rdt = norm((a.*(alp-rho*a)+mu)./max(a,1),Inf)/(0.8*(bet*tol)^0.2);
 if dt*rdt > 1
     dt = 1/rdt;
@@ -231,13 +236,11 @@ end
 a0 = ap+(a-ap)*(d-ap(1))/(a(1)-ap(1));
 
 
-function a0=ic(rho,alp,bet,d,i,epsilon,mu,n,dtp,tol)
+function a0=ic(rho,alp,bet,d,i,epsilon,mu,n,dt,dtp,tol)
 % Guess initial conditions
 em = max(epsilon,mu);
 a = circshift([bet(i)-d;em(ones(n-2,1)).^2;d],i-1);
 
-% Find time step using inter-passage transition time approximation
-dt = 0.1*2*log(d./(bet(i)-d))./alp(i);
 rdt = norm((a.*(alp-rho*a)+mu)./max(a,1),Inf)/(0.8*(bet(i)*tol)^0.2);
 if dt*rdt > 1
     dt = 1/rdt;
