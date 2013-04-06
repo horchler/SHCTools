@@ -9,7 +9,7 @@ function tau_bar=shc_lv_meanperiod(net,epsilon_hat,N)
 %       SHC_LV_INVPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.0, 4-5-13
+%   Revision: 1.0, 4-6-13
 
 
 % Check network
@@ -58,7 +58,7 @@ else
 end
 
 bet = net.beta;
-delta = 0.04*bet;
+delta = shc_lv_neighborhood(net.beta);
 
 % Find global mean first passage time to estimate integration time
 tau = shc_lv_globalpassagetime(net,delta,epsilon_hat);

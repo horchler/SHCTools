@@ -9,7 +9,7 @@ function tt=shc_lv_transitiontime(net,delta,mu)
 %       STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 12-17-12
-%   Revision: 1.0, 4-5-13
+%   Revision: 1.0, 4-6-13
 
 
 % Check network
@@ -78,8 +78,7 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
         && all(lambda_s == lambda_s(1)) && all(delta == delta(1)) ...
         && all(mu == mu(1))
     alp = alp(1);
-    lim = bet(1);
-    d = lim-delta(1);
+    d = bet(1)-delta(1);
     mu = mu(1);
     
     % Guess initial conditions
@@ -88,7 +87,9 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
     % Find time step using approximation based on marginally-stable case
     ttmin = shc_lv_mintransitiontime(net,delta(1));
     dt = 0.1*ttmin(1);
-    rdt = norm((a.*(alp-rho*a)+mu)./max(a,1),Inf)/(0.8*(lim*tol)^0.2);
+    
+    % Refine step size approximation
+    rdt = norm((a.*(alp-rho*a)+mu)./max(a,1),Inf)/(0.8*(bet(1)*tol)^0.2);
     if dt*rdt > 1
         dt = 1/rdt;
     end
@@ -104,7 +105,7 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
         f3 = a.*(alp-rho*a)+mu;
         a = ap+dt*f3;
         f4 = a.*(alp-rho*a)+mu;
-        a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),lim);
+        a = max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0);
     end
     
     % Linearly interpolate for other a at a(1) = bet-delta
@@ -112,7 +113,7 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
     
     % Integrate to find number of time-steps to a(2) = bet-delta
     tt = 0;
-    while dt >= 16*eps
+    while dt >= 128*eps
         dt = 0.125*dt;  % Reduce step-size
         nt = 0;         % Set/reset time-step counter
         while a(2) <= d
@@ -124,7 +125,7 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
             f3 = a.*(alp-rho*a)+mu;
             a = ap+dt*f3;
             f4 = a.*(alp-rho*a)+mu;
-            a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),lim);
+            a = max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0);
             nt = nt+1;
         end
         a = ap;             % Set next state to previous state
@@ -139,14 +140,18 @@ else
     if isscalar(mu)
         mu = mu(ones(n,1));
     end
+    
+    % Find time steps using approximation based on marginally-stable case
+	dtt = 0.1*shc_lv_mintransitiontime(net,delta);
+    
     for i = n:-1:1
         j = mod(i,n)+1;
         
         % Guess initial conditions
         a = circshift([d(i);sqrt(tol);mu(i+zeros(N-2,1)).^2],i-1);
-
-        % Find time step using approximation based on marginally-stable case
-        dt = 0.1*shc_lv_mintransitiontime(net,delta);
+        
+        % Refine step size approximation
+        dt = dtt(i);
         rdt = norm((a.*(alp-rho*a)+mu)./max(a,1),Inf)/(0.8*(bet(i)*tol)^0.2);
         if dt*rdt > 1
             dt = 1/rdt;
@@ -163,7 +168,7 @@ else
             f3 = a.*(alp-rho*a)+mu;
             a = ap+dt*f3;
             f4 = a.*(alp-rho*a)+mu;
-            a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),bet);
+            a = max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0);
         end
 
         % Linearly interpolate for other a at a(i) = bet(i)-delta(i)
@@ -171,7 +176,7 @@ else
         
         % Integrate to find number of time-steps to a(i+1) = bet(i+1)-delta(i+1)
         tt(i) = 0;
-        while dt >= 16*eps
+        while dt >= 128*eps
             dt = 0.125*dt;  % Reduce step-size
             nt = 0;       	% Set/reset time-step counter
             while a(j) <= d(j)
@@ -183,7 +188,7 @@ else
                 f3 = a.*(alp-rho*a)+mu;
                 a = ap+dt*f3;
                 f4 = a.*(alp-rho*a)+mu;
-                a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),bet);
+                a = max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0);
                 nt = nt+1;
             end
             a = ap;                     % Set next state to previous state
@@ -191,7 +196,7 @@ else
         end
         tt(i) = tt(i)+0.5*dt;
     end
-    tt = tt(:);
+    tt = tt([end 1:end-1]).';
 end
 
 if any(tt <= 0) || ~all(isfinite(tt))
