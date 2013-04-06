@@ -12,7 +12,7 @@ function tf=shc_lv_iscycle(net)
 %       SHC_LV_EIGS, BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA
 
 %   Andrew D. Horchler, adh9@case.edu, Created 2-12-13
-%   Revision: 1.0, 2-12-13
+%   Revision: 1.0, 4-6-13
 
 
 % Check network
@@ -58,7 +58,7 @@ if isempty(rho) || ~shc_ismatrix(rho) || m ~= n
 end
 
 if n < 3
-    tf = false; % An SHC cycle must have at least three nodes
+    tf = false; % A Lotka-Volterra SHC cycle must have at least three nodes
 else
     % Check that each node has one unstable eigenvalue and N-1 stable ones
     E = shc_lv_eigs(net);

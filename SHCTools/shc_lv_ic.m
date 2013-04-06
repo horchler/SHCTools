@@ -10,18 +10,8 @@ function a0=shc_lv_ic(net,a0,epsilon,mu)
 %       SHC_LV_INTEGRATE, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-11-12
-%   Revision: 1.0, 4-5-13
+%   Revision: 1.0, 4-6-13
 
-
-%{
-% Find initial guess for a10 as a funtion of a20 and eigenvector for a1
-params = {sym('alp','positive') sym('bet','positive') sym('gam','positive') 0};
-net = shc_create('channel',params,2);
-eq = shc_lv_ode(0,sym('[a10;a20]'),net);
-[V,~] = shc_lv_eigs(net,1);
-a10 = solve([char(eq(2)/eq(1)-V(2,1)/V(1,1)) '=0'],'a10');
-% Result is two equations (quadratic solution arises in a10), simplified below:
-%}
 
 % Check network
 if ~isstruct(net) || ~isfield(net,'rho')
@@ -56,7 +46,7 @@ if nargin > 1
               'whose values are less than the corresponding Beta values.']);
     end
 else
-    a0 = 0.04*min(bet);
+    a0 = shc_lv_neighborhood(min(bet));
 end
 
 % Check Epsilon
@@ -176,11 +166,11 @@ else
     end
     
     % Find time step using approximation based on marginally-stable case
-    dtt = 0.1*shc_lv_mintransitiontime(net,delta);
+    ttmin = shc_lv_mintransitiontime(net,delta);
+    dtt = 0.1*ttmin(i);
     
     % Find time step using estimate from mean first passage time
-    dtp = stoneholmespassagetime(a0(i),max(epsilon,mu),lambda_u(i),...
-        lambda_s(i));
+    dtp = stoneholmespassagetime(a0(i),max(epsilon,mu),lambda_u(i),lambda_s(i));
     
     a0 = ic(rho,alp(i),bet(i),d,i,epsilon,mu,n,dtt,dtp,tol);
 end
@@ -208,7 +198,7 @@ while a(1) <= d
     f3 = a.*(alp-rho*a)+mu;
     a = ap+dt*f3;
     f4 = a.*(alp-rho*a)+mu;
-    a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),bet);
+    a = max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0);
 end
 
 % Find time step based on mean first passage time
@@ -229,7 +219,7 @@ while a(1) >= d
     f3 = a.*(alp-rho*a)+mu;
     a = ap+dt*f3;
     f4 = a.*(alp-rho*a)+mu;
-    a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),bet);
+    a = max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0);
 end
 
 % Linearly interpolate for a at a(1) = d
@@ -257,7 +247,7 @@ while a(i) <= d
     f3 = a.*(alp-rho*a)+mu;
     a = ap+dt*f3;
     f4 = a.*(alp-rho*a)+mu;
-    a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),bet);
+    a = max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0);
 end
 
 % Find time step based on mean first passage time
@@ -278,7 +268,7 @@ while a(i) >= d
     f3 = a.*(alp-rho*a)+mu;
     a = ap+dt*f3;
     f4 = a.*(alp-rho*a)+mu;
-    a = min(max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0),bet);
+    a = max(ap+(dt/6)*(f1+2*(f2+f3)+f4),0);
 end
 
 % Linearly interpolate for a at a(i) = d
