@@ -1,5 +1,5 @@
 %SHCTools
-%  Version 1.0, 2-13-13
+%  Version 1.1, 4-5-13
 %
 %  SHC network creation, modification, and visualization, and conversion.
 %      buildrho               - Create RHO matrix from SHC network structure.
@@ -19,12 +19,11 @@
 %      shc_lv_globalpassagetime - Find passage times from SHC network structure.
 %      shc_lv_ic              - Find initial conditions close to SHC manifold.
 %      shc_lv_integrate       - Solve Lotka-Volterra SDEs numerically.
-%      shc_lv_invpassagetime  - Find noise magnitude from SHC network structure.
 %      shc_lv_iscycle         - Check if Lotka-Volterra system is an SHC cycle.
 %      shc_lv_isstable        - Check stability of Lotka-Volterra system nodes.
 %      shc_lv_jacobian        - Jacobian of N-dimensional Lotka-Volterra system.
 %      shc_lv_lambda_us       - Dominant unstable and stable eigenvalues.
-%      shc_lv_neighborhood    - Simulate to fit linear neighborhood size.
+%      shc_lv_meanperiod      - Simulate system to find average mean period.
 %      shc_lv_ode         	  - ODEs for N-dimensional Lotka-Volterra system.
 %      shc_lv_params          - Find RHO matrix parameters from description.
 %      shc_lv_passagetime     - Mean first passage times of SHC network.
@@ -50,11 +49,11 @@
 %      shc.xsd                - XML Schema.
 
 %  This version tested with Matlab 8.0.0.783 (R2012b)
-%  Mac OS X 10.8.2 (Build: 12C2034), Java 1.6.0_37-b06-434-11M3909
+%  Mac OS X 10.8.2 (Build: 12D78), Java 1.6.0_43-b01-447-11M4203
 %  Compatibility maintained back through Matlab 7.4 (R2007a)
 
 %  Andrew D. Horchler, adh9 @ case . edu
-%  Created: 1-4-12, Revision: 1.0, 2-13-13
+%  Created: 1-4-12, Revision: 1.1, 4-5-13
 
 
 %  Acknowledgment of support: This material is based upon work supported by the
