@@ -1,4 +1,4 @@
-function tf=shc_lv_isstasble(net,M)
+function tf=shc_lv_isstable(net,M)
 %SHC_LV_ISSTABLE  Check stability of Lotka-Volterra system nodes.
 %   SHC_LV_ISSTABLE(NET,M) returns a logical 1 (true) if the M-th node of the
 %   N-dimensional Lotka-Volterra SHC network described by the connection matrix
@@ -28,7 +28,7 @@ function tf=shc_lv_isstasble(net,M)
 %       SHC_LV_EIGS, BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA
 
 %   Andrew D. Horchler, adh9@case.edu, Created 8-30-12
-%   Revision: 1.0, 2-11-13
+%   Revision: 1.0, 4-6-13
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the
 %   Phase Plane," Nieuw Archief Voor Wiskunde (3), Vol. 27, 1979, pp. 238-254.
@@ -37,7 +37,7 @@ function tf=shc_lv_isstasble(net,M)
 if nargin == 2
     if ischar(M)
         if ~strcmpi(M,'all')
-            errror('SHCTools:shc_lv_isstasble:InvalidStringM',...
+            errror('SHCTools:shc_lv_isstable:InvalidStringM',...
                   ['The second argument must the string ''all'' or a scalar '...
                    'integer greater than or equal to 1 and less than or '...
                    'equal to N, the size of the network.']);
