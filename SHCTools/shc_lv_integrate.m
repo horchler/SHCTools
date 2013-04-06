@@ -1,17 +1,15 @@
-function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,rho,eta,mu,options)
+function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,net,eta,mu,options)
 %SHC_LV_INTEGRATE  Solve stochastic Lotka-Volterra differential equations.
 %   AOUT = SHC_LV_INTEGRATE(TSPAN,A0,RHO,ETA) with TSPAN = [T0 T1 ... TFINAL]
 %   integrates the stochastic differential equations for the N-dimensional
 %   Lotka-Volterra system with diagonal additive noise from time T0 to TFINAL
 %   (all increasing or all decreasing with arbitrary step size) with initial
-%   conditions A0. RHO is the N-by-N connection matrix and can be specified via
-%   a floating-point matrix or an SHC network structure. If RHO is a matrix, the
-%   amplitude scaling parameters, beta, are asummed to all be equal to one. If
-%   RHO is an SHC network structure, arbitrary beta values may be used. ETA is a
-%   scalar or length N vector denoting the root-mean-squared magnitude of the
-%   noise perturbing each dimension. If all elelments of ETA are equal to zero,
-%   the system is treated as an ODE rather than an SDE. Each row in the solution
-%   array AOUT corresponds to a time in the input vector TSPAN.
+%   conditions A0. RHO is an SHC network structure describing an N-by-N
+%   connection matrix and its parameters. ETA is a scalar or length N vector
+%   denoting the root-mean-squared magnitude of the noise perturbing each
+%   dimension. If all elelments of ETA are equal to zero, the system is treated
+%   as an ODE rather than an SDE. Each row in the solution array AOUT
+%   corresponds to a time in the input vector TSPAN.
 %
 %   [AOUT, W] = SHC_LV_INTEGRATE(TSPAN,A0,RHO,ETA) outputs the matrix W of
 %   integrated Weiner increments that were used for integration. W is N columns
@@ -45,14 +43,15 @@ function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,rho,eta,mu,options)
 %   SHC_LV_INTEGRATE is an implementation of the explicit Euler-Maruyama scheme
 %   with diagonal additive noise (order 1.0 strong convergence). Ito and
 %   Stratonovich interpretations coincide for this case and higher order schemes
-%   such as Euler-Heun and Milstein effectively simplify to Euler-Maruyama.
+%   such as Euler-Heun and Milstein effectively simplify to Euler-Maruyama. In
+%   the zero noise case, explicit Euler integration is used.
 
 %   For details of this integration method, see: Peter E. Kloeden and Eckhard
 %   Platen, "Numerical solution of Stochastic Differential Equations,"
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.0, 2-10-13
+%   Revision: 1.0, 4-5-13
 
 
 % Check inputs and outputs
@@ -109,57 +108,13 @@ a0 = a0(:);
 N = length(a0);	% number of state variables
 
 % Check Rho matrix
-if isstruct(rho) && isfield(rho,'rho')
-    if isfield(rho,'alpha')
-        alpv = rho.alpha';
-        if ~isfloat(alpv) || ~isreal(alpv) || ~all(isfinite(alpv))
-            error('SHCTools:shc_lv_integrate:AlphaVectorInvalid',...
-                 ['The ''alpha'' field of the SHC network structure must be '...
-                  'a finite real floating-point vector.']);
-        end
-        if ~isvector(alpv) || size(alpv,2) ~= N
-            error('SHCTools:shc_lv_integrate:AlphaVectorDimensionMismatch',...
-                 ['The ''alpha'' field of the SHC network structure must be '...
-                  'a column vector the same length as A0.']);
-        end
-        rho = rho.rho';
-    else
-        rho = rho.rho';
-        alpv = diag(rho)';
-    end
-    if isfield(rho,'beta')
-        betv = rho.beta';
-        if ~isfloat(betv) || ~isreal(betv) || ~all(isfinite(betv))
-            error('SHCTools:shc_lv_integrate:BetaVectorInvalid',...
-                 ['The ''beta'' field of the SHC network structure must be '...
-                  'a finite real floating-point vector.']);
-        end
-        if ~isvector(betv) || size(betv,2) ~= N
-            error('SHCTools:shc_lv_integrate:BetaVectorDimensionMismatch',...
-                 ['The ''beta'' field of the SHC network structure must be '...
-                  'a column vector the same length as A0.']);
-        end
-    else
-        betv = alpv./diag(rho)';
-    end
-    if ~isfloat(rho) || ~isreal(rho) || ~all(isfinite(rho(:)))
-        error('SHCTools:shc_lv_integrate:InvalidRhoStruct',...
-             ['If the input RHO is a SHC network structure, the ''rho'' '...
-              'field must be a finite real floating-point matrix.']);
-    end
-elseif isfloat(rho)
-    if ~isreal(rho) || ~all(isfinite(rho(:)))
-        error('SHCTools:shc_lv_integrate:InvalidRhoMatrix',...
-              'RHO must be finite a real floating-point matrix.');
-    end
-    rho = rho';
-    alpv = diag(rho)';
-    betv = 1;
-else
+if ~isstruct(net) || ~isfield(net,'rho') || ~isfield(net,'alpha')
     error('SHCTools:shc_lv_integrate:InvalidRho',...
-         ['RHO must be finite real floating-point matrix or SHC network '...
-          'structure with a ''rho'' field.']);
+          ['RHO must be an SHC network structure with ''rho'' and ''alpha'' '...
+           'fields.']);
 end
+rho = net.rho.';
+alpv = net.alpha.';
 if ~shc_ismatrix(rho) || ~all(size(rho) == N)
     error('SHCTools:shc_lv_integrate:RhoDimensionMismatch',...
           'RHO must be a square matrix the same dimension as A0.');
@@ -188,7 +143,7 @@ if isa(eta,'function_handle')
                 rethrow(err);
         end
     end
-    eta0 = eta0(:)';
+    eta0 = eta0(:).';
     EtaFUN = true;
 else
     if ~isvector(eta) || ~any(length(eta) == [1 N])
@@ -199,7 +154,7 @@ else
         error('SHCTools:shc_lv_integrate:InvalidEta',...
               'ETA must be a finite real floating-point vector.');
     end
-    eta0 = eta(:)';
+    eta0 = eta(:).';
     EtaFUN = false;
 end
 D = length(eta0);
@@ -488,11 +443,12 @@ if any(eta0 ~= 0) || EtaFUN
         else
             etai = A(i+1,:);
         end
-        A(i+1,:) = min(max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt+etai,0),betv);
+        A(i+1,:) = max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt+etai,0);
         
         % Check for and handle zero-crossing events
         if isEvents
-            [te,ae,we,ie,EventsValue,IsTerminal] = shc_zero(EventsFUN,tspan(i+1),A(i+1,:),W(i+1,:),EventsValue);
+            [te,ae,we,ie,EventsValue,IsTerminal] =...
+                shc_zero(EventsFUN,tspan(i+1),A(i+1,:),W(i+1,:),EventsValue);
             if ~isempty(te)
                 if nargout >= 3
                     TE = [TE;te];               %#ok<AGROW>
@@ -536,11 +492,12 @@ else
         if ~ConstStep
             dt = h(i);
         end
-        A(i+1,:) = min(max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt,0),betv);
+        A(i+1,:) = max(A(i,:)+(A(i,:).*(alpv-A(i,:)*rho)+mu)*dt,0);
         
         % Check for and handle zero-crossing events
         if isEvents
-            [te,ae,we,ie,EventsValue,IsTerminal] = shc_zero(EventsFUN,tspan(i+1),A(i+1,:),Wz,EventsValue);
+            [te,ae,we,ie,EventsValue,IsTerminal] =...
+                shc_zero(EventsFUN,tspan(i+1),A(i+1,:),Wz,EventsValue);
             if ~isempty(te)
                 if nargout >= 3
                     TE = [TE;te];               %#ok<AGROW>
