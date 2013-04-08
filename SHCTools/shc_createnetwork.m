@@ -8,7 +8,7 @@ function net=shc_createnetwork(nettype,params,varargin)
 %   NET = SHC_CREATENETWORK('custom',PARAMS,T)
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-28-12
-%   Revision: 1.0, 2-15-13
+%   Revision: 1.0, 4-7-13
 
 
 % Handle network type
@@ -172,7 +172,7 @@ if isCustom
 elseif nargin > 2
     m = varargin{1};
     if ~isscalar(m) || ~isnumeric(m) || ~isreal(m) || ~isfinite(m) || ...
-            m-floor(m) ~= 0 || m < 1
+            m ~= floor(m) || m < 1
         error('SHCTools:shc_createnetwork:InvalidNetworkSize',...
              ['The network size, N, must be a positive finite real scalar '...
               'integer.']);

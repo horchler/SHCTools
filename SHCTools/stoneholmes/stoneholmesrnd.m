@@ -55,7 +55,7 @@ function r=stoneholmesrnd(delta,epsilon,lambda_u,lambda_s,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-6-12
-%   Revision: 1.0, 1-18-13
+%   Revision: 1.0, 4-7-13
 
 
 % Check four parameters
@@ -97,7 +97,7 @@ if length(v) == 1
     M=v{1};
     if isempty(M) || ~isvector(M) || ~isreal(M) || ~isnumeric(M) || ...
             ~all(isfinite(M)) || any(M < 0) || ~(isinteger(M) || ...
-            all(M-floor(M) == 0))
+            all(M == floor(M)))
         error('SHCTools:stoneholmesrnd:DimensionInvalid',...
              ['Size vector must be a row vector of positive finite real '...
               'integers.'])

@@ -8,7 +8,7 @@ function shc_validatesubnetwork(s,varargin)
 %shc_validatesubnetwork(s,num,'strict')
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-15-12
-%   Revision: 1.0, 11-19-12
+%   Revision: 1.0, 4-7-13
 
 
 if nargin > 1 && ~ischar(varargin{1})
@@ -259,7 +259,7 @@ if isempty(i)
                  ['The optional ''children'' field must be a positive real'...
                   'integer or row vector of such values.']);
         end
-        if any(s.children < 2) || any(s.children-floor(s.children) ~= 0)
+        if any(s.children < 2) || any(s.children ~= floor(s.children))
             error('SHCTools:shc_validatesubnetwork:NonIntegerChildren',...
                  ['The optional ''children'' field values must all be real '...
                   'integers >= 2.']);
@@ -366,7 +366,7 @@ else
                  ['The ''children'' field of network%s must be a positive '...
                   'real integer or row vector of such values.'],i);
         end
-        if any(s.children <= num) || any(s.children-floor(s.children) ~= 0)
+        if any(s.children <= num) || any(s.children ~= floor(s.children))
             error('SHCTools:shc_validatesubnetwork:NonIntegerChildrenID',...
                  ['The ''children'' field values of network%s must all be '...
                   'real integers >= %d.'],i,num+1);

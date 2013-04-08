@@ -21,7 +21,7 @@ function y=gammaincNegative(x,a,tail)
 %   Based on: http://functions.wolfram.com/GammaBetaErf/Gamma2/16/01/01/
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-5-12
-%   Revision: 1.0, 11-26-12
+%   Revision: 1.0, 4-7-13
 
 
 if isscalar(a)
@@ -30,7 +30,7 @@ else
     y = NaN(size(a),superiorfloat(a,x));
 end
 
-i = find(x > 0 | (x == 0 & (a > 0 | a-floor(a) ~= 0)));
+i = find(x > 0 | (x == 0 & (a > 0 | a ~= floor(a))));
 if ~isempty(i)
     if isscalar(a) && isscalar(x)
         y = gammainc_recurse(a,x);

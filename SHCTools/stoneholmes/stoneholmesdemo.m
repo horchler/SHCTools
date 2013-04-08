@@ -27,7 +27,7 @@ function stoneholmesdemo(varargin)
 %   http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-25-12
-%   Revision: 1.0, 1-14-13
+%   Revision: 1.0, 4-7-13
 
 
 if nargin == 0
@@ -108,7 +108,7 @@ else
               'Stone-Holmes distribution defines Lambda_U < Lambda_S.'])
     end
     if ~isscalar(N) || isempty(N) || ~isreal(N) || ~isnumeric(N) ...
-            || ~isfinite(N) || N < 1 || N-floor(N) ~= 0
+            || ~isfinite(N) || N < 1 || N ~= floor(N)
         error('SHCTools:stoneholmesdemo:NInvalid',...
              ['N must be a finite real positive integer greater than or '...
               'equal to one.'])

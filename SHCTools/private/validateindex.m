@@ -4,7 +4,7 @@ function varargout=validateindex(i)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-19-12
-%   Revision: 1.0, 4-21-12
+%   Revision: 1.0, 4-7-13
 
 
 if nargout  > 2
@@ -44,7 +44,7 @@ if isnumeric(i)
         end
         return;
     end
-    if i < 1 || (isfloat(i) && i-floor(i) ~= 0)
+    if i < 1 || (isfloat(i) && i ~= floor(i))
         if nargout == 1
             varargout{1} = false;
         else

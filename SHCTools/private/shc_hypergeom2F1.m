@@ -4,7 +4,7 @@ function y=shc_hypergeom2F1(varargin)
 %
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-12-12
-%   Revision: 1.0, 5-12-12
+%   Revision: 1.0, 4-7-13
 
 
 % Handle variable arguments
@@ -115,7 +115,7 @@ else
         end
         nIterations = false;
     else
-        if n-floor(n) ~= 0
+        if n ~= floor(n)
             error('SHCTools:shc_hypergeom2F1:NErrorNonInteger',...
                  ['The optional fifth argument must be a positive integer '...
                   'number series terms or a scalar value indicating the '...
