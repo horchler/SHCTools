@@ -10,7 +10,7 @@ function a0=shc_lv_ic(net,a0,epsilon,mu)
 %       SHC_LV_INTEGRATE, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-11-12
-%   Revision: 1.0, 4-6-13
+%   Revision: 1.0, 4-8-13
 
 
 % Check network
@@ -20,6 +20,7 @@ if ~isstruct(net) || ~isfield(net,'rho')
 end
 bet = net.beta;
 n = net.size;
+delta = shc_lv_neighborhood(bet);
 
 % Check A0
 if nargin > 1
@@ -46,7 +47,7 @@ if nargin > 1
               'whose values are less than the corresponding Beta values.']);
     end
 else
-    a0 = shc_lv_neighborhood(min(bet));
+    a0 = min(delta);
 end
 
 % Check Epsilon
