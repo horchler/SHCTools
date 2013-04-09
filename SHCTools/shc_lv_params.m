@@ -12,7 +12,7 @@ function [alp,bet,varargout]=shc_lv_params(delta,epsilon,mag,nu,tau,options)
 %       FZERO, FSOLVE, STONEHOLMESPASSAGETIME, SHC_LV_TRANSITIONTIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
-%   Revision: 1.0, 4-5-13
+%   Revision: 1.0, 4-9-13
 
 
 % Check variable outputs
@@ -239,21 +239,24 @@ if n == 1 || all(alp0(1) == alp0)
     end
 else
     if ~isfield(options,'Algorithm')
-        options.('Algorithm') = 'levenberg-marquardt';
+        options.('Algorithm') = 'active-set';
+        options.('TolFun') = eps(dtype);
+        options.('TolCon') = eps(dtype);
     end
     
     % Create N-node connection matrix from parameters
     N = max([length(alp0) length(bet) length(nu) 3]);
     net = shc_create('contour',{1,bet,nu},N);
     
-    % Create function handle for FSOLVE
-    afun = @(alp)alproot(net,delta,epsilon,alp,bet,nu,tau,N);
+    % Create function handles for FMINCON
+    afun = @(alp)alproot(net,delta,epsilon,alp,net.beta,nu,tau,N);
+    cfun = @(alp)alpcon(alp,nu);
     
     % Find root of Stone-Holmes mean first passage time in terms of Alpha
-    [alp,fval,exitflag] = fsolve(afun,alp0,options);
+    [alp,fval,exitflag] = fmincon(afun,alp0,[],[],[],[],[],[],cfun,options);
     delete(CatchWarningObj);
-
-    % Check output from FSOLVE
+    
+    % Check output from FMINCON
     if exitflag < 0
         error('SHCTools:shc_lv_params:NoSolutionAlpha',...
               'Unable to find suitable parameters.');
@@ -316,8 +319,13 @@ net.alpha = alp;
 % Inter-passage transition time
 tt = shc_lv_transitiontime(net,delta);
 
-% Zero of Stone-Holmes mean first passage time using analytical solution
-z = tau-tt-stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
+% Minimum of Stone-Holmes mean first passage time using analytical solution
+z = sum((tau-tt-stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s)).^2);
+
+
+function [c,ceq]=alpcon(alp,nu)
+c = alp-nu.*alp([2:end 1]);
+ceq = [];
 
 
 function z=alproot1d(net,delta,epsilon,alp,nu,tau)
