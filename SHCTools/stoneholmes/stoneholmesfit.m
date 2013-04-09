@@ -75,7 +75,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 1-16-13
+%   Revision: 1.0, 4-9-13
 
 
 % Check number of input and output arguments
@@ -194,10 +194,10 @@ end
 % Generate options structure for fzero
 if isempty(options)
     if isa(x,'single')
-        options=struct('Display','iter','TolX',eps('single'),...
+        options=struct('Display','off','TolX',eps('single'),...
                        'FunValCheck','off');
     else
-        options=struct('Display','iter','TolX',1e-9,'FunValCheck','off');
+        options=struct('Display','off','TolX',1e-9,'FunValCheck','off');
     end
 else
     if ~isfield(options,'Display')
