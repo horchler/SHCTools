@@ -9,7 +9,7 @@ function tau_bar=shc_lv_meanperiod(net,epsilon_hat,N)
 %       SHC_LV_INVPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.0, 4-9-13
+%   Revision: 1.0, 4-18-13
 
 
 % Check network
@@ -115,14 +115,14 @@ else
     TE1 = diff(TE);
     TEj = cell(M,n);
     for i = 1:n
-        TEj{1,i} =  TE1((2*i-1):2*n:end);
+        TEj{1,i} =  TE1(i:n:end);
     end
     
     for j = 2:M
         [~,~,TE] = shc_lv_integrate(tspan,a0,net,epsilon_hat,0,opts);
         TE1 = diff(TE);
         for i = 1:n
-            TEj{j,i} = TE1((2*i-1):2*n:end);
+            TEj{j,i} = TE1(i:n:end);
         end
     end
     
@@ -131,10 +131,10 @@ else
         tau = vertcat(TEj{:,i});
         [delhat,ephat,lamuhat,lamshat] = stoneholmesfit(tau,1,lambda_s(i));
         tau_bar(i) = stoneholmespassagetime(delhat,ephat,lamuhat,lamshat);
-        
-        tau_bar(i) = mean(vertcat(TEj{:,i}));
     end
+    tau_bar = tau_bar([2:end 1]);
 end
+tau_bar = tau_bar(:);
 
 
 
