@@ -23,7 +23,7 @@ function [lambda_u,lambda_s]=shc_lv_lambda_us(rho,M)
 %       BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA
 
 %   Andrew D. Horchler, adh9@case.edu, Created 8-29-12
-%   Revision: 1.0, 2-15-13
+%   Revision: 1.0, 4-18-13
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the
 %   Phase Plane," Nieuw Archief Voor Wiskunde (3), Vol. 27, 1979, pp. 238-254.
@@ -61,8 +61,23 @@ if nargin == 2
     end
     
     E = shc_lv_eigs(rho,M);
-    lambda_u = min(E(E > 0));
-    lambda_s = -max(E(E < 0));
+    if isa(E,'sym')
+        j = (E > 0);
+        if islogical(j)
+            lambda_u = minsym(E(j));
+        else
+            lambda_u = minsym(E(isAlways(j)));
+        end
+        j = (E < 0);
+        if islogical(j)
+            lambda_s = -maxsym(E(j));
+        else
+            lambda_s = -maxsym(E(isAlways(j)));
+        end
+    else
+        lambda_u = min(E(E > 0));
+        lambda_s = -max(E(E < 0));
+    end
     
     if isempty(lambda_u) || isempty(lambda_s)
         error('SHTools:shc_lv_lambda_us:InvalidNetworkNode',...
@@ -72,9 +87,25 @@ if nargin == 2
     end
 else
     E = shc_lv_eigs(rho);
+    isSym = isa(E,'sym');
     for i = m:-1:1
-        lamu = min(E(E(:,i) > 0,i));
-        lams = -max(E(E(:,i) < 0,i));
+        if isSym
+            j = (E(:,i) > 0);
+            if islogical(j)
+                lamu = minsym(E(j,i));
+            else
+                lamu = minsym(E(isAlways(j),i));
+            end
+            j = (E(:,i) < 0);
+            if islogical(j)
+                lams = -maxsym(E(j,i));
+            else
+                lams = -maxsym(E(isAlways(j),i));
+            end
+        else
+            lamu = min(E(E(:,i) > 0,i));
+            lams = -max(E(E(:,i) < 0,i));
+        end
 
         if isempty(lamu) || isempty(lams)
             error('SHTools:shc_lv_lambda_us:InvalidNetwork',...
