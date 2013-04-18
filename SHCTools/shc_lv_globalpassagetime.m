@@ -11,7 +11,7 @@ function varargout=shc_lv_globalpassagetime(net,delta,epsilon,mu)
 %       SHC_LV_PASSAGETIME_MU, SHC_LV_INVPASSAGETIME_MU, STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 2-13-13
-%   Revision: 1.0, 2-15-13
+%   Revision: 1.0, 4-16-13
 
 
 if nargout > 3
@@ -85,6 +85,7 @@ if ~isscalar(delta) || ~isscalar(epsilon) || ~isscalar(mu)
     end
     delta = delta(:);
     epsilon = epsilon(:);
+    epsilon = epsilon([2:end 1]);
     mu = mu(:);
 end
 
