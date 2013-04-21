@@ -10,7 +10,7 @@ function a0=shc_lv_ic(net,a0,epsilon,mu)
 %       SHC_LV_INTEGRATE, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-11-12
-%   Revision: 1.0, 4-8-13
+%   Revision: 1.0, 4-21-13
 
 
 % Check network
@@ -18,8 +18,10 @@ if ~isstruct(net) || ~isfield(net,'rho')
     error('SHCTools:shc_lv_ic:NetworkStructOrRhoInvalid',...
           'Input must be a valid SHC network structure.');
 end
-bet = net.beta;
 n = net.size;
+
+% Neighborhood size
+bet = net.beta;
 delta = shc_lv_neighborhood(bet);
 
 % Check A0
@@ -129,9 +131,6 @@ if ~isscalar(epsilon) || ~isscalar(mu)
     mu = mu(:);
 end
 
-rho = net.rho;
-alp = net.alpha;
-
 % Stable and unstable eigenvalues
 [lambda_u,lambda_s] = shc_lv_lambda_us(net);
 
@@ -141,24 +140,26 @@ d = bet(i)-a0(i);
 
 % If all nodes identical, collapse to n = 1
 tol = eps;
-if false && all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
+if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
         && all(lambda_s(1) == lambda_s) && all(epsilon(1) == epsilon) ...
         && all(mu(1) == mu)
     % Find time step using approximation based on marginally-stable case
-    ttmin = shc_lv_mintransitiontime(net,delta(1));
+    ttmin = shc_lv_mintransitiontime(net);
     dtt = 0.1*ttmin(1);
 
     % Find time step using estimate from mean first passage time
     dtp = stoneholmespassagetime(a0(i),max(epsilon(1),mu(1)),lambda_u(1),...
         lambda_s(1));
     
-    a0 = ic1d(rho,alp(1),bet(1),d,epsilon(1),mu(1),n,dtt,dtp,tol);
+    a0 = ic1d(net.rho,net.alpha(1),bet(1),d,epsilon(1),mu(1),n,dtt,dtp,tol);
     if ~isscalar(a0)
         a0 = circshift(a0,i-1);
     end
 else
+    ep = max(epsilon,mu);
     if i > 1
         if ~isscalar(epsilon)
+            ep = max(epsilon(mod(i,n)+1),mu);
             epsilon = epsilon(i);
         end
         if ~isscalar(mu)
@@ -167,13 +168,13 @@ else
     end
     
     % Find time step using approximation based on marginally-stable case
-    ttmin = shc_lv_mintransitiontime(net,delta);
+    ttmin = shc_lv_mintransitiontime(net);
     dtt = 0.1*ttmin(i);
     
     % Find time step using estimate from mean first passage time
-    dtp = stoneholmespassagetime(a0(i),max(epsilon,mu),lambda_u(i),lambda_s(i));
+    dtp = stoneholmespassagetime(a0(i),ep,lambda_u(i),lambda_s(i));
     
-    a0 = ic(rho,alp(i),bet(i),d,i,epsilon,mu,n,dtt,dtp,tol);
+    a0 = ic(net.rho,net.alpha(i),bet(i),d,i,epsilon,mu,n,dtt,dtp,tol);
 end
 
 
