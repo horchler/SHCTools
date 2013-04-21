@@ -9,10 +9,12 @@ function [tau_bar,N,tau]=shc_lv_meanperiod(net,epsilon_hat,N)
 %   [TAU_BAR, N, TAU] = SHC_LV_MEANPERIOD(NET,...)
 %
 %   See also:
-%       SHC_LV_INVPASSAGETIME
+%       TAUFIT, EPSILONFIT, SHC_LV_PASSAGETIME, SHC_LV_TRANSITIONTIME,
+%       SHC_LV_GLOBALPASSAGETIME, STONEHOLMESPASSAGETIME, SHC_LV_PARAMS,
+%       SHC_CREATE, SHC_LV_INTEGRATE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.0, 4-18-13
+%   Revision: 1.0, 4-21-13
 
 
 % Check network
@@ -60,11 +62,8 @@ else
     N = 300;
 end
 
-bet = net.beta;
-delta = shc_lv_neighborhood(net.beta);
-
 % Find global mean first passage time to estimate integration time
-taug = shc_lv_globalpassagetime(net,delta,epsilon_hat);
+taug = shc_lv_globalpassagetime(net,epsilon_hat);
 
 % Time vector for integration
 t0 = 0;
@@ -74,6 +73,7 @@ tspan = t0:dt:tf;
 
 % Find unstable and stable eigenvalues for network
 [lambda_u,lambda_s] = shc_lv_lambda_us(net);
+bet = net.beta;
 
 % Simplified case if all nodes are identical
 if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
@@ -99,12 +99,15 @@ if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
         tau{j} = diff(TE);
     end
     
-    tau_bar = vertcat(tau{:});
+    tau = vertcat(tau{:});
     if nargout > 1
-        N = numel(tau_bar);
+        N = numel(tau);
     end
-    [lambda_u,lambda_s] = shc_lv_lambda_us(net,1);  %#ok<ASGLU>
-    [delhat,ephat,lamuhat,lamshat] = stoneholmesfit(tau_bar,1,lambda_s);
+    
+    % Fit Tau period data using Stone-Holmes distribution
+    [delhat,ephat,lamuhat,lamshat] = stoneholmesfit(tau,1,lambda_s(1));
+    
+    % Use fitted parameters to estimate true mean of Tau
     tau_bar = stoneholmespassagetime(delhat,ephat,lamuhat,lamshat);
 else
     a0 = shc_lv_ic(net,0.5*bet);
@@ -132,18 +135,27 @@ else
         end
     end
     
-    if nargout > 1
-        N = 0;
-    end
-    [lambda_u,lambda_s] = shc_lv_lambda_us(net);  %#ok<ASGLU>
-    for i = n:-1:1
-        tau_bar = vertcat(tau{:,i});
-        if nargout > 1
-            N = N+numel(tau_bar);
+    % Tau is measured the same number of times for each node
+    N = min(sum(cellfun(@numel,tau),1));
+    
+    % Fit Tau period data using Stone-Holmes distribution
+    if nargout > 2
+        for i = n:-1:1
+            tau_bar(:,i) = vertcat(tau{:,i});
+            tau_bar(:,i) = tau_bar(1:N);
+            [delhat(i),ephat(i),lamuhat(i),lamshat(i)] = ...
+                stoneholmesfit(tau_bar(:,i),1,lambda_s(i));
         end
-        [delhat(i),ephat(i),lamuhat(i),lamshat(i)] = ...
-            stoneholmesfit(tau_bar,1,lambda_s(i));
+        tau = tau_bar;
+    else
+        for i = n:-1:1
+            tau_bar = vertcat(tau{:,i});
+            [delhat(i),ephat(i),lamuhat(i),lamshat(i)] = ...
+                stoneholmesfit(tau_bar(1:N),1,lambda_s(i));
+        end
     end
+    
+    % Use fitted parameters to estimate true mean of Tau
     tau_bar = stoneholmespassagetime(delhat,ephat,lamuhat,lamshat);
     tau_bar = tau_bar([2:end 1]);
     tau_bar = tau_bar(:);
