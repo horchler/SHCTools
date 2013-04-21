@@ -1,33 +1,21 @@
-function tt=shc_lv_transitiontime(net,delta,mu)
+function tt=shc_lv_transitiontime(net,mu)
 %SHC_LV_TRANSITIONTIME  Inter-passage transition times of Lotka-Volterra system.
 %
-%   TT = SHC_LV_TRANSITIONTIME(NET,DELTA)
-%   TT = SHC_LV_TRANSITIONTIME(NET,DELTA,MU)
+%   TT = SHC_LV_TRANSITIONTIME(NET)
+%   TT = SHC_LV_TRANSITIONTIME(NET,MU)
 %
 %   See also:
-%       SHC_LV_PASSAGETIME, SHC_LV_GLOBALPASSAGETIME, SHC_LV_PASSAGETIME_MU,
+%       SHC_LV_MINTRANSITIONTIME, SHC_LV_PASSAGETIME, SHC_LV_GLOBALPASSAGETIME,
 %       STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 12-17-12
-%   Revision: 1.0, 4-6-13
+%   Revision: 1.0, 4-20-13
 
 
 % Check network
 if ~isstruct(net) || ~isfield(net,'rho')
     error('SHCTools:shc_lv_transitiontime:NetworkStructOrRhoInvalid',...
           'Input must be a valid SHC network structure.');
-end
-
-% Check Delta
-if ~isvector(delta) || isempty(delta) || ~isfloat(delta)
-    error('SHCTools:shc_lv_transitiontime:DeltaInvalid',...
-         ['The neighborhood size, Delta, must be a non-empty floating-point '...
-          'vector.']);
-end
-if ~isreal(delta) || ~all(isfinite(delta)) || any(delta <= 0)
-    error('SHCTools:shc_lv_transitiontime:DeltaNonFiniteReal',...
-         ['The neighborhood size, Delta, must be a positive finite real '...
-          'floating-point vector.']);
 end
 
 % Check Mu
@@ -46,26 +34,23 @@ else
     mu = sqrt(realmin);
 end
 
-% Minimum Mu to avoid getting trapped
-mu = max(mu,sqrt(realmin));
-
 % Check lengths
 n = net.size;
-if ~isscalar(delta) || ~isscalar(mu)
-    lv = [n length(delta) length(mu)];
-    lv = lv(lv ~= 1);
-    if length(lv) > 1 && ~all(lv(2:end) == lv(1))
+if ~isscalar(mu)
+    if length(mu) ~= n
         error('SHCTools:shc_lv_transitiontime:DimensionMismatch',...
-             ['If any combination of Delta and Mu are non-scalar vectors, '...
-              'they must have the same length as the network dimension.']);
+             ['If Mu is a non-scalar vector, it must have the same length '...
+              'as the network dimension.']);
     end
-    delta = delta(:);
     mu = mu(:);
 end
 
-rho = net.rho;
-alp = net.alpha;
+% Minimum Mu to avoid getting trapped
+mu = max(mu,sqrt(realmin));
+
+% Neighborhood size
 bet = net.beta;
+delta = shc_lv_neighborhood(bet);
 
 % Stable and unstable eigenvalues
 [lambda_u,lambda_s] = shc_lv_lambda_us(net);
@@ -75,9 +60,9 @@ tol = 1e-12;
 % If all nodes identical, collapse to n = 1, re-expand at end
 N = n;
 if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
-        && all(lambda_s == lambda_s(1)) && all(delta == delta(1)) ...
-        && all(mu == mu(1))
-    alp = alp(1);
+        && all(lambda_s == lambda_s(1)) && all(mu == mu(1))
+    rho = net.rho;
+    alp = net.alpha(1);
     d = bet(1)-delta(1);
     mu = mu(1);
     
@@ -85,7 +70,7 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
     a = [d;sqrt(tol);mu(ones(N-2,1)).^2];
     
     % Find time step using approximation based on marginally-stable case
-    ttmin = shc_lv_mintransitiontime(net,delta(1));
+    ttmin = shc_lv_mintransitiontime(net);
     dt = 0.1*ttmin(1);
     
     % Refine step size approximation
@@ -136,13 +121,15 @@ if n > 1 && all(bet == bet(1)) && all(lambda_u == lambda_u(1)) ...
     % Re-expand identical nodes
     tt = tt(ones(N,1));
 else
+    rho = net.rho;
+    alp = net.alpha;
     d = bet-delta;
     if isscalar(mu)
         mu = mu(ones(n,1));
     end
     
     % Find time steps using approximation based on marginally-stable case
-	dtt = 0.1*shc_lv_mintransitiontime(net,delta);
+	dtt = 0.1*shc_lv_mintransitiontime(net);
     
     for i = n:-1:1
         j = mod(i,n)+1;

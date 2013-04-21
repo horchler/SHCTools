@@ -1,20 +1,20 @@
-function tp=shc_lv_passagetime(net,delta,epsilon,varargin)
+function tp=shc_lv_passagetime(net,epsilon,varargin)
 %SHC_LV_PASSAGETIME  Mean first passage times of noisy Lotka-Volterra system.
 %
-%   TP = SHC_LV_PASSAGETIME(NET,DELTA,EPSILON)
+%   TP = SHC_LV_PASSAGETIME(NET,EPSILON)
 %   TP = SHC_LV_PASSAGETIME(...,METHOD)
 %   TP = SHC_LV_PASSAGETIME(...,OPTIONS)
 %
 %   See also:
-%       SHC_LV_INVPASSAGETIME, SHC_LV_PASSAGETIME_MU, SHC_LV_INVPASSAGETIME_MU,
-%       STONEHOLMESPASSAGETIME, QUAD, QUADL, INTEGRAL, PCHIP
+%       SHC_LV_GLOBALPASSAGETIME, STONEHOLMESPASSAGETIME, QUAD, QUADL, INTEGRAL,
+%       PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-28-12
-%   Revision: 1.0, 2-15-13
+%   Revision: 1.0, 4-21-13
 
 
 % Handle inputs
-if nargin < 3
+if nargin < 2
     error('SHCTools:shc_lv_passagetime:TooFewInputs',...
 	      'Not enough input arguments.');
 end
@@ -23,18 +23,6 @@ end
 if ~isstruct(net) || ~isfield(net,'rho')
     error('SHCTools:shc_lv_passagetime:NetworkStructOrRhoInvalid',...
           'Input must be a valid SHC network structure.');
-end
-
-% Check Delta
-if ~isvector(delta) || isempty(delta) || ~isfloat(delta)
-    error('SHCTools:shc_lv_passagetime:DeltaInvalid',...
-         ['The neighborhood size, Delta, must be a non-empty floating-point '...
-          'vector.']);
-end
-if ~isreal(delta) || ~all(isfinite(delta)) || any(delta <= 0)
-    error('SHCTools:shc_lv_passagetime:DeltaNonFiniteReal',...
-         ['The neighborhood size, Delta, must be a positive finite real '...
-          'floating-point vector.']);
 end
 
 % Check Epsilon
@@ -49,28 +37,36 @@ if ~isreal(epsilon) || ~all(isfinite(epsilon)) || any(epsilon <= 0)
           'floating-point vector.']);
 end
 
+% Tp(i) = F(Epsilon(i+1))
+epsilon = epsilon([2:end 1]);
+
+% Neighborhood size
+bet = net.beta;
+delta = shc_lv_neighborhood(bet);
+if any(epsilon >= delta)
+    error('SHCTools:shc_lv_passagetime:EpsilonNeighborhood',...
+         ['The noise magnitude, Epsilon, must be less than the neighborhood '...
+          'size, Delta = %f.'],delta);
+end
+
 % Check lengths
 n = net.size;
-if ~isscalar(delta) || ~isscalar(epsilon)
-    lv = [n length(delta) length(epsilon)];
-    lv = lv(lv ~= 1);
-    if length(lv) > 1 && ~all(lv(2:end) == lv(1))
+if ~isscalar(epsilon)
+    if length(epsilon) ~= n
         error('SHCTools:shc_lv_passagetime:DimensionMismatch',...
-             ['If any combination of Delta and Epsilon are non-scalar '...
-              'vectors, they must have the same length as the network '...
-              'dimension.']);
+             ['If Epsilon is a non-scalar vector, it must have the same '...
+              'length as the network dimension.']);
     end
-    delta = delta(:);
     epsilon = epsilon(:);
 end
 
 % Get and check method and options
-if nargin > 3
-    if nargin > 5
+if nargin > 2
+    if nargin > 4
         error('SHCTools:shc_lv_passagetime:TooManyInputs',...
               'Too many input arguments.');
     end
-    if nargin == 4
+    if nargin == 3
         if ischar(varargin{1})
             method = varargin{1};
             options = [];
@@ -100,9 +96,6 @@ end
 
 % Stable and unstable eigenvalues
 [lambda_u,lambda_s] = shc_lv_lambda_us(net);
-
-% Tp(i) = F(Epsilon(i+1))
-epsilon = epsilon([2:end 1]);
 
 if nargin == 3 || any(strcmp(method,{'default','analytic','stoneholmes'}))
     % Stone-Holmes mean first passage time using analytical solution
