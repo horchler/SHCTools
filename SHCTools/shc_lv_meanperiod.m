@@ -1,9 +1,12 @@
-function tau_bar=shc_lv_meanperiod(net,epsilon_hat,N)
+function [tau_bar,N,tau]=shc_lv_meanperiod(net,epsilon_hat,N)
 %SHC_LV_MEANPERIOD  Simulate Lotka-Volterra system to find average mean period.    
 %
 %   TAU_BAR = SHC_LV_MEANPERIOD(NET)
 %   TAU_BAR = SHC_LV_MEANPERIOD(NET,EPSILON_HAT)
 %   TAU_BAR = SHC_LV_MEANPERIOD(NET,EPSILON_HAT,N)
+%
+%   [TAU_BAR, N] = SHC_LV_MEANPERIOD(NET,...)
+%   [TAU_BAR, N, TAU] = SHC_LV_MEANPERIOD(NET,...)
 %
 %   See also:
 %       SHC_LV_INVPASSAGETIME
@@ -61,12 +64,12 @@ bet = net.beta;
 delta = shc_lv_neighborhood(net.beta);
 
 % Find global mean first passage time to estimate integration time
-tau = shc_lv_globalpassagetime(net,delta,epsilon_hat);
+taug = shc_lv_globalpassagetime(net,delta,epsilon_hat);
 
 % Time vector for integration
 t0 = 0;
 dt = 1e-3;
-tf = min(5*N*max(tau),1e3);
+tf = min(5*N*max(taug),1e3);
 tspan = t0:dt:tf;
 
 % Find unstable and stable eigenvalues for network
@@ -88,17 +91,20 @@ if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
     end
     
     M = ceil(N/lte);
-    TEj = cell(M,1);
-    TEj{1} = diff(TE);
+    tau = cell(M,1);
+    tau{1} = diff(TE);
     
     for j = 2:M
         [~,~,TE] = shc_lv_integrate(tspan,a0,net,epsilon_hat,0,opts);
-        TEj{j} = diff(TE);
+        tau{j} = diff(TE);
     end
     
-    tau = vertcat(TEj{:});
+    tau_bar = vertcat(tau{:});
+    if nargout > 1
+        N = numel(tau_bar);
+    end
     [lambda_u,lambda_s] = shc_lv_lambda_us(net,1);  %#ok<ASGLU>
-    [delhat,ephat,lamuhat,lamshat] = stoneholmesfit(tau,1,lambda_s);
+    [delhat,ephat,lamuhat,lamshat] = stoneholmesfit(tau_bar,1,lambda_s);
     tau_bar = stoneholmespassagetime(delhat,ephat,lamuhat,lamshat);
 else
     a0 = shc_lv_ic(net,0.5*bet);
@@ -112,29 +118,36 @@ else
     end
     
     M = ceil(N*n/lte);
-    TE1 = diff(TE);
-    TEj = cell(M,n);
+    TE = diff(TE);
+    tau = cell(M,n);
     for i = 1:n
-        TEj{1,i} =  TE1(i:n:end);
+        tau{1,i} =  TE(i:n:end);
     end
     
     for j = 2:M
         [~,~,TE] = shc_lv_integrate(tspan,a0,net,epsilon_hat,0,opts);
-        TE1 = diff(TE);
+        TE = diff(TE);
         for i = 1:n
-            TEj{j,i} = TE1(i:n:end);
+            tau{j,i} = TE(i:n:end);
         end
     end
     
+    if nargout > 1
+        N = 0;
+    end
     [lambda_u,lambda_s] = shc_lv_lambda_us(net);  %#ok<ASGLU>
     for i = n:-1:1
-        tau = vertcat(TEj{:,i});
-        [delhat,ephat,lamuhat,lamshat] = stoneholmesfit(tau,1,lambda_s(i));
-        tau_bar(i) = stoneholmespassagetime(delhat,ephat,lamuhat,lamshat);
+        tau_bar = vertcat(tau{:,i});
+        if nargout > 1
+            N = N+numel(tau_bar);
+        end
+        [delhat(i),ephat(i),lamuhat(i),lamshat(i)] = ...
+            stoneholmesfit(tau_bar,1,lambda_s(i));
     end
+    tau_bar = stoneholmespassagetime(delhat,ephat,lamuhat,lamshat);
     tau_bar = tau_bar([2:end 1]);
+    tau_bar = tau_bar(:);
 end
-tau_bar = tau_bar(:);
 
 
 
