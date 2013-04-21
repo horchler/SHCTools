@@ -13,7 +13,7 @@ function s=shc_lv_symequilibria(rho)
 %       SHC_LV_JACOBIAN, SHC_LV_EIGS, BUILDRHO, SHC_CREATE, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-3-11
-%   Revision: 1.0, 2-21-13
+%   Revision: 1.0, 4-19-13
 
 
 % Check Rho matrix
@@ -24,7 +24,7 @@ if isstruct(rho) && isfield(rho,'rho')
              ['The ''rho'' field of the SHC network structure must be a '...
               'symbolic or floating-point matrix.']);
     end
-    if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
+    if ~isreal(p) || ~all(isfinitesym(p(:)))
         error('SHCTools:shc_lv_symequilibria:RhoStructNonFiniteReal',...
              ['The ''rho'' field of the SHC network structure must be a '...
               'finite real symbolic or floating-point matrix.']);
@@ -39,7 +39,7 @@ else
              ['The connection matrix, Rho, must be a symbolic or '...
               'floating-point matrix.']);
     end
-    if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
+    if ~isreal(p) || ~all(isfinitesym(p(:)))
         error('SHCTools:shc_lv_symequilibria:RhoNonFiniteReal',...
              ['The connection matrix, Rho, must be a finite real symbolic '...
               'or floating-point matrix.']);
@@ -54,10 +54,11 @@ else
 end
 
 % Column vector of number state variables
-a = sym(sym('a%d',[n 1]),'real');
+a = sym('a%d',[n 1]);
+assume(a,'real');
 
 % Generate equations and convert to strings
-eq = char((a.*(alpv-p*a)).');
+eq = char(shc_lv_ode(0,a,rho).'==0);
 v = char(a.');
 
 % Remove 'matrix([[ ... ]])' from converting sym to char and solve system

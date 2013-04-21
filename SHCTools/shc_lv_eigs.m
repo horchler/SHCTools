@@ -36,7 +36,7 @@ function varargout=shc_lv_eigs(rho,M)
 %       SHC_LV_LAMBDA_US
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-6-12
-%   Revision: 1.0, 2-21-12
+%   Revision: 1.0, 4-19-12
 
 
 if nargout > 2
@@ -51,7 +51,7 @@ if isstruct(rho) && isfield(rho,'rho')
              ['The ''rho'' field of the SHC network structure must be a '...
               'symbolic or floating-point matrix.']);
     end
-    if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
+    if ~isreal(p) || ~all(isfinitesym(p(:)))
         error('SHCTools:shc_lv_eigs:RhoStructNonFiniteReal',...
              ['The ''rho'' field of the SHC network structure must be a '...
               'finite real symbolic or floating-point matrix.']);
@@ -67,7 +67,7 @@ else
              ['The connection matrix, Rho, must be a symbolic or '...
               'floating-point matrix.']);
     end
-    if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
+    if ~isreal(p) || ~all(isfinitesym(p(:)))
         error('SHCTools:shc_lv_eigs:RhoNonFiniteReal',...
              ['The connection matrix, Rho, must be a finite real symbolic '...
               'or floating-point matrix.']);

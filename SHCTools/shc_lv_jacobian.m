@@ -17,7 +17,7 @@ function J=shc_lv_jacobian(rho,eqpt)
 %       SHC_LV_LAMBDA_US, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 12-1-10
-%   Revision: 1.0, 2-21-13
+%   Revision: 1.0, 4-19-13
 
 
 % Check Rho matrix
@@ -28,7 +28,7 @@ if isstruct(rho) && isfield(rho,'rho')
              ['The ''rho'' field of the SHC network structure must be a '...
               'symbolic or floating-point matrix.']);
     end
-    if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
+    if ~isreal(p) || ~all(isfinitesym(p(:)))
         error('SHCTools:shc_lv_jacobian:RhoStructNonFiniteReal',...
              ['The ''rho'' field of the SHC network structure must be a '...
               'finite real symbolic or floating-point matrix.']);
@@ -44,7 +44,7 @@ else
              ['The connection matrix, Rho, must be a symbolic or '...
               'floating-point matrix.']);
     end
-    if ~isreal(p) || any(abs(p(:)) == Inf) || any(isnan(p(:)))
+    if ~isreal(p) || ~all(isfinitesym(p(:)))
         error('SHCTools:shc_lv_jacobian:RhoNonFiniteReal',...
              ['The connection matrix, Rho, must be a finite real symbolic '...
               'or floating-point matrix.']);
@@ -71,7 +71,7 @@ if nargin == 2
              ['The equilibrium point must be a symbolic or floating-point '...
               'vector.']);
     end
-    if ~isreal(eqpt) || any(abs(eqpt) == Inf) || any(isnan(eqpt))
+    if ~isreal(eqpt) || ~all(isfinitesym(eqpt))
         error('SHCTools:shc_lv_jacobian:EquilibriumPointNonFiniteReal',...
              ['The equilibrium point must be a finite real symbolic or '...
               'floating-point vector.']);
