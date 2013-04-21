@@ -6,9 +6,12 @@ function net=shc_createnetwork(nettype,params,varargin)
 %   PARAMS = {ALPHA,BETA,NU}
 %   NET = SHC_CREATENETWORK(NETTYPE,PARAMS,N)
 %   NET = SHC_CREATENETWORK('custom',PARAMS,T)
+%
+%   See also:
+%       SHC_INITIALIZE, BUILDRHO, SHC_CREATE, SHC_PARAMS, SHC_SYMPARAMS
 
 %   Andrew D. Horchler, adh9@case.edu, Created 3-28-12
-%   Revision: 1.0, 4-7-13
+%   Revision: 1.0, 4-21-13
 
 
 % Handle network type

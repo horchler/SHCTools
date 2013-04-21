@@ -1,10 +1,13 @@
 function net=shc_initialize(net,reinit)
 %SHC_INITIALIZE  Create required fields for SHC network structure.
+%   NET = SHC_INITIALIZE(NET)
+%   NET = SHC_INITIALIZE(NET,'reset')
 %
-%
+%   See also:
+%       SHC_CREATENETWORK, BUILDRHO, SHC_CREATE, SHC_PARAMS, SHC_SYMPARAMS
 
 %   Andrew D. Horchler, adh9@case.edu, Created 1-14-12
-%   Revision: 1.0, 2-21-13
+%   Revision: 1.0, 4-21-13
 
 
 % Check for 'reset' mode to clear and reset 'children', 'index,' and 'T' fields

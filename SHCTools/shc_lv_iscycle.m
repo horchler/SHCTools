@@ -9,10 +9,10 @@ function tf=shc_lv_iscycle(net)
 %
 %   See also:
 %       SHC_LV_ISSTABLE, SHC_LV_STABILITY, SHC_LV_LAMBDA_US, SHC_LV_JACOBIAN,
-%       SHC_LV_EIGS, BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA
+%       SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_CREATE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 2-12-13
-%   Revision: 1.0, 4-19-13
+%   Revision: 1.0, 4-21-13
 
 
 % Check network

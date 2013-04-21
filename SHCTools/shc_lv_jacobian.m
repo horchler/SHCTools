@@ -13,11 +13,11 @@ function J=shc_lv_jacobian(rho,eqpt)
 %   equilibrium point vectors from the columns of an identity matrix of size N.
 %
 %   See also:
-%       SHC_LV_EIGS, BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA,
-%       SHC_LV_LAMBDA_US, SHC_LV_ODE
+%       SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_LV_LAMBDA_US, SHC_LV_ODE,
+%       SHC_CREATE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 12-1-10
-%   Revision: 1.0, 4-19-13
+%   Revision: 1.0, 4-21-13
 
 
 % Check Rho matrix

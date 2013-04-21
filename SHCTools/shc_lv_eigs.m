@@ -32,11 +32,10 @@ function varargout=shc_lv_eigs(rho,M)
 %   V whose columns are the corresponding eigenvectors are returned.
 %
 %   See also:
-%       SHC_LV_JACOBIAN, SHC_LV_SYMEQUILIBRIA, BUILDRHO, SHC_CREATE, 
-%       SHC_LV_LAMBDA_US
+%       SHC_LV_JACOBIAN, SHC_LV_SYMEQUILIBRIA, SHC_CREATE, SHC_LV_LAMBDA_US
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-6-12
-%   Revision: 1.0, 4-19-12
+%   Revision: 1.0, 4-21-12
 
 
 if nargout > 2

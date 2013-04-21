@@ -21,10 +21,10 @@ function nu=shc_lv_stability(net,M)
 %
 %   See also:
 %       SHC_LV_ISSTABLE, SHC_LV_ISCYCLE, SHC_LV_LAMBDA_US, SHC_LV_JACOBIAN,
-%       SHC_LV_EIGS, BUILDRHO, SHC_CREATE, SHC_LV_SYMEQUILIBRIA
+%       SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_CREATE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 8-30-12
-%   Revision: 1.0, 4-19-13
+%   Revision: 1.0, 4-21-13
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the
 %   Phase Plane," Nieuw Archief Voor Wiskunde (3), Vol. 27, 1979, pp. 238-254.

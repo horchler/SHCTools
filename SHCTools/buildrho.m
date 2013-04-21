@@ -1,10 +1,11 @@
 function net=buildrho(net)
 %BUILDRHO  Create RHO matrix from SHC network structure.
 %
-%
+%   See also:
+%       SHC_CREATENETWORK, SHC_INITIALIZE, SHC_CREATE, SHC_PARAMS, SHC_SYMPARAMS
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-21-10
-%   Revision: 1.0, 12-4-12
+%   Revision: 1.0, 4-21-13
 
 
 % Convert from XML file to structure if necessary

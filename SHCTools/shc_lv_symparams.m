@@ -13,7 +13,8 @@ function [alp,bet,varargout]=shc_lv_symparams(varargin)
 %   [...] = SHC_LV_SYMPARAMS(...,'unstable')
 %
 %   See also:
-%       SYM, SYM/ASSUME, SYM/ASSUMEALSO, ASSUMPTIONS, SYM/ISALWAYS
+%       SHC_LV_PARAMS, SYM, SYM/ASSUME, SYM/ASSUMEALSO, ASSUMPTIONS,
+%       SYM/ISALWAYS
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-19-13
 %   Revision: 1.0, 4-20-13
