@@ -290,13 +290,6 @@ else
 end
 assumeAlso(lambda_s > 0);
 
-if isTheta
-    assumeAlso(sqrt(lambda_u)./theta > sym('exp(-eulergamma/2)/sqrt(2)'));
-else
-    assumeAlso(sqrt(lambda_u).*delta./epsilon > ...
-        sym('exp(-eulergamma/2)/sqrt(2)'));
-end
-
 % Stability, compressive flow if Lambda_S > Lambda_U
 if isStable
     if isMarginal
