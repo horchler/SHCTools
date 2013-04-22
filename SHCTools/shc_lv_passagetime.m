@@ -31,22 +31,24 @@ if ~isvector(epsilon) || isempty(epsilon) || ~isfloat(epsilon)
          ['The noise magnitude, Epsilon, must be a non-empty floating-point '...
           'vector.']);
 end
-if ~isreal(epsilon) || ~all(isfinite(epsilon)) || any(epsilon <= 0)
+if ~isreal(epsilon) || ~all(isfinite(epsilon)) || any(epsilon < 0)
     error('SHCTools:shc_lv_passagetime:EpsilonNonFiniteReal',...
-         ['The noise magnitude, Epsilon, must be a positive finite real '...
+         ['The noise magnitude, Epsilon, must be a non-negative finite real '...
           'floating-point vector.']);
 end
 
-% Tp(i) = F(Epsilon(i+1))
-epsilon = epsilon([2:end 1]);
+%Beta
+bet = net.beta;
+
+% Tp(i) = F(Epsilon(i+1)), scaled by Beta to match Delta
+epsilon = epsilon([2:end 1]).*bet;
 
 % Neighborhood size
-bet = net.beta;
 delta = shc_lv_neighborhood(bet);
 if any(epsilon >= delta)
     error('SHCTools:shc_lv_passagetime:EpsilonNeighborhood',...
          ['The noise magnitude, Epsilon, must be less than the neighborhood '...
-          'size, Delta = %f.'],delta);
+          'size, Delta.']);
 end
 
 % Check lengths
