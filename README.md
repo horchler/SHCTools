@@ -34,18 +34,18 @@ Lotka-Volterra SHC network tools.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_passagetime```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_passagetime.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Mean first passage times of SHC network.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_stability```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_stability.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Saddle values of Lotka-Volterra system nodes.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_symequilibria```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_symequilibria.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Solve for all equlibrium points symbolically.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_symparams```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_symparams.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create symbolic SHC parameters with assumptions.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_taufit```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_taufit.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Nonlinear-compensated (fitted) mean period.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_symparams```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_symparams.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create symbolic SHC parameters with assumptions.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_taufit```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_taufit.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Nonlinear-compensated (fitted) mean period.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_transitiontime```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_transitiontime.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Inter-passage transition times of SHC network.
 
 Stone-Holmes distribution.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmescdf```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmescdf.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Cummulative distribution function.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmeschi2gof```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmeschi2gof.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Chi-squared goodness-of-fit test.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmeschi2gof```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmeschi2gof.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Chi-squared goodness-of-fit test.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmesdemo```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmesdemo.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Demonstrate Stone-Holmes distribution functions.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmesfit```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmesfit.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Parameter estimates from data.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmesinv```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmesinv.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Inverse cummulative distribution.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmesinvpassagetime```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmesinvpassagetime.m)&nbsp;- Noise as a function of mean passage time.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmeskstest```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmeskstest.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Kolmogorov-Smirnov goodness-of-fit test.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmeskstest```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmeskstest.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Kolmogorov-Smirnov goodness-of-fit test.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmeslike```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmeslike.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Negative log-likelihood.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmesmedian```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmesmedian.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Median of distribution.   
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmesmode```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmesmode.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Mode (maximum value) of distribution.  
@@ -60,17 +60,17 @@ XML validation files.
 
 --------
 
-References  
-&nbsp;&nbsp;V.S. Afraimovich, M.I. Rabinovich, and P. Varona, "Heteroclinic contours in neural ensembles and the winnerless competition,"  
-&nbsp;&nbsp;_Int. J. Bifurcation Chaos_, Vol. 14, 2004, pp. 1195-1208. [http://dx.doi.org/10.1142/S0218127404009806](http://dx.doi.org/10.1142/S0218127404009806)  
-&nbsp;&nbsp;M.I. Rabinovich, R. Huerta, P. Varona, and V.S. Afraimovich, "Transient Cognitive Dynamics, Metastability, and Decision Making,"  
-&nbsp;&nbsp;_PLoS Comp. Biol._, Vol. 4, No. 5, 2008, e1000072. [http://dx.doi.org/10.1371/journal.pcbi.1000072](http://dx.doi.org/10.1371/journal.pcbi.1000072)  
-&nbsp;&nbsp;J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the Phase Plane,"  
-&nbsp;&nbsp;_Nieuw Archief Voor Wiskunde (3)_, Vol. 27, 1979, pp. 238-254. [PDF](https://github.com/horchler/SHCTools/blob/master/SHCTools/references/)  
-&nbsp;&nbsp;K.M. Shaw, Y.-M. Park, H.J. Chiel, and P.J. Thomas, "Phase Resetting in an Asymptotically Phaseless System: On the Phase Response of Limit Cycles Verging on a Heteroclinic Orbit,"  
-&nbsp;&nbsp;_SIAM J. Appl. Dyn. Syst._, Vol. 11, No. 1, 2012, pp. 350?391. [http://dx.doi.org/10.1137/110828976](http://dx.doi.org/10.1137/110828976)  
-&nbsp;&nbsp;E. Stone and P. Holmes, "Random Perturbations of Heteroclinic Attractors,"  
-&nbsp;&nbsp;_SIAM J. Appl. Math._, Vol. 50, No. 3, 1990, pp. 726-743. [http://jstor.org/stable/2101884](http://jstor.org/stable/2101884)  
+#References#  
+&nbsp;&nbsp;V.S. Afraimovich, M.I. Rabinovich, and P. Varona, &#8220;Heteroclinic contours in neural ensembles and the winnerless competition,&#8221;  
+&nbsp;&nbsp;*Int. J. Bifurcation Chaos*, Vol. 14, 2004, pp. 1195-1208. [PDF Preprint](http://arxiv.org/abs/nlin/0304016) [http://dx.doi.org/10.1142/S0218127404009806](http://dx.doi.org/10.1142/S0218127404009806)  
+&nbsp;&nbsp;M.I. Rabinovich, R. Huerta, P. Varona, and V.S. Afraimovich, &#8220;Transient Cognitive Dynamics, Metastability, and Decision Making,&#8221;  
+&nbsp;&nbsp;*PLoS Comp. Biol.*, Vol. 4, No. 5, 2008, e1000072. [http://dx.doi.org/10.1371/journal.pcbi.1000072](http://dx.doi.org/10.1371/journal.pcbi.1000072)  
+&nbsp;&nbsp;J.W. Reyn, &#8220;A Stability Criterion for Separatrix Polygons in the Phase Plane,&#8221;  
+&nbsp;&nbsp;*Nieuw Archief Voor Wiskunde (3)*, Vol. 27, 1979, pp. 238-254. [PDF](https://github.com/horchler/SHCTools/blob/master/SHCTools/references/)  
+&nbsp;&nbsp;K.M. Shaw, Y.-M. Park, H.J. Chiel, and P.J. Thomas, &#8220;Phase Resetting in an Asymptotically Phaseless System: On the Phase Response of Limit Cycles Verging on a Heteroclinic Orbit,&#8221;  
+&nbsp;&nbsp;*SIAM J. Appl. Dyn. Syst.*, Vol. 11, No. 1, 2012, pp. 350?391. [http://dx.doi.org/10.1137/110828976](http://dx.doi.org/10.1137/110828976)  
+&nbsp;&nbsp;E. Stone and P. Holmes, &#8220;Random Perturbations of Heteroclinic Attractors,&#8221;  
+&nbsp;&nbsp;*SIAM J. Appl. Math.*, Vol. 50, No. 3, 1990, pp. 726-743. [http://jstor.org/stable/2101884](http://jstor.org/stable/2101884)  
 &nbsp;  
 
 --------
