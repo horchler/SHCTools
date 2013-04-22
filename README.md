@@ -19,7 +19,7 @@ SHC network creation, modification, and visualization, and conversion.
 
 Lotka-Volterra SHC network tools.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_eigs```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_eigs.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Eigenvalues/vectors of Lotka-Volterra system.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_epsilonfit```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_epsilonfit.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Nonlinear-compensated (fitted) noise magnitude.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_epsilonfit```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_epsilonfit.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Nonlinear-compensated (fitted) noise magnitude.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_globalpassagetime```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_globalpassagetime.m)&nbsp;&nbsp;- Find passage times from SHC network structure.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_ic```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_ic.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Generate initial conditions on the SHC manifold.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_integrate```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_integrate.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Solve Lotka-Volterra SDEs numerically.  
@@ -34,7 +34,7 @@ Lotka-Volterra SHC network tools.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_passagetime```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_passagetime.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Mean first passage times of SHC network.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_stability```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_stability.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Saddle values of Lotka-Volterra system nodes.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_symequilibria```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_symequilibria.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Solve for all equlibrium points symbolically.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_symparams```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_symparams.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create symbolic SHC parameters with assumptions.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_symparams```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_symparams.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create symbolic SHC parameters with assumptions.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_taufit```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_taufit.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Nonlinear-compensated (fitted) mean period.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_transitiontime```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_transitiontime.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Inter-passage transition times of SHC network.
 
@@ -60,17 +60,17 @@ XML validation files.
 
 --------
 
-#References#  
+References
 &nbsp;&nbsp;V.S. Afraimovich, M.I. Rabinovich, and P. Varona, &#8220;Heteroclinic contours in neural ensembles and the winnerless competition,&#8221;  
-&nbsp;&nbsp;*Int. J. Bifurcation Chaos*, Vol. 14, 2004, pp. 1195-1208. [PDF Preprint](http://arxiv.org/abs/nlin/0304016) [http://dx.doi.org/10.1142/S0218127404009806](http://dx.doi.org/10.1142/S0218127404009806)  
+&nbsp;&nbsp;*Int. J. Bifurcation Chaos*, Vol. 14, 2004, pp. 1195&ndash;1208. [PDF Preprint](http://arxiv.org/abs/nlin/0304016), [http://dx.doi.org/10.1142/S0218127404009806](http://dx.doi.org/10.1142/S0218127404009806)  
 &nbsp;&nbsp;M.I. Rabinovich, R. Huerta, P. Varona, and V.S. Afraimovich, &#8220;Transient Cognitive Dynamics, Metastability, and Decision Making,&#8221;  
 &nbsp;&nbsp;*PLoS Comp. Biol.*, Vol. 4, No. 5, 2008, e1000072. [http://dx.doi.org/10.1371/journal.pcbi.1000072](http://dx.doi.org/10.1371/journal.pcbi.1000072)  
 &nbsp;&nbsp;J.W. Reyn, &#8220;A Stability Criterion for Separatrix Polygons in the Phase Plane,&#8221;  
-&nbsp;&nbsp;*Nieuw Archief Voor Wiskunde (3)*, Vol. 27, 1979, pp. 238-254. [PDF](https://github.com/horchler/SHCTools/blob/master/SHCTools/references/)  
+&nbsp;&nbsp;*Nieuw Archief Voor Wiskunde (3)*, Vol. 27, 1979, pp. 238&ndash;254. [PDF](https://github.com/horchler/SHCTools/blob/master/SHCTools/references/)  
 &nbsp;&nbsp;K.M. Shaw, Y.-M. Park, H.J. Chiel, and P.J. Thomas, &#8220;Phase Resetting in an Asymptotically Phaseless System: On the Phase Response of Limit Cycles Verging on a Heteroclinic Orbit,&#8221;  
-&nbsp;&nbsp;*SIAM J. Appl. Dyn. Syst.*, Vol. 11, No. 1, 2012, pp. 350?391. [http://dx.doi.org/10.1137/110828976](http://dx.doi.org/10.1137/110828976)  
+&nbsp;&nbsp;*SIAM J. Appl. Dyn. Syst.*, Vol. 11, No. 1, 2012, pp. 350&ndash;391. [http://dx.doi.org/10.1137/110828976](http://dx.doi.org/10.1137/110828976)  
 &nbsp;&nbsp;E. Stone and P. Holmes, &#8220;Random Perturbations of Heteroclinic Attractors,&#8221;  
-&nbsp;&nbsp;*SIAM J. Appl. Math.*, Vol. 50, No. 3, 1990, pp. 726-743. [http://jstor.org/stable/2101884](http://jstor.org/stable/2101884)  
+&nbsp;&nbsp;*SIAM J. Appl. Math.*, Vol. 50, No. 3, 1990, pp. 726&ndash;743. [http://jstor.org/stable/2101884](http://jstor.org/stable/2101884)  
 &nbsp;  
 
 --------
