@@ -1,12 +1,12 @@
 function [alp,bet,varargout]=shc_lv_symparams(varargin)
 %SHC_LV_SYMPARAMS  Symbolic Lotka-Volterra SHC parameters with assumptions.
-%   [ALP, BET, NU] = SHC_LV_SYMPARAMS(PARAMS)
-%   [ALP, BET, GAM, DEL] = SHC_LV_SYMPARAMS(PARAMS)
+%   [ALPHA, BETA, NU] = SHC_LV_SYMPARAMS(PARAMS)
+%   [ALPHA, BETA, GAMMA, DELTA] = SHC_LV_SYMPARAMS(PARAMS)
 %
-%   [ALP, BET, NU] = SHC_LV_SYMPARAMS(ALP,BET,NU)
-%   [ALP, BET, GAM, DEL] = SHC_LV_SYMPARAMS(ALP,BET,GAM,DEL)
-%   [ALP, BET, NU] = SHC_LV_SYMPARAMS(ALP,BET,GAM,DEL)
-%   [ALP, BET, GAM, DEL] = SHC_LV_SYMPARAMS(ALP,BET,NU)
+%   [ALPHA, BETA, NU] = SHC_LV_SYMPARAMS(ALPHA,BETA,NU)
+%   [ALPHA, BETA, GAMMA, DELTA] = SHC_LV_SYMPARAMS(ALPHA,BETA,GAMMA,DELTA)
+%   [ALPHA, BETA, NU] = SHC_LV_SYMPARAMS(ALPHA,BETA,GAMMA,DELTA)
+%   [ALPHA, BETA, GAMMA, DELTA] = SHC_LV_SYMPARAMS(ALPHA,BETA,NU)
 %
 %   [...] = SHC_LV_SYMPARAMS(...,'marginal')
 %   [...] = SHC_LV_SYMPARAMS(...,'stable')
@@ -17,7 +17,7 @@ function [alp,bet,varargout]=shc_lv_symparams(varargin)
 %       SYM/ISALWAYS
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-19-13
-%   Revision: 1.0, 4-20-13
+%   Revision: 1.0, 4-21-13
 
 
 % Check number of input and output arguments
@@ -245,7 +245,7 @@ if alpn > 1
 else
     alp = sym(alpstr,'real');
 end
-assumeAlso(alp > 0)
+assumeAlso(alp > 0);
 
 % Create symbolic Beta
 if betn > 1
