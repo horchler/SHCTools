@@ -14,7 +14,7 @@ function nlogL=stoneholmeslike(x,varargin)
 %   is 1-by-the number of columns of the other parameter(s) or X.
 %
 %   NLOGL = STONEHOLMESLIKE(X,THETA,LAMBDA_U,LAMBDA_S) returns the negative
-%   log-likelihood for the two parameter Stone-Holmes distribution, where
+%   log-likelihood for the three parameter Stone-Holmes distribution, where
 %   Theta = Epsilon/Delta (Theta << 1) is the size of the noise relative to that
 %   of the neighborhood.
 %
@@ -51,7 +51,7 @@ function nlogL=stoneholmeslike(x,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 1-17-13
+%   Revision: 1.0, 4-22-13
 
 
 % Check X

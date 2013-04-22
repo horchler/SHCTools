@@ -14,7 +14,7 @@ function y=stoneholmesmode(varargin)
 %   of the parameters are scalars or column vectors, the size of Y is the size
 %   of the other parameter(s).
 %
-%   Y = STONEHOLMESMODE(THETA,LAMBDA_U,LAMBDA_S) returns the mode of the two
+%   Y = STONEHOLMESMODE(THETA,LAMBDA_U,LAMBDA_S) returns the mode of the three
 %   parameter Stone-Holmes probability density function, where
 %   Theta = Epsilon/Delta (Theta << 1) is the size of the noise relative to that
 %   of the neighborhood.
@@ -44,7 +44,7 @@ function y=stoneholmesmode(varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-23-12
-%   Revision: 1.0, 1-14-13
+%   Revision: 1.0, 4-22-13
 
 
 % Check variable inputs
