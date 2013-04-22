@@ -9,7 +9,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   real parts, respectively.
 %
 %   [THETAHAT,LAMBDA_UHAT,LAMBDA_SHAT] = STONEHOLMESFIT(X) returns estimated
-%   parameters for the two parameter Stone-Holmes distribution
+%   parameters for the three parameter Stone-Holmes distribution
 %   Theta = Epsilon/Delta (Theta << 1) is the size of the noise relative to that
 %   of the neighborhood.
 %
@@ -57,8 +57,9 @@ function varargout=stoneholmesfit(x,varargin)
 %   
 %   See also:
 %       STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESINV, STONEHOLMESLIKE,
-%       STONEHOLMESRND, STONEHOLMESMEDIAN, STONEHOLMESMODE,
-%       STONEHOLMESPASSAGETIME, STONEHOLMESINVPASSAGETIME, FZERO
+%       STONEHOLMESCHI2GOF, STONEHOLMESKSTEST, STONEHOLMESRND,
+%       STONEHOLMESMEDIAN, STONEHOLMESMODE, STONEHOLMESPASSAGETIME,
+%       STONEHOLMESINVPASSAGETIME, FZERO
 
 %   ISROW, ISCOLUMN, and ISMATRIX are not used to maintain compatibility with
 %   versions prior to Matlab 7.11 (R2010b).
@@ -75,7 +76,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 4-9-13
+%   Revision: 1.0, 4-22-13
 
 
 % Check number of input and output arguments
@@ -220,15 +221,16 @@ classX=class(x);
 if n == 0 || any(x < 0) || any(x == Inf)
     if nargout <= 1
         if deltaset
-            varargout{1}=NaN(1,2,classX);
-        else
             varargout{1}=NaN(1,3,classX);
+        else
+            varargout{1}=NaN(1,4,classX);
         end
     else
         varargout{1}=NaN(classX);
         varargout{2}=NaN(classX);
-        if nargout == 4
-            varargout{3}=NaN(classX);
+        varargout{3}=NaN(classX);
+        if ~deltaset
+            varargout{4}=NaN(classX);
         end
     end
     return
@@ -295,24 +297,10 @@ if nargout <= 1
     else
         varargout{1}=[cast(delta,classX) delta*theta lambda_uhat lambda_s];
     end
-elseif nargout == 2
-    if deltaset
-        varargout{1}=theta;
-        varargout{2}=lambda_uhat;
-    else
-        varargout{1}=cast(delta,classX);
-        varargout{2}=delta*theta;
-    end
 elseif nargout == 3
-    if deltaset
-        varargout{1}=theta;
-        varargout{2}=lambda_uhat;
-        varargout{3}=lambda_s;
-    else
-        varargout{1}=cast(delta,classX);
-        varargout{2}=delta*theta;
-        varargout{3}=lambda_uhat;
-    end
+    varargout{1}=theta;
+    varargout{2}=lambda_uhat;
+	varargout{3}=lambda_s;
 else
     varargout{1}=cast(delta,classX);
     varargout{2}=delta*theta;

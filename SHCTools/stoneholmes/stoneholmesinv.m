@@ -21,7 +21,7 @@ function x=stoneholmesinv(p,varargin)
 %
 %   Example:
 %       % Plot CDF and inverse CDF together and find root mean squared error
-%       x=0:0.05:25; delta=1; epsilon=0.03; lambda_u=0.5; lambda_s = 1;
+%       x=0:0.05:25; delta=1; epsilon=0.03; lambda_u=0.5; lambda_s=1;
 %       p=stoneholmescdf(x,delta,epsilon,lambda_u,lambda_s);
 %       xi=stoneholmesinv(p,delta,epsilon,lambda_u,lambda_s);
 %       rmse=sqrt(mean((x-xi).^2));
