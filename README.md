@@ -2,7 +2,6 @@ SHCTools
 ========
 #####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems Based&nbsp;on&nbsp;Networks&nbsp;of&nbsp;Stable&nbsp;Heteroclinic&nbsp;Channels&nbsp;(SHCs).#####
 ######Version 1.1, 4-22-13######
-&nbsp;  
 
 SHC network creation, modification, and visualization, and conversion.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```buildrho```](https://github.com/horchler/SHCTools/blob/master/SHCTools/buildrho.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create RHO matrix from SHC network structure.  
@@ -34,8 +33,8 @@ Lotka-Volterra SHC network tools.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_passagetime```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_passagetime.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Mean first passage times of SHC network.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_stability```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_stability.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Saddle values of Lotka-Volterra system nodes.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_symequilibria```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_symequilibria.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Solve for all equlibrium points symbolically.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_symparams```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_symparams.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create symbolic SHC parameters with assumptions.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_taufit```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_taufit.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Nonlinear-compensated (fitted) mean period.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_symparams```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_symparams.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create symbolic SHC parameters with assumptions.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_taufit```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_taufit.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Nonlinear-compensated (fitted) mean period.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_transitiontime```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_lv_transitiontime.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Inter-passage transition times of SHC network.
 
 Stone-Holmes distribution.  
@@ -61,6 +60,7 @@ XML validation files.
 --------
 
 References  
+&nbsp;  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;V.S. Afraimovich, M.I. Rabinovich, and P. Varona, &#8220;Heteroclinic contours in neural ensembles and the winnerless competition,&#8221;  
 &nbsp;&nbsp;&nbsp;&nbsp; *Int. J. Bifurcation Chaos*, Vol. 14, 2004, pp. 1195&ndash;1208. [[PDF Preprint](http://arxiv.org/abs/nlin/0304016)] [[http://dx.doi.org/10.1142/S0218127404009806](http://dx.doi.org/10.1142/S0218127404009806)]  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;M.I. Rabinovich, R. Huerta, P. Varona, and V.S. Afraimovich, &#8220;Transient Cognitive Dynamics, Metastability, and Decision Making,&#8221;  
