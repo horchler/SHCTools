@@ -28,6 +28,16 @@ function varargout=stoneholmeschi2gof(tau,varargin)
 %   stable eigenvalue, LAMBDA_S, 0 < LAMBDA_S <= Inf. LAMBDA_S is the absolute
 %   value the eigenvalue with the largest negative real part.
 %
+%   [...] = STONEHOLMESCHI2GOF(TAU,CDF) specifies a cummulative distribution
+%   function, CDF, to be used for the test instead of the default one obtained
+%   by fitting the data, TAU, to the Stone-Holmes distribution. CDF must be a
+%   function handle that takes one input argument, X (0 <= X <= Inf), and
+%   returns an output, Y (0 <= Y <= 1). CDF must not depend on parameters
+%   estimated from TAU. The Stone-Holmes CDF with preset parameters can be used
+%   to perform the chi-squared goodness-of-fit test via:
+%
+%       cdf = @(x)stoneholmescdf(x,delta,epsilon,lambda_u,lambda_s)
+%
 %   Note:
 %       STONEHOLMESCHI2GOF estimates the parameters of Stone-Holmes distribution
 %       to be tested by fitting TAU with STONEHOLMESFIT. Due to a limitation of
@@ -56,7 +66,7 @@ function varargout=stoneholmeschi2gof(tau,varargin)
 %       STONEHOLMESPDF, STONEHOLMESRND, STONEHOLMESLIKE, STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-9-13
-%   Revision: 1.0, 4-22-13
+%   Revision: 1.0, 4-25-13
 
 
 if nargout > 3
@@ -65,28 +75,36 @@ if nargout > 3
 end
 
 % Handle variable input
-if nargin > 1
-    delta = varargin{1};
-    if nargin > 2
-        lambda_s = varargin{2};
-        if nargin > 3
-            error('SHCTools:stoneholmeschi2gof:TooManyInputs',...
-                  'Too many input arguments.');
+if nargin == 2 && isa(varargin{1},'function_handle')
+    % Alternative CDF function handle for Chi-squared goodness-of-fit function
+    cdffun = varargin{1};
+    n = 0;
+else
+    if nargin > 1
+        delta = varargin{1};
+        if nargin > 2
+            lambda_s = varargin{2};
+            if nargin > 3
+                error('SHCTools:stoneholmeschi2gof:TooManyInputs',...
+                      'Too many input arguments.');
+            end
+        else
+            lambda_s = Inf;
         end
     else
+        delta = 1;
         lambda_s = Inf;
     end
-else
-    delta = 1;
-    lambda_s = Inf;
+
+    % Fit Tau data
+    [delta_hat,epsilon_hat,lambda_uhat,lambda_shat] = stoneholmesfit(tau,...
+        delta,lambda_s);
+
+    % Stone-Holmes CDF function handle for Chi-squared goodness-of-fit function
+    cdffun = @(x)stoneholmescdf(x,delta_hat,epsilon_hat,lambda_uhat,...
+        lambda_shat);
+    n = 2;
 end
 
-% Fit Tau data
-[delta_hat,epsilon_hat,lambda_uhat,lambda_shat] = ...
-    stoneholmesfit(tau,delta,lambda_s);
-
-% Stone-Holmes CDF function handle for Chi-squared goodness-of-fit function
-cdffun = @(x)stoneholmescdf(x,delta_hat,epsilon_hat,lambda_uhat,lambda_shat);
-
 % Chi-squared goodness-of-fit test
-[varargout{1:min(max(nargout,1),3)}] = chi2gof(tau,'cdf',cdffun,'nparams',2);
+[varargout{1:min(max(nargout,1),3)}] = chi2gof(tau,'cdf',cdffun,'nparams',n);
