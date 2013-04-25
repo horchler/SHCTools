@@ -12,7 +12,7 @@ function [alp,bet,varargout]=shc_lv_params(tau,epsilon,bet,nu,options)
 %       FSOLVE, STONEHOLMESPASSAGETIME, SHC_LV_TRANSITIONTIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
-%   Revision: 1.0, 4-21-13
+%   Revision: 1.0, 4-25-13
 
 
 % Check variable outputs
@@ -279,7 +279,7 @@ if nargout == 3
     varargout{1} = nu;
 else
     % Find Gamma and Delta as function of Alpha solution, Beta, and Nu
-    varargout{1} = (alp+alp([2:end 1]).*nu([2:end 1]))./bet([2:end 1]);
+    varargout{1} = (alp+alp([2:end 1]))./bet([2:end 1]);
     varargout{2} = (alp...
         -alp([end 1:end-1])./nu([end 1:end-1]))./bet([end 1:end-1]);
 end
@@ -292,7 +292,7 @@ lambda_s = alp;
 lambda_u = lambda_s./nu;
 
 % Adjust network structure, build connection matrix
-rho = ones(n,1)*(alp.*nu).';
+rho = ones(n,1)*(alp.');
 rho([2:n+1:end n*(n-1)+1]) = -alp./nu;
 rho(1:n+1:end) = 0;
 net.rho = rho+alp*ones(1,n);
