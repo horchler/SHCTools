@@ -1,18 +1,30 @@
-function tf=shc_lv_iscycle(net)
+function tf=shc_lv_iscycle(net,S)
 %SHC_LV_ISCYCLE  Check if Lotka-Volterra system is an SHC cycle.
 %   SHC_LV_ISCYCLE(NET) returns a logical 1 (true) if the N-dimensional
 %   Lotka-Volterra SHC network described by the connection matrix NET is an SHC
 %   cycle (stable, marginally stable, or unstable), and logical 0 (false)
 %   otherwise. A Lotka-Volterra SHC cycle must have at least three nodes. Each
 %   node must have exactly one unstable (positive) eigenvalue and N-1 stable
-%   (negative) ones. NET is a symbolic or floating-point SHC network structure. 
+%   (negative) ones. NET is a symbolic or floating-point SHC network structure.
+%
+%   SHC_LV_ISCYCLE(NET,'negative') removes the default constraint that all
+%   elements of the connection matrix, NET, must be non-negative.
+%
+%   SHC_LV_ISCYCLE(NET,'positive') requires that all elements of the connection
+%   matrix, NET, must be positive and non-zero.
+%
+%   Note:
+%       The existence of an SHC cycle does not imply that the cycle is stable.
+%       SHC_LV_ISCYCLE only indicates if a cycle is present. The stability of
+%       the cycle must be determined by examining the values of the unstable and
+%       stable eigenvalues. See SHC_LV_ISSTABLE and SHC_LV_STABILITY.
 %
 %   See also:
 %       SHC_LV_ISSTABLE, SHC_LV_STABILITY, SHC_LV_LAMBDA_US, SHC_LV_JACOBIAN,
 %       SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_CREATE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 2-12-13
-%   Revision: 1.0, 4-21-13
+%   Revision: 1.0, 4-25-13
 
 
 % Check network
@@ -55,6 +67,39 @@ end
 if n < 3
     tf = false; % A Lotka-Volterra SHC cycle must have at least three nodes
 else
+    isNegative = false;
+    isPositive = false;
+    if nargin == 2
+        if ischar(S)
+            s = strcmpi(S,{'negative','positive','non-negative'});
+            if s(1)
+                isNegative = true;
+            elseif s(2)
+                isPositive = true;
+            elseif ~s(3)
+                error('SHTools:shc_lv_stability:InvalidStringS',...
+                     ['The second argument must be the string ''negative'' '...
+                      'or ''positive''.']);
+            end
+        else
+            error('SHTools:shc_lv_stability:NonStringS',...
+                 ['The second argument must be the string ''negative'' or '...
+                  '''positive''.']);
+        end
+    end
+    
+    % Check signs of elements of connection matrix
+    if ~isNegative
+        if isPositive
+            tf = all(net.rho(:) > 0);
+        else
+            tf = all(net.rho(:) >= 0);
+        end
+        if ~tf
+            return;
+        end
+    end
+    
     % Check that each node has one unstable eigenvalue and N-1 stable ones
     E = shc_lv_eigs(net);
     isSym = isa(E,'sym');
