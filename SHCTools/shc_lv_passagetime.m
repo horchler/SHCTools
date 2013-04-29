@@ -10,7 +10,7 @@ function tp=shc_lv_passagetime(net,epsilon,varargin)
 %       PCHIP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-28-12
-%   Revision: 1.0, 4-21-13
+%   Revision: 1.0, 4-29-13
 
 
 % Handle inputs
@@ -100,8 +100,15 @@ end
 [lambda_u,lambda_s] = shc_lv_lambda_us(net);
 
 if nargin == 3 || any(strcmp(method,{'default','analytic','stoneholmes'}))
+    % Disable warning in stoneholmespassagetime(), allow Lambda_U == Lambda_S
+    CatchWarningObj = catchwarning('',...
+        'SHCTools:stoneholmespassagetime:LambdaScaling');
+
     % Stone-Holmes mean first passage time using analytical solution
 	tp = stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
+    
+    % Re-enable warning in stoneholmespassagetime()
+    delete(CatchWarningObj);
 else
     if any(lambda_u >= lambda_s)
         warning('SHCTools:shc_lv_passagetime:LambdaScaling',...

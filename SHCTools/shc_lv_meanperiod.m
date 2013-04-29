@@ -14,7 +14,7 @@ function [tau_bar,N,tau]=shc_lv_meanperiod(net,epsilon_hat,N)
 %       STONEHOLMESPASSAGETIME, SHC_LV_PARAMS, SHC_CREATE, SHC_LV_INTEGRATE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.0, 4-21-13
+%   Revision: 1.0, 4-29-13
 
 
 % Check network
@@ -106,9 +106,6 @@ if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
     
     % Fit Tau period data using Stone-Holmes distribution
     [delhat,ephat,lamuhat,lamshat] = stoneholmesfit(tau,1,lambda_s(1));
-    
-    % Use fitted parameters to estimate true mean of Tau
-    tau_bar = stoneholmespassagetime(delhat,ephat,lamuhat,lamshat);
 else
     a0 = shc_lv_ic(net,0.5*bet);
     
@@ -154,13 +151,19 @@ else
                 stoneholmesfit(tau_bar(1:N),1,lambda_s(i));
         end
     end
-    
-    % Use fitted parameters to estimate true mean of Tau
-    tau_bar = stoneholmespassagetime(delhat,ephat,lamuhat,lamshat);
-    tau_bar = tau_bar([2:end 1]);
-    tau_bar = tau_bar(:);
 end
 
+% Disable warning in stoneholmespassagetime(), allow Lambda_U == Lambda_S
+CatchWarningObj = catchwarning('',...
+    'SHCTools:stoneholmespassagetime:LambdaScaling');
+
+% Use fitted parameters to estimate true mean of Tau
+tau_bar = stoneholmespassagetime(delhat,ephat,lamuhat,lamshat);
+tau_bar = tau_bar([2:end 1]);
+tau_bar = tau_bar(:);
+    
+% Re-enable warning in stoneholmespassagetime()
+delete(CatchWarningObj);
 
 
 function [value,isterminal,direction]=events(t,y,d)	%#ok<INUSL>

@@ -10,7 +10,7 @@ function a0=shc_lv_ic(net,a0,epsilon,mu)
 %       SHC_LV_INTEGRATE, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9@case.edu, Created 5-11-12
-%   Revision: 1.0, 4-21-13
+%   Revision: 1.0, 4-29-13
 
 
 % Check network
@@ -146,10 +146,17 @@ if all(bet(1) == bet) && all(lambda_u(1) == lambda_u) ...
     % Find time step using approximation based on marginally-stable case
     ttmin = shc_lv_mintransitiontime(net);
     dtt = 0.1*ttmin(1);
+    
+    % Disable warning in stoneholmespassagetime(), allow Lambda_U == Lambda_S
+    CatchWarningObj = catchwarning('',...
+        'SHCTools:stoneholmespassagetime:LambdaScaling');
 
     % Find time step using estimate from mean first passage time
     dtp = stoneholmespassagetime(a0(i),max(epsilon(1),mu(1)),lambda_u(1),...
         lambda_s(1));
+    
+    % Re-enable warning in stoneholmespassagetime()
+    delete(CatchWarningObj);
     
     a0 = ic1d(net.rho,net.alpha(1),bet(1),d,epsilon(1),mu(1),n,dtt,dtp,tol);
     if ~isscalar(a0)
@@ -171,8 +178,15 @@ else
     ttmin = shc_lv_mintransitiontime(net);
     dtt = 0.1*ttmin(i);
     
+    % Disable warning in stoneholmespassagetime(), allow Lambda_U == Lambda_S
+    CatchWarningObj = catchwarning('',...
+        'SHCTools:stoneholmespassagetime:LambdaScaling');
+    
     % Find time step using estimate from mean first passage time
     dtp = stoneholmespassagetime(a0(i),ep,lambda_u(i),lambda_s(i));
+    
+    % Re-enable warning in stoneholmespassagetime()
+    delete(CatchWarningObj);
     
     a0 = ic(net.rho,net.alpha(i),bet(i),d,i,epsilon,mu,n,dtt,dtp,tol);
 end

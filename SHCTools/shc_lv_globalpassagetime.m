@@ -10,7 +10,7 @@ function varargout=shc_lv_globalpassagetime(net,epsilon,mu)
 %       SHC_LV_PASSAGETIME, SHC_LV_TRANSITIONTIME, STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 2-13-13
-%   Revision: 1.0, 4-21-13
+%   Revision: 1.0, 4-29-13
 
 
 if nargout > 3
@@ -87,27 +87,36 @@ if ~isscalar(epsilon) || ~isscalar(mu)
     mu = mu(:);
 end
 
-% Stable and unstable eigenvalues
-[lambda_u,lambda_s] = shc_lv_lambda_us(net);
-
 % Passage time
-if all(epsilon >= mu)
-    % Stone-Holmes mean first passage time using analytical solution
-    tp = stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
-elseif all(epsilon < mu)
+if all(epsilon < mu)
     tp = shc_lv_passagetime_mu(net,mu);
 else
-    for i = n:-1:1
-        if epsilon(i) > mu(i)
-            % Stone-Holmes mean first passage time using analytical solution
-            tp(i) = stoneholmespassagetime(delta(i),epsilon(i),lambda_u(i),...
-                lambda_s(i));
-        else
-            tpi = shc_lv_passagetime_mu(net,mu(i));
-            tp(i) = tpi(1);
+    % Stable and unstable eigenvalues
+    [lambda_u,lambda_s] = shc_lv_lambda_us(net);
+
+    % Disable warning in stoneholmespassagetime(), allow Lambda_U == Lambda_S
+    CatchWarningObj = catchwarning('',...
+        'SHCTools:stoneholmespassagetime:LambdaScaling');
+
+    if all(epsilon >= mu)
+        % Stone-Holmes mean first passage time using analytical solution
+        tp = stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
+    else
+        for i = n:-1:1
+            if epsilon(i) > mu(i)
+                % Stone-Holmes mean first passage time using analytical solution
+                tp(i) = stoneholmespassagetime(delta(i),epsilon(i),...
+                    lambda_u(i),lambda_s(i));
+            else
+                tpi = shc_lv_passagetime_mu(net,mu(i));
+                tp(i) = tpi(1);
+            end
         end
+        tp = tp(:);
     end
-    tp = tp(:);
+    
+    % Re-enable warning in stoneholmespassagetime()
+    delete(CatchWarningObj);
 end
 
 % Inter-passage transition time
