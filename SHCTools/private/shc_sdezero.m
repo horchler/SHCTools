@@ -1,13 +1,13 @@
-function [te,ae,we,ie,vnew,stop] = shc_zero(EventsFUN,t,a,w,value)
-%SHC_ZERO  Locate any zero-crossings of event functions in a time step.
+function [te,ae,we,ie,vnew,stop] = shc_sdezero(EventsFUN,t,a,w,value)
+%SHC_SDEZERO  Locate any zero-crossings of event functions in a time step.
 %
 %   See also:
-%       SHC_LV_INTEGRATE, FUNCTION_HANDLE
+%       SHC_LV_INTEGRATE, SHC_SDEEVENTS, FUNCTION_HANDLE
         
 %   Andrew D. Horchler, adh9 @ case . edu, Created 12-30-11
-%   Revision: 1.0, 1-12-13
+%   Revision: 1.0, 5-4-13
 
-%   SHC_ZERO is loosely based on Matlab's ODEZERO helper function.
+%   SHC_SDEZERO is loosely based on Matlab's ODEZERO helper function.
 
 
 [vnew,isterminal,direction] = EventsFUN(t,a(:));

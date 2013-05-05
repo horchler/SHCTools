@@ -14,7 +14,7 @@ function [tau_bar,N,tau]=shc_lv_meanperiod(net,epsilon_hat,N)
 %       STONEHOLMESPASSAGETIME, SHC_LV_PARAMS, SHC_CREATE, SHC_LV_INTEGRATE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.0, 4-29-13
+%   Revision: 1.2, 5-4-13
 
 
 % Check network
@@ -166,7 +166,7 @@ tau_bar = tau_bar(:);
 delete(CatchWarningObj);
 
 
-function [value,isterminal,direction]=events(t,y,d)	%#ok<INUSL>
-value = y-d;
+function [value,isterminal,direction]=events(t,a,d)	%#ok<INUSL>
+value = a-d;
 isterminal = 0;
 direction = 1;

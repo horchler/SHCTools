@@ -1,11 +1,11 @@
-function reset_stream(Stream)
-%RESET_STREAM  Reset global stream or delete custom random stream.
+function shc_sdereset_stream(Stream)
+%SHC_SDERESET_STREAM  Reset global stream or delete custom random stream.
 %
 %   See also:
-%       SHC_LV_INTEGRATE, ONCLEANUP, FUNCTION_HANDLE, RANDSTREAM
+%       SHC_LV_INTEGRATE, SHC_SDERANDFUN, ONCLEANUP, FUNCTION_HANDLE, RANDSTREAM
         
 %   Andrew D. Horchler, adh9 @ case . edu, Created 12-30-12
-%   Revision: 1.0, 12-31-12
+%   Revision: 1.2, 5-4-13
 
 
 % Called by onCleanup to reset antihetic property for global stream
