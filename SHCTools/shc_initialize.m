@@ -4,10 +4,10 @@ function net=shc_initialize(net,reinit)
 %   NET = SHC_INITIALIZE(NET,'reset')
 %
 %   See also:
-%       SHC_CREATENETWORK, BUILDRHO, SHC_CREATE, SHC_PARAMS, SHC_SYMPARAMS
+%       SHC_CREATENETWORK, BUILDRHO, SHC_CREATE, SHC_LV_PARAMS, SHC_LV_SYMPARAMS
 
-%   Andrew D. Horchler, adh9@case.edu, Created 1-14-12
-%   Revision: 1.0, 4-25-13
+%   Andrew D. Horchler, adh9 @ case . edu, Created 1-14-12
+%   Revision: 1.2, 5-4-13
 
 
 % Check for 'reset' mode to clear and reset 'children', 'index,' and 'T' fields
@@ -140,46 +140,20 @@ for i = 1:nnets
                 || ~isscalar(s.nu))
             bet = s.beta;
             nu = s.nu;
+            
             z = ones(s.size,1);
             if isscalar(alp)
-                alp = alp(z,1);
-            end
-            if isscalar(alp)
-                alp = alp(z,1);
+                s.gamma = 2*alp+zeros(s.size);
+            else
+                s.gamma = alp*z.'+z*alp([2:end 1]).';
             end
             if isscalar(bet)
-                bet = bet(z,1);
-            end
-            if isscalar(nu)
-                nu = nu(z,1);
-            end
-            
-            if isa(alp,'sym') || isa(bet,'sym') || isa(nu,'sym')
-                s.gamma = sym(~s.T);
-                gam2 = sym(zeros(s.size,1));
+                s.gamma = s.gamma/bet;
             else
-                s.gamma = double(~s.T);
-                gam2(s.size,1) = 0;
+                s.gamma = s.gamma./(z*bet.');
             end
             s.gamma(1:s.size+1:end) = 0;
-            gamv = true;
-            for j = 1:s.size
-                for k = 1:s.size
-                    if s.gamma(j,k) ~= 0
-                        s.gamma(j,k) = (alp(j)+alp(k))./bet(k);
-                        if gamv
-                            if gam2(j) == 0
-                                gam2(j) = s.gamma(j,k);
-                            elseif gam2(j) ~= s.gamma(j,k)
-                                gamv = false;
-                            end
-                        end
-                    end
-                end
-            end
-            if gamv
-                s.gamma = gam2;
-            end
+            s.gamma(s.T(:)) = 0;
             
             s.delta = (alp...
                 -alp([end 1:end-1])./nu([end 1:end-1]))./bet([end 1:end-1]); 

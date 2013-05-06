@@ -162,7 +162,7 @@ else
     end
 end
 
-if isWNeeded
+if D > 0 || isWNeeded
     % Check if alternative RandFUN function or W matrix is present
     if isempty(RandFUN) && ~isempty(options)
         CustomRandFUN = isa(options.RandFUN,'function_handle');
