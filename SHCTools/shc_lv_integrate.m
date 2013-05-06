@@ -164,7 +164,7 @@ end
 
 if D > 0 || isWNeeded
     % Check if alternative RandFUN function or W matrix is present
-    if isempty(RandFUN) && ~isempty(options)
+    if isempty(RandFUN) && isfield(options,'RandFUN')
         CustomRandFUN = isa(options.RandFUN,'function_handle');
         CustomWMatrix = ~CustomRandFUN;
     else
