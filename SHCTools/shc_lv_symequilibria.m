@@ -12,8 +12,8 @@ function s=shc_lv_symequilibria(rho)
 %   See also:
 %       SHC_LV_JACOBIAN, SHC_LV_EIGS, SHC_CREATE, SHC_LV_ODE
 
-%   Andrew D. Horchler, adh9@case.edu, Created 1-3-11
-%   Revision: 1.0, 4-21-13
+%   Andrew D. Horchler, adh9 @ case . edu, Created 1-3-11
+%   Revision: 1.2, 5-4-13
 
 
 % Check Rho matrix

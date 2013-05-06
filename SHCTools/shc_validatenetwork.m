@@ -3,8 +3,8 @@ function shc_validatenetwork(net,usestrict)
 %
 %
 
-%   Andrew D. Horchler, adh9@case.edu, Created 1-11-12
-%   Revision: 1.0, 11-19-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 1-11-12
+%   Revision: 1.2, 5-4-13
 
 
 % Check base structure input

@@ -3,8 +3,8 @@ function net=loadnet(filename,options)
 %
 %
 
-%   Andrew D. Horchler, adh9@case.edu, Created 1-23-12
-%   Revision: 1.0, 3-24-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 1-23-12
+%   Revision: 1.2, 5-4-13
 
 
 if nargin < 2

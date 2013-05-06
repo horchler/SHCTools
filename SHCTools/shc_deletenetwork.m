@@ -3,8 +3,8 @@ function net=shc_deletenetwork(net,i)
 %
 %
 
-%   Andrew D. Horchler, adh9@case.edu, Created 1-21-12
-%   Revision: 1.0, 3-24-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 1-21-12
+%   Revision: 1.2, 5-4-13
 
 
 % Check network

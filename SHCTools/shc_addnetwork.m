@@ -3,8 +3,8 @@ function net=shc_addnetwork(net,s,p,n)
 %
 %
 
-%   Andrew D. Horchler, adh9@case.edu, Created 1-18-12
-%   Revision: 1.0, 3-28-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 1-18-12
+%   Revision: 1.2, 5-4-13
 
 
 % Check base network

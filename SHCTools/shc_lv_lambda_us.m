@@ -22,8 +22,8 @@ function [lambda_u,lambda_s]=shc_lv_lambda_us(rho,M)
 %       SHC_LV_STABILITY, SHC_LV_ISSTABLE, SHC_LV_JACOBIAN, SHC_LV_EIGS,
 %       SHC_LV_SYMEQUILIBRIA, SHC_CREATE
 
-%   Andrew D. Horchler, adh9@case.edu, Created 8-29-12
-%   Revision: 1.0, 4-21-13
+%   Andrew D. Horchler, adh9 @ case . edu, Created 8-29-12
+%   Revision: 1.2, 5-4-13
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the
 %   Phase Plane," Nieuw Archief Voor Wiskunde (3), Vol. 27, 1979, pp. 238-254.

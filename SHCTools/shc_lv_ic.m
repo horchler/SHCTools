@@ -9,8 +9,8 @@ function a0=shc_lv_ic(net,a0,epsilon,mu)
 %   See also:
 %       SHC_LV_INTEGRATE, SHC_LV_ODE
 
-%   Andrew D. Horchler, adh9@case.edu, Created 5-11-12
-%   Revision: 1.0, 4-29-13
+%   Andrew D. Horchler, adh9 @ case . edu, Created 5-11-12
+%   Revision: 1.2, 5-4-13
 
 
 % Check network

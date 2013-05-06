@@ -34,8 +34,8 @@ function varargout=shc_lv_eigs(rho,M)
 %   See also:
 %       SHC_LV_JACOBIAN, SHC_LV_SYMEQUILIBRIA, SHC_CREATE, SHC_LV_LAMBDA_US
 
-%   Andrew D. Horchler, adh9@case.edu, Created 4-6-12
-%   Revision: 1.0, 4-21-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 4-6-12
+%   Revision: 1.2, 5-4-13
 
 
 if nargout > 2

@@ -22,8 +22,8 @@ function adot=shc_lv_ode(t,a,rho,mu)
 %   See also:
 %       SHC_LV_JACOBIAN, SHC_LV_SYMEQUILIBRIA, SHC_LV_INTEGRATE, ODE45
 
-%   Andrew D. Horchler, adh9@case.edu, Created 3-28-12
-%   Revision: 1.0, 2-15-13
+%   Andrew D. Horchler, adh9 @ case . edu, Created 3-28-12
+%   Revision: 1.2, 5-4-13
 
 
 if isstruct(rho) && isfield(rho,'rho')

@@ -3,8 +3,8 @@ function net=shc_reset(net)
 %
 %
 
-%   Andrew D. Horchler, adh9@case.edu, Created 1-19-12
-%   Revision: 1.0, 5-29-12
+%   Andrew D. Horchler, adh9 @ case . edu, Created 1-19-12
+%   Revision: 1.2, 5-4-13
 
 
 % Check base structure input
