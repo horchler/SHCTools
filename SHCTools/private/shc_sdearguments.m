@@ -1,4 +1,4 @@
-function [N,tspan,lt,a0,rho,alpv,epsilon0,mu0,h,sh,ConstStep,dataType,...
+function [N,tspan,lt,a0,rho,alpv,epsilon,mu,h,sh,ConstStep,dataType,...
           NonNegative,NonNegativeFUN,ScalarNoise,ConstGFUN,ConstInputFUN,...
           RandFUN,ResetStream,EventsFUN,EventsValue,OutputFUN,WSelect] ...
           = shc_sdearguments(solver,tspan,a0,net,epsilon,mu,options)
@@ -9,7 +9,7 @@ function [N,tspan,lt,a0,rho,alpv,epsilon0,mu0,h,sh,ConstStep,dataType,...
 %       SHC_SDERESET_STREAM, FUNCTION_HANDLE
         
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.2, 5-4-13
+%   Revision: 1.2, 5-6-13
 
 %   SHC_SDEARGUMENTS is partially based on an updating of version 1.12.4.15 of
 %   Matlab's ODEARGUMENTS.
@@ -73,13 +73,20 @@ end
 
 % Check Epsilon
 if isa(epsilon,'function_handle')
+    % Create Epsilon function handle
+    if nargin(epsilon) == 1
+        epsilon = @(t,a)feval(epsilon,t);
+    elseif nargin(epsilon) >= 2
+        epsilon = @(t,a)feval(epsilon,t,a(:));
+    else
+        error('SHCTools:shc_sdearguments:EpsilonFUNTooFewInputs',...
+              'The Epsilon function must have at least one input.');
+    end
     try
-        epsilon0 = feval(epsilon,t0);
+        % Test Epsilon function handle
+        epsilon0 = epsilon(t0,a0);
     catch err
         switch err.identifier
-            case 'MATLAB:TooManyInputs'
-                error('SHCTools:shc_sdearguments:EpsilonFUNTooFewInputs',...
-                      'The Epsilon function must have at least one input.');
             case 'MATLAB:TooManyOutputs'
                 error('SHCTools:shc_sdearguments:EpsilonFUNNoOutput',...
                      ['The output of the Epsilon function was not '...
@@ -90,8 +97,8 @@ if isa(epsilon,'function_handle')
                       'assigned.']);
             case 'MATLAB:minrhs'
                 error('SHCTools:shc_sdearguments:EpsilonFUNTooManyInputs',...
-                     ['The Epsilon function must not require more than one '...
-                      'input.']);
+                     ['The Epsilon function must not require more than two '...
+                      'inputs.']);
             otherwise
                 rethrow(err);
         end
@@ -110,16 +117,19 @@ else
               'Epsilon must be a finite real floating-point vector.');
     end
     epsilon0 = epsilon(:).';
+    ConstGFUN = true;
+end
+if ConstGFUN
     if all(epsilon0(1) == epsilon0)
         epsilon0 = epsilon0(1);
     end
-    ConstGFUN = true;
+    epsilon = epsilon0;
 end
 ScalarNoise = isscalar(epsilon0);
 
 % Check optional Mu
 if isempty(mu)
-    mu0 = 0;
+    mu = 0;
     ConstInputFUN = true;
     
     % Determine the dominant data type, single or double
@@ -131,13 +141,20 @@ if isempty(mu)
     dataType = superiorfloat(t0,a0,rho,epsilon0);
 else
     if isa(mu,'function_handle')
+        % Create Mu function handle
+        if nargin(mu) == 1
+            mu = @(t,a)feval(mu,t);
+        elseif nargin(mu) >= 2
+            mu = @(t,a)feval(mu,t,a(:));
+        else
+            error('SHCTools:shc_sdearguments:MuFUNTooFewInputs',...
+                  'The Mu function must have at least one input.');
+        end
         try
-            mu0 = feval(mu,t0);
+            % Test Mu function handle
+            mu0 = mu(t0,a0);
         catch err
             switch err.identifier
-                case 'MATLAB:TooManyInputs'
-                    error('SHCTools:shc_sdearguments:MuFUNTooFewInputs',...
-                          'The Mu function must have at least one input.');
                 case 'MATLAB:TooManyOutputs'
                     error('SHCTools:shc_sdearguments:MuFUNNoOutput',...
                          ['The output of the Mu function was not specified. '...
@@ -148,13 +165,12 @@ else
                           'assigned.']);
                 case 'MATLAB:minrhs'
                     error('SHCTools:shc_sdearguments:MuFUNTooManyInputs',...
-                         ['The Mu function must not require more than one '...
-                          'input.']);
+                         ['The Mu function must not require more than two '...
+                          'inputs.']);
                 otherwise
                     rethrow(err);
             end
         end
-        mu0 = mu0(:).';
         ConstInputFUN = false;
     else
         if ~isvector(mu) || ~any(length(mu) == [1 N])
@@ -165,10 +181,12 @@ else
             error('SHCTools:shc_sdearguments:InvalidMu',...
                   'Mu must be a finite real floating-point vector.');
         end
-        mu0 = mu(:).';
-        if all(mu0(1) == mu0)
-            mu0 = mu0(1);
+        if all(mu(1) == mu)
+            mu = mu(1);
+        else
+            mu = mu(:).';
         end
+        mu0 = mu;
         ConstInputFUN = true;
     end
     

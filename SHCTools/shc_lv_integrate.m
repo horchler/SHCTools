@@ -51,7 +51,7 @@ function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,net,epsilon,varargin)
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.2, 5-4-13
+%   Revision: 1.2, 5-6-13
 
 
 solver = 'SHC_LV_INTEGRATE';
@@ -70,7 +70,7 @@ if nargin == 4
     options = [];
 elseif nargin == 5
     v = varargin{1};
-    if isstruct(v) || isempty(v) && sde_ismatrix(v)
+    if isstruct(v) || isempty(v) && shc_ismatrix(v)
         mu = 0;
         options = v;
     else
@@ -174,7 +174,7 @@ if D > 0 || isWNeeded
 
     if CustomWMatrix
         W = shc_sdeget(options,'RandFUN',[],'flag');
-        if ~isfloat(W) || ~sde_ismatrix(W) || any(size(W) ~= [lt D])
+        if ~isfloat(W) || ~shc_ismatrix(W) || any(size(W) ~= [lt D])
             error('SHCTools:shc_lv_integrate:RandFUNInvalidW',...
                  ['RandFUN must be a function handle or a '...
                   'LENGTH(TSPAN)-by-D (%d by %d) floating-point matrix of '...
@@ -279,13 +279,13 @@ for i = 1:lt-1
         dt = h(i);
     end
     if ~ConstInputFUN
-        mui = feval(mu,tspan(i));
+        mui = mu(tspan(i),Ai);
         mui = mui(:).';
     end
     if ConstGFUN
         epsilondWi = A(i+1,:);
     else
-        epsilondWi = feval(epsilon,tspan(i));
+        epsilondWi = epsilon(tspan(i),Ai);
         epsilondWi = epsilondWi(:).'.*A(i+1,:);
     end
     
