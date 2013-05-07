@@ -128,12 +128,10 @@ isWOutput = (nargout >= 2);
 isWNeeded = (isWOutput || isEvents || WSelect);
 
 % Allocate state array, A, if needed
-if isAOutput
-    if strcmp(dataType,'double')
-        A(lt,N) = 0;
-    else
-        A(lt,N) = single(0);
-    end
+if strcmp(dataType,'double')
+    A(lt,N) = 0;
+else
+    A(lt,N) = single(0);
 end
 
 % Reduce dimension of allocated Wiener increments if possible
@@ -160,6 +158,7 @@ else
         D = N;
         D0 = 1:N;
     end
+    Wi = [];
 end
 
 if D > 0 || isWNeeded
@@ -181,9 +180,12 @@ if D > 0 || isWNeeded
                   'integrated Wiener increments.  See %s.'],lt,D,solver);
         end
 
-        % Only allocate A matrix if requested as output
-        if isAOutput
-            A(2:end,:) = diff(W,[],1);
+        % Calculate Wiener increments from W
+        A(2:end,D0) = diff(W,[],1);
+        
+        % Remove large temporary variable to save memory 
+        if ~isWNeeded
+            clear W;
         end
     else
         if CustomRandFUN
@@ -224,37 +226,20 @@ if D > 0 || isWNeeded
             end
         
             % Calculate Wiener increments from normal variates
-            if ConstGFUN
-                if (ScalarNoise && ConstStep) || (~ScalarNoise && ~ConstStep)
-                    A(2:end,D0) = (sh*epsilon).*r;
-                else
-                    A(2:end,D0) = bsxfun(@times,sh*epsilon,r);
-                end
+            if ConstStep || D == 1
+                A(2:end,D0) = sh.*r;
             else
-                if ConstStep || D == 1
-                    A(2:end,D0) = sh.*r;
-                else
-                    A(2:end,D0) = bsxfun(@times,sh,r);
-                end
+                A(2:end,D0) = bsxfun(@times,sh,r);
             end
 
-            % remove large temporary variable to save memory 
+            % Remove large temporary variable to save memory 
             clear r;
         else
             % No error checking needed if default RANDN used
-            if ConstGFUN
-                if (ScalarNoise && ConstStep) || (~ScalarNoise && ~ConstStep)
-                    A(2:end,D0) = (sh*epsilon).*feval(RandFUN,lt-1,D);
-                else
-                    A(2:end,D0) = bsxfun(@times,sh*epsilon,...
-                        feval(RandFUN,lt-1,D));
-                end
+            if ConstStep || D == 1
+                A(2:end,D0) = sh.*feval(RandFUN,lt-1,D);
             else
-                if ConstStep || D == 1
-                    A(2:end,D0) = sh.*feval(RandFUN,lt-1,D);
-                else
-                    A(2:end,D0) = bsxfun(@times,sh,feval(RandFUN,lt-1,D));
-                end
+                A(2:end,D0) = bsxfun(@times,sh,feval(RandFUN,lt-1,D));
             end
         end
         
@@ -271,7 +256,12 @@ Ai = a0;
 if isAOutput
     A(1,:) = Ai;
 end
-mui = mu;
+if ConstInputFUN
+    mui = mu;
+end
+if ConstGFUN
+    epsiloni = epsilon;
+end
 
 % Integration loop
 for i = 1:lt-1
@@ -282,15 +272,14 @@ for i = 1:lt-1
         mui = mu(tspan(i),Ai);
         mui = mui(:).';
     end
-    if ConstGFUN
-        epsilondWi = A(i+1,:);
-    else
-        epsilondWi = epsilon(tspan(i),Ai);
-        epsilondWi = epsilondWi(:).'.*A(i+1,:);
+    if ~ConstGFUN
+        epsiloni = epsilon(tspan(i),Ai);
+        epsiloni = epsiloni(:).';
     end
+    dWi = A(i+1,:);
     
     % Euler-Maruyama step
-    Ai = Ai+(Ai.*(alpv-Ai*rho)+mui)*dt+epsilondWi;
+    Ai = Ai+(Ai.*(alpv-Ai*rho)+mui)*dt+epsiloni.*dWi;
     
     % Force specified solution to be >= 0
     if NonNegative
@@ -309,15 +298,16 @@ for i = 1:lt-1
     if isWNeeded
         if isWOutput
             Wi = W(i+1,:);                  % Use stored W
+            Wi = Wi(:);
         else
-            Wi = Wi+dW;                     % Integrate Wiener increments
+            Wi = Wi+dWi(:);                 % Integrate Wiener increments
         end
     end
     
     % Check for and handle zero-crossing events
     if isEvents
         [te,ae,we,ie,EventsValue,IsTerminal] =...
-            shc_sdezero(EventsFUN,tspan(i+1),Ai,Wi,EventsValue);
+            shc_sdezero(EventsFUN,tspan(i+1),Ai(:),Wi,EventsValue);
         if ~isempty(te)
             if nargout >= 3
                 TE = [TE;te];               %#ok<AGROW>
@@ -343,7 +333,7 @@ for i = 1:lt-1
 
     % Check for and handle output function
     if isOutput
-        OutputFUN(tspan(i+1),Ai,'',Wi);
+        OutputFUN(tspan(i+1),Ai(:),'',Wi);
     end
 end
 

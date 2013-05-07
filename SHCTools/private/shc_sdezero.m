@@ -10,7 +10,7 @@ function [te,ae,we,ie,vnew,stop] = shc_sdezero(EventsFUN,t,a,w,value)
 %   SHC_SDEZERO is loosely based on Matlab's ODEZERO helper function.
 
 
-[vnew,isterminal,direction] = EventsFUN(t,a(:));
+[vnew,isterminal,direction] = EventsFUN(t,a);
 if isempty(direction)
     direction = 0;
 end

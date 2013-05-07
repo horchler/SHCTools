@@ -6,7 +6,7 @@ function [OutputFUN,WSelect]=shc_sdeoutputfun(solver,tspan,a0,N,options)
 %       SHC_SDEPLOT, FUNCTION_HANDLE
         
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-2-13
-%   Revision: 1.2, 5-4-13
+%   Revision: 1.2, 5-6-13
 
 
 % Check for output function
@@ -40,6 +40,7 @@ if ~isempty(OutputFUN)
                  ['OutputYSelect vector cannot contain repeated indices.  '...
                   'See %s.'],solver);
         end
+        idxA = idxA(:);
         ASelect = true;
         AAll = false;
     else
@@ -53,7 +54,7 @@ if ~isempty(OutputFUN)
         if AAll
             OutputFUN = @(t,a,flag,w)OutputFUN(t,a,flag,w);
         elseif ASelect
-            OutputFUN = @(t,a,flag,w)OutputFUN(t,a(idxA(~isempty(a),:)),flag,w);
+            OutputFUN = @(t,a,flag,w)OutputFUN(t,a(idxA(:,~isempty(a))),flag,w);
         else
             OutputFUN = @(t,a,flag,w)OutputFUN(t,[],flag,w);
         end
@@ -75,20 +76,21 @@ if ~isempty(OutputFUN)
                  ['OutputWSelect vector cannot contain repeated indices.  '...
                   'See %s.'],solver);
         end
+        idxW = idxW(:);
         if AAll
-            OutputFUN = @(t,a,flag,w)OutputFUN(t,a,flag,w(idxW(~isempty(w),:)));
+            OutputFUN = @(t,a,flag,w)OutputFUN(t,a,flag,w(idxW(:,~isempty(w))));
         elseif ASelect
-            OutputFUN = @(t,a,flag,w)OutputFUN(t,a(idxA(~isempty(a),:)),flag,...
-                w(idxW(~isempty(w),:)));
+            OutputFUN = @(t,a,flag,w)OutputFUN(t,a(idxA(:,~isempty(a))),flag,...
+                w(idxW(:,~isempty(w))));
         else
             OutputFUN = @(t,a,flag,w)OutputFUN(t,[],flag,...
-                w(idxW(~isempty(w),:)));
+                w(idxW(:,~isempty(w))));
         end
         WSelect = true;
     else
         if ASelect && ~AAll
-            OutputFUN = @(t,a,flag,w)OutputFUN(t,a(idxA(~isempty(a),:)),flag);
-        elseif ~YSelect
+            OutputFUN = @(t,a,flag,w)OutputFUN(t,a(idxA(:,~isempty(a))),flag);
+        elseif ~ASelect
             OutputFUN = @(t,a,flag,w)OutputFUN(t,[],flag);
         else
             OutputFUN = @(t,a,flag,w)OutputFUN(t,a,flag);
