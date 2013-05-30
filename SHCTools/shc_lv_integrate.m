@@ -18,18 +18,19 @@ function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,net,epsilon,varargin)
 %   [...] = SHC_LV_INTEGRATE(TSPAN,A0,RHO,EPSILON,MU) specifies the additional
 %   parameter MU which must be a scalar or vector of length N.
 %
-%   [...] = SHC_LV_INTEGRATE(TSPAN,A0,RHO,EPSILON,OPTIONS) specifies options to
-%   be for generating the random variates that are used to calculate the Wiener
-%   increments. Supported properties names: RandSeed, RandFUN, Antithetic, and
-%   EventsFUN.
+%   [...] = SHC_LV_INTEGRATE(...,OPTIONS) specifies options to for generating
+%   the random variates that are used to calculate the Wiener increments, detect
+%   events, and call an output function. Supported properties names: RandSeed,
+%   RandFUN, Antithetic, ConstGFUN, NonNegativeFUN, EventsFUN, OutputFUN,
+%   OutputYSelect, and OutputWSelect. See SHC_SDESET and SHC_SDEGET.
 %
-%   [AOUT, W, TE, AE, WE, IE] = SHC_LV_INTEGRATE(TSPAN,A0,RHO,EPSILON,OPTIONS)
-%   with the EventsFUN property set to a function handle, in order to specify an
-%   events function, solves as above while also finding zero-crossings. The
-%   corresponding function must take at least two inputs and output three
-%   vectors: [Value, IsTerminal, Direction] = Events(T,Y). The scalar input T is
-%   the current integration time and the vector Y is the current state. For the
-%   i-th event, Value(i) is the value of the zero-crossing function and
+%   [AOUT, W, TE, AE, WE, IE] = SHC_LV_INTEGRATE(...,OPTIONS) with the EventsFUN
+%   property set to a function handle, in order to specify an events function,
+%   solves as above while also finding zero-crossings. The corresponding
+%   function must take at least two inputs and output three vectors:
+%   [Value, IsTerminal, Direction] = Events(T,Y). The scalar input T is the
+%   current integration time and the vector Y is the current state. For the i-th
+%   event, Value(i) is the value of the zero-crossing function and
 %   IsTerminal(i) = 1 specifies that integration is to terminate at a zero or to
 %   continue if IsTerminal(i) = 0. If Direction(i) = 1, only zeros where
 %   Value(i) is increasing are found, if Direction(i) = -1, only zeros where
@@ -38,7 +39,7 @@ function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,net,epsilon,varargin)
 %   for all events. Direction and IsTerminal may also be scalars.
 %
 %   See also:
-%       SHC_LV_ODE, SHC_LV_IC, RANDSTREAM
+%       SHC_LV_ODE, SHC_LV_IC, RANDSTREAM, SHC_SDESET, SHC_SDEGET
 
 %   SHC_LV_INTEGRATE is an implementation of the explicit Euler-Maruyama scheme
 %   with diagonal additive noise (order 1.0 strong convergence). Ito and
@@ -51,7 +52,7 @@ function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,net,epsilon,varargin)
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.2, 5-6-13
+%   Revision: 1.2, 5-30-13
 
 
 solver = 'SHC_LV_INTEGRATE';
