@@ -19,7 +19,7 @@ function [szy,expnd]=stoneholmesargs(str,varargin)
 %
 %   [...] = STONEHOLMESARGS(STR,SZDELTA,SZEPSILON,SZLAMBDA_U,SZLAMBDA_S) and
 %   [...] = STONEHOLMESARGS(STR,SZTHETA,SZLAMBDA_U,SZLAMBDA_S) are as above, but
-%   the valid string, STR, for this input format is 'passagetime'.
+%   valid strings, STR, for this input format are 'stat' and 'passagetime'.
 %   
 %   See also:
 %       STONEHOLMESPDF, STONEHOLMESCDF, STONEHOLMESINV, STONEHOLMESRND,
@@ -30,22 +30,22 @@ function [szy,expnd]=stoneholmesargs(str,varargin)
 %   versions prior to Matlab 7.11 (R2010b).
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-12-12
-%   Revision: 1.0, 1-13-13
+%   Revision: 1.1, 6-7-13
 
 
 if ~ischar(str)
     error('SHCTools:stoneholmesargs:StringMissing',...
          ['First argument must be a string. Valid strings are: ''pdf'', '...
-          '''cdf'', ''inv'', ''rnd'', ''like'', ''median'', ''mode'', and '...
-          '''passagetime''.']);
+          '''cdf'', ''inv'', ''rnd'', ''like'', ''median'', ''mode'', '...
+          '''stat'', and ''passagetime''.']);
 end
 
 % Special cases
 isLike=strcmpi(str,'like');
 isMedianMode=any(strcmpi(str,{'mode','median'}));
 isLikeRnd=any(strcmpi(str,{'like','rnd'}));
-isPassageTime=strcmpi(str,'passagetime');
-isX=~(isMedianMode || isPassageTime);
+isMean=any(strcmpi(str,{'passagetime','stat'}));
+isX=~(isMedianMode || isMean);
 
 if isMedianMode && nargin < 4 || isLikeRnd && nargin < 6 || nargin < 5
     error('SHCTools:stoneholmesargs:TooFewInputs','Not enough input arguments.')
@@ -105,7 +105,7 @@ if ns(1) && (~isLike && any(sz([false;ns(2:end)],1) ~= sz(ns(1),1)) ...
         errmsg=['If more than one of ' thetastr ', Lambda_U, Lambda_S, or ' ...
                 msgstr ' are non-scalar, they must have the same number of '...
                 'rows.'];
-    elseif isPassageTime
+    elseif isMean
         errmsg=['If more than one of ' thetastr ', Lambda_U, or Lambda_S '...
                 'are non-scalar, they must have the same number of rows.'];
     elseif isLike
@@ -165,7 +165,7 @@ if size(sza,1) > 1 && any(any(bsxfun(@ne,sza(2:end,2:end),sza(1,2:end)),2))
         end
         errmsg=['If more than one of ' thetastr ', Lambda_U, Lambda_S, or ' ...
                 msgstr ', they must have the same dimensions.'];
-    elseif isPassageTime
+    elseif isMean
         errmsg=['If more than one of ' thetastr ', Lambda_U, or Lambda_S '...
                 'are non-scalar arrays and not column vectors, they must '...
                 'have the same dimensions.'];
@@ -218,7 +218,7 @@ if nargout == 2
                 expnd=[expnd(1);false;expnd(2:end)];
             end
         else  
-            if isPassageTime && nargin == 4 || isMedianMode && nargin == 4
+            if isMean && nargin == 4 || isMedianMode && nargin == 4
                 expnd=[false;(isCol & (1-eye(length(sz)))*double(isArray) > 0)];
             else
                 expnd=(isCol & (1-eye(length(sz)))*double(isArray) > 0);
