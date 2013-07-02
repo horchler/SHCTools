@@ -7,7 +7,7 @@ function net=shc_initialize(net,reinit)
 %       SHC_CREATENETWORK, BUILDRHO, SHC_CREATE, SHC_LV_PARAMS, SHC_LV_SYMPARAMS
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 1-14-12
-%   Revision: 1.2, 7-1-13
+%   Revision: 1.2, 7-2-13
 
 
 % Check for 'reset' mode to clear and reset 'children', 'index,' and 'T' fields
@@ -145,7 +145,8 @@ for i = 1:nnets
             if isscalar(alp)
                 s.gamma = 2*alp+zeros(s.size);
             else
-                s.gamma = alp*z.'+z*alp.';
+                gam = alp(:,z);
+                s.gamma = gam+gam.';
             end
             if isscalar(bet)
                 s.gamma = s.gamma/bet;
