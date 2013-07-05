@@ -13,7 +13,7 @@ function s=shc_lv_symequilibria(rho)
 %       SHC_LV_JACOBIAN, SHC_LV_EIGS, SHC_CREATE, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 1-3-11
-%   Revision: 1.2, 5-4-13
+%   Revision: 1.2, 7-5-13
 
 
 % Check Rho matrix
@@ -68,4 +68,10 @@ if isa(p,'sym') || isa(alpv,'sym')
 else
     % Convert back to class of rho and alpv if neither is symbolic
     s = cast([s{:}],superiorfloat(class(p),class(alpv))).';
+end
+if size(s,2) ~= 2^n
+    warning('SHTools:shc_lv_symequilibria:Singularity',...
+           ['Singularity. Fewer than 2^N = %d equilibria were found. Some '...
+            'equilibria are located at +/-Inf in one or more dimensions '...
+            'for the parameters describing RHO.'],2^n);
 end
