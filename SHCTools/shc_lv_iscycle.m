@@ -24,7 +24,7 @@ function tf=shc_lv_iscycle(net,S)
 %       SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_CREATE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 2-12-13
-%   Revision: 1.2, 5-4-13
+%   Revision: 1.2, 7-30-13
 
 
 % Check network
@@ -91,9 +91,9 @@ else
     % Check signs of elements of connection matrix
     if ~isNegative
         if isPositive
-            tf = all(net.rho(:) > 0);
+            tf = all(relopsym(net.rho(:) > 0));
         else
-            tf = all(net.rho(:) >= 0);
+            tf = all(relopsym(net.rho(:) >= 0));
         end
         if ~tf
             return;

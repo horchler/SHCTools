@@ -24,7 +24,7 @@ function nu=shc_lv_stability(net,M)
 %       SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_CREATE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-30-12
-%   Revision: 1.2, 5-4-13
+%   Revision: 1.2, 7-30-13
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the
 %   Phase Plane," Nieuw Archief Voor Wiskunde (3), Vol. 27, 1979, pp. 238-254.
@@ -84,7 +84,18 @@ if nargin == 2
     E = shc_lv_eigs(net,M);
     if isa(E,'sym')
         lambda_u = minsym(E(relopsym(E > 0)));
+        if isequal(lambda_u,'undefined')
+            error('SHTools:shc_lv_stability:IndeterminiteLambda_UNode',...
+                 ['Cannot determine smallest unstable eigenvalue for node '...
+                  '%d from symbolic assumptions.'],M);
+        end
+        
         lambda_s = -maxsym(E(relopsym(E < 0)));
+        if isequal(lambda_s,'undefined')
+            error('SHTools:shc_lv_stability:IndeterminiteLambda_SNode',...
+                 ['Cannot determine largest stable eigenvalue for node %d '...
+                  'from symbolic assumptions.'],M);
+        end
     else
         lambda_u = min(E(E > 0));
         lambda_s = -max(E(E < 0));
@@ -103,7 +114,18 @@ else
     for i = m:-1:1
         if isSym
             lambda_u = minsym(E(relopsym(E(:,i) > 0),i));
+            if isequal(lambda_u,'undefined')
+                error('SHTools:shc_lv_stability:IndeterminiteLambda_U',...
+                     ['Cannot determine smallest unstable eigenvalue for '...
+                      'node %d from symbolic assumptions.'],i);
+            end
+            
             lambda_s = -maxsym(E(relopsym(E(:,i) < 0),i));
+            if isequal(lambda_s,'undefined')
+                error('SHTools:shc_lv_stability:IndeterminiteLambda_S',...
+                     ['Cannot determine largest stable eigenvalue for node '...
+                      '%d from symbolic assumptions.'],i);
+            end
         else
             lambda_u = min(E(E(:,i) > 0,i));
             lambda_s = -max(E(E(:,i) < 0,i));
