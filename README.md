@@ -1,7 +1,15 @@
 SHCTools
 ========
 #####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems Based&nbsp;on&nbsp;Networks&nbsp;of&nbsp;Stable&nbsp;Heteroclinic&nbsp;Channels&nbsp;(SHCs).#####
-######Version 1.1, 6-8-13######
+######Version 1.1, 8-30-13######
+
+How to install (and uninstall) SHCTools:  
+ 1. Download and expand the *[SHCTools-master.zip](https://github.com/horchler/SHCTools/archive/master.zip)* ZIP archive of the repository.  
+ 2. Move the resultant *SHCTools-master* folder to the desired permanent location.  
+ 3. In Matlab, navigate to *SHCTools-master/SHCTools/* and run ```shc_install```. This adds the necessary files and folders to the Matlab search path. To uninstall SHCTools, run ```shc_install('remove')```.  
+&nbsp;  
+
+--------
 
 SHC network creation, modification, and visualization, and conversion.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```buildrho```](https://github.com/horchler/SHCTools/blob/master/SHCTools/buildrho.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create RHO matrix from SHC network structure.  
@@ -60,34 +68,26 @@ XML validation files.
 --------
 
 References  
-&nbsp;  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;V.S. Afraimovich, M.I. Rabinovich, and P. Varona, &#8220;Heteroclinic contours in neural ensembles and the winnerless competition,&#8221;  
-&nbsp;&nbsp;&nbsp;&nbsp; *Int. J. Bifurcation Chaos*, Vol. 14, 2004, pp. 1195&ndash;1208. [[PDF Preprint](http://arxiv.org/abs/nlin/0304016)] [[http://dx.doi.org/10.1142/S0218127404009806](http://dx.doi.org/10.1142/S0218127404009806)]  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;M.I. Rabinovich, R. Huerta, P. Varona, and V.S. Afraimovich, &#8220;Transient Cognitive Dynamics, Metastability, and Decision  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Making,&#8221; *PLoS Comp. Biol.*, Vol. 4, No. 5, 2008, e1000072. [[http://dx.doi.org/10.1371/journal.pcbi.1000072](http://dx.doi.org/10.1371/journal.pcbi.1000072)]  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;J.W. Reyn, &#8220;A Stability Criterion for Separatrix Polygons in the Phase Plane,&#8221; *Nieuw Archief Voor Wiskunde (3)*,  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Vol. 27, 1979, pp. 238&ndash;254. [[PDF](https://github.com/horchler/SHCTools/blob/master/references/reyn_criterion_1979.pdf?raw=true)]  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;K.M. Shaw, Y.-M. Park, H.J. Chiel, and P.J. Thomas, &#8220;Phase Resetting in an Asymptotically Phaseless System:  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;On the Phase Response of Limit Cycles Verging on a Heteroclinic Orbit,&#8221; *SIAM J. Appl. Dyn. Syst.*,  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Vol. 11, No. 1, 2012, pp. 350&ndash;391. [[http://dx.doi.org/10.1137/110828976](http://dx.doi.org/10.1137/110828976)]  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;E. Stone and P. Holmes, &#8220;Random Perturbations of Heteroclinic Attractors,&#8221; *SIAM J. Appl. Math.*,  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Vol. 50, No. 3, 1990, pp. 726&ndash;743. [[http://jstor.org/stable/2101884](http://jstor.org/stable/2101884)]  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;V.S. Afraimovich, M.I. Rabinovich, and P. Varona, &#8220;Heteroclinic contours in neural ensembles and the winnerless competition,&#8221; *Int. J. Bifurcation Chaos*, Vol. 14, 2004, pp. 1195&ndash;1208. [[PDF Preprint](http://arxiv.org/abs/nlin/0304016)] [[http://dx.doi.org/10.1142/S0218127404009806](http://dx.doi.org/10.1142/S0218127404009806)]  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;M.I. Rabinovich, R. Huerta, P. Varona, and V.S. Afraimovich, &#8220;Transient Cognitive Dynamics, Metastability, and Decision Making,&#8221; *PLoS Comp. Biol.*, Vol. 4, No. 5, 2008, e1000072. [[http://dx.doi.org/10.1371/journal.pcbi.1000072](http://dx.doi.org/10.1371/journal.pcbi.1000072)]  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;J.W. Reyn, &#8220;A Stability Criterion for Separatrix Polygons in the Phase Plane,&#8221; *Nieuw Archief Voor Wiskunde (3)*, Vol. 27, 1979, pp. 238&ndash;254. [[PDF](https://github.com/horchler/SHCTools/blob/master/references/reyn_criterion_1979.pdf?raw=true)]  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;K.M. Shaw, Y.-M. Park, H.J. Chiel, and P.J. Thomas, &#8220;Phase Resetting in an Asymptotically Phaseless System: On the Phase Response of Limit Cycles Verging on a Heteroclinic Orbit,&#8221; *SIAM J. Appl. Dyn. Syst.*, Vol. 11, No. 1, 2012, pp. 350&ndash;391. [[http://dx.doi.org/10.1137/110828976](http://dx.doi.org/10.1137/110828976)]  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;E. Stone and P. Holmes, &#8220;Random Perturbations of Heteroclinic Attractors,&#8221; *SIAM J. Appl. Math.*, Vol. 50, No. 3, 1990, pp. 726&ndash;743. [[http://jstor.org/stable/2101884](http://jstor.org/stable/2101884)]  
 &nbsp;  
 
 --------
 
 Andrew D. Horchler, *adh9 @ case . edu*, [biorobots.case.edu](http://biorobots.case.edu/)  
-Created: 1-4-12, Revision: 1.1, 6-8-13  
+Created: 1-4-12, Revision: 1.1, 8-30-13  
 
-This version tested with Matlab 8.0.0.783 (R2012b)  
-Mac OS X 10.8.4 (Build: 12E55), Java 1.6.0_45-b06-451-11M4406  
+This version tested with Matlab 8.1.0.604 (R2013a)  
+Mac OS X 10.8.4 (Build: 12E55), Java 1.6.0_51-b11-457-11M4509  
 Compatibility maintained back through Matlab 7.4 (R2007a)  
 &nbsp;  
 
 --------
 
-Acknowledgment of support: This material is based upon work supported by the [National Science Foundation](http://www.nsf.gov/) under  
-[Grant No.&nbsp;1065489](http://www.nsf.gov/awardsearch/showAward.do?AwardNumber=1065489). Disclaimer: Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.  
+Acknowledgment of support: This material is based upon work supported by the [National Science Foundation](http://www.nsf.gov/) under [Grant No.&nbsp;1065489](http://www.nsf.gov/awardsearch/showAward.do?AwardNumber=1065489). Disclaimer: Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.  
 &nbsp;  
 
 Copyright &copy; 2012&ndash;2013, Andrew D. Horchler  

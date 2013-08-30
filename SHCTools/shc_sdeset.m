@@ -58,7 +58,7 @@ function options=shc_sdeset(varargin)
 %   via Y(t) = MAX(Y(t),0). Set this property to the string 'abs' to specify
 %   that the absolute value function be used instead: Y(t) = ABS(Y(t)). If this
 %   property to 'no', no function will be applied and the output will not be
-%   kept non-negative.An empty vector, [], is equivalent to 'max'.
+%   kept non-negative. An empty vector, [], is equivalent to 'max'.
 %
 %EventsFUN - Locate multiple zero-crossing events  [ function_handle ]
 %   Set this property to a function handle in order to specify an events
@@ -103,7 +103,7 @@ function options=shc_sdeset(varargin)
 %   SHC_SDESET is based on an updating of version 1.46.4.10 of Matlab's ODESET.
 
 %   Andrew D. Horchler, adh9 @ case . edu, 10-27-10
-%   Revision: 1.2, 5-4-13
+%   Revision: 1.2, 8-20-13
 
 
 options = struct(	'RandSeed',         [],...
