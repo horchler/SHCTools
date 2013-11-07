@@ -76,7 +76,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 4-22-13
+%   Revision: 1.0, 11-7-13
 
 
 % Check number of input and output arguments
@@ -244,7 +244,7 @@ elseif isNoCensoring
     % Estimate Lambda_U parameter as a starting value
     fx=freq.*x;
     wtx=sum(fx)/n;
-    lambda_uhat=sqrt(4/(pi*(sum(x.*fx)/n-wtx^2)));  % = (2/sqrt(pi))/std(x)
+    lambda_uhat=sqrt((n-1)*4/(pi*(sum(x.*fx)-n*wtx^2)));   % = 2/sqrt(pi*var(x))
 else
     xuncensored=x(uncensored);
     if range(xuncensored) < eps(min(xuncensored))
@@ -312,22 +312,30 @@ end
 
 % Negative likelihood equation for Lambda_U, Lambda_S = Inf
 function z=likeeq_UInf(lambda_u,x,n,wtx,freq)
-ex=exp(2*lambda_u*x);
+lx=2*lambda_u*x;
+ex=exp(lx);
+if any(ex == Inf)
+    ex=exp(vpa(lx));
+end
 ex1=1./(ex-1);
 s1=2*x.*ex.*ex1;
 
 % Times -2/n
-z=-3/lambda_u+n*sum(freq.*s1)-wtx ...
-    -sum(freq.*(lambda_u*s1-1).*ex1)/(lambda_u*sum(freq.*ex1));
+z=double(-3/lambda_u+n*sum(freq.*s1)-wtx ...
+    -sum(freq.*(lambda_u*s1-1).*ex1)/(lambda_u*sum(freq.*ex1)));
  
 
 % Negative likelihood equation for Lambda_U given Lambda_S
 function z=likeeq_US(lambda_u,lambda_s,x,n,wtx,freq)
+lx=2*lambda_u*x;
+ex=exp(lx);
+if any(ex == Inf)
+    ex=exp(vpa(lx));
+end
 lam1=1+lambda_u/lambda_s;
-ex=exp(2*lambda_u*x);
 ex1=1./(lam1*ex-1);
 s1=(1/lambda_s+2*lam1*x).*ex.*ex1;
 
 % Times -2/n
-z=-2/(lambda_u+lambda_s)-3/lambda_u+n*sum(freq.*s1)-wtx ...
-     -sum(freq.*(lambda_u*s1-1).*ex1)/(lambda_u*sum(freq.*ex1));
+z=double(-2/(lambda_u+lambda_s)-3/lambda_u+n*sum(freq.*s1)-wtx ...
+     -sum(freq.*(lambda_u*s1-1).*ex1)/(lambda_u*sum(freq.*ex1)));
