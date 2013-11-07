@@ -287,8 +287,13 @@ elseif eps(likelihoodval) > options.TolX
 end
 
 % Calculate explicit MLE for Theta (Epsilon/Delta) in terms of Lambda_U
-theta=sqrt(2*lambda_uhat*sum(freq./((1+...
-      lambda_uhat/lambda_s)*exp(2*lambda_uhat*x)-1))/n);
+lx=2*lambda_uhat*x;
+if any(lx > log(realmax))
+    theta=double(sqrt(2*lambda_uhat*sum(freq./((1+...
+          lambda_uhat/lambda_s)*exp(vpa(lx))-1))/n));
+else
+    theta=sqrt(2*lambda_uhat*sum(freq./((1+lambda_uhat/lambda_s)*exp(lx)-1))/n);
+end
 
 % Output fitted parameters
 if nargout <= 1
@@ -313,9 +318,10 @@ end
 % Negative likelihood equation for Lambda_U, Lambda_S = Inf
 function z=likeeq_UInf(lambda_u,x,n,wtx,freq)
 lx=2*lambda_u*x;
-ex=exp(lx);
-if any(ex == Inf)
+if any(lx > log(realmax))
     ex=exp(vpa(lx));
+else
+    ex=exp(lx);
 end
 ex1=1./(ex-1);
 s1=2*x.*ex.*ex1;
@@ -328,9 +334,10 @@ z=double(-3/lambda_u+n*sum(freq.*s1)-wtx ...
 % Negative likelihood equation for Lambda_U given Lambda_S
 function z=likeeq_US(lambda_u,lambda_s,x,n,wtx,freq)
 lx=2*lambda_u*x;
-ex=exp(lx);
-if any(ex == Inf)
+if any(lx > log(realmax))
     ex=exp(vpa(lx));
+else
+    ex=exp(lx);
 end
 lam1=1+lambda_u/lambda_s;
 ex1=1./(lam1*ex-1);
