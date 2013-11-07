@@ -14,7 +14,7 @@ function [tau_bar,N,tau]=shc_lv_meanperiod(net,epsilon_hat,N)
 %       STONEHOLMESPASSAGETIME, SHC_LV_PARAMS, SHC_CREATE, SHC_LV_INTEGRATE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.2, 5-4-13
+%   Revision: 1.2, 8-8-13
 
 
 % Check network
@@ -60,6 +60,30 @@ if nargin > 2
     end
 else
     N = 300;
+end
+
+persistent NET_CACHE EPSILON_HAT_CACHE NIN_CACHE NARGOUT_CACHE ...
+    TAU_BAR_CACHE NOUT_CACHE TAU_CACHE
+if isempty(NET_CACHE)
+    NET_CACHE = net;
+    EPSILON_HAT_CACHE = epsilon_hat;
+    NIN_CACHE = N;
+    NARGOUT_CACHE = nargout;
+elseif isequal(NET_CACHE,net) && isequal(EPSILON_HAT_CACHE,epsilon_hat) ...
+        && isequal(NIN_CACHE,N) && isequal(NARGOUT_CACHE,nargout)
+    tau_bar = TAU_BAR_CACHE;
+    if nargout > 1
+        N = NOUT_CACHE;
+        if nargout > 2
+            tau = TAU_CACHE;
+        end
+    end
+    return;
+else
+    NET_CACHE = net;
+    EPSILON_HAT_CACHE = epsilon_hat;
+    NIN_CACHE = N;
+    NARGOUT_CACHE = nargout;
 end
 
 % Find global mean first passage time to estimate integration time
@@ -161,6 +185,13 @@ CatchWarningObj = catchwarning('',...
 tau_bar = stoneholmespassagetime(delhat,ephat,lamuhat,lamshat);
 tau_bar = tau_bar([2:end 1]);
 tau_bar = tau_bar(:);
+TAU_BAR_CACHE = tau_bar;
+if nargout > 1
+    NOUT_CACHE = N;
+    if nargout > 2
+        TAU_CACHE = tau;
+    end
+end
     
 % Re-enable warning in stoneholmespassagetime()
 delete(CatchWarningObj);
