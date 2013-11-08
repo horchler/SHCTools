@@ -1,4 +1,4 @@
-function y=stoneholmescv(x,dim)
+function y=stoneholmescv(x,flag,dim)
 %STONEHOLMESCV  Coefficient of variation for Stone-Holmes distribution samples.
 %   Y = STONEHOLMESCV(X) returns the coefficient of variation of the values in
 %   the vector X. If X is a matrix, Y is a row vector containing the coefficient
@@ -7,14 +7,22 @@ function y=stoneholmescv(x,dim)
 %   non-finite or fall outside of the (0, Inf] support of the Stone-Holmes
 %   distribution, are treated as missing values and ignored.
 %
-%   STONEHOLMESCV normalizes Y by N-3/2-K/4 if N > 3, where N is the sample size
-%   and K is the bias-adjusted kurtosis. This is an approximation of an unbiased
-%   estimator for the standard deviation of the population from which X is
-%   drawn, as long as X consists of independent, identically distributed samples
-%   from the Stone-Holmes distribution. For N = 2 and N = 3, Y is normalized by
-%   N-1. For N = 1, Y is normalized by N.
+%   STONEHOLMESCV normalizes Y by N-1 if N > 1, where N is the sample size. This
+%   is an unbiased estimator of the variance of the population from which X is
+%   drawn, as long as X consists of independent, identically distributed
+%   samples. For N = 1, Y is normalized by N.
 %
-%   Y = STONEHOLMESCV(X,DIM) returns the coefficient of variation along the
+%   STONEHOLMESCV(X,1) normalizes by N and produces the second moment of the
+%   sample about its mean. STONEHOLMESCV(X,0) is the same as STONEHOLMESCV(X).
+%
+%   STONEHOLMESCV(X,2) normalizes by N-3/2-K/4 if N > 3, where K is the
+%   bias-adjusted kurtosis. This is an approximation of an unbiased estimator
+%   for the standard deviation of the population from which X is drawn, as long
+%   as X consists of independent, identically distributed samples from the
+%   Stone-Holmes distribution. For N = 2 and N = 3, Y is normalized by N-1. For
+%   N = 1, Y is normalized by N.
+%
+%   Y = STONEHOLMESCV(X,FLAG,DIM) returns the coefficient of variation along the
 %   dimension DIM of X.
 %
 %   See also:
@@ -22,7 +30,7 @@ function y=stoneholmescv(x,dim)
 %       STONEHOLMESPASSAGETIME, STONEHOLMESSTAT
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-6-13
-%   Revision: 1.0, 6-8-13
+%   Revision: 1.0, 11-8-13
 
 
 %Check x
@@ -31,25 +39,35 @@ if ~isfloat(x)
           'The input X must be a floating-point array.')
 end
 
-% Check dim
+% Check flag
 if nargin < 2
-    % Special case to match form of VAR and NANVAR
-    if isequal(x,[])
-        y = NaN(class(x));
-        return;
+    flag = 0;
+else
+    if ~isscalar(flag) || ~any(flag == 0:2)
+        error('SHCTools:stoneholmescv:InvalidFlag',...
+              'The second input must be 0, 1, or 2.');
     end
     
-    % First non-singleton dimension
-    dim = find(size(x)~=1,1);
-    if isempty(dim)
-        dim = 1;
-    end
-else
-    if ~isscalar(dim) || ~isnumeric(dim) || ~isreal(dim) || ~isfinite(dim) ...
-            || dim < 1 || floor(dim) ~= dim
-        error('SHCTools:stoneholmescv:InvalidDimension',...
-             ['The dimension argument must be a finite real positive '...
-              'integer scalar within the indexing range.'])
+    % Check dim
+    if nargin < 3
+        % Special case to match form of VAR and NANVAR
+        if isequal(x,[])
+            y = NaN(class(x));
+            return;
+        end
+
+        % First non-singleton dimension
+        dim = find(size(x)~=1,1);
+        if isempty(dim)
+            dim = 1;
+        end
+    else
+        if ~isscalar(dim) || ~isnumeric(dim) || ~isreal(dim) || dim < 1 ...
+                || dim > ndims(x) || floor(dim) ~= dim
+            error('SHCTools:stoneholmescv:InvalidDimension',...
+                 ['The dimension argument must be a finite real positive '...
+                  'integer scalar within the indexing range of X.'])
+        end
     end
 end
 
@@ -74,10 +92,14 @@ if any(xnan)
         end
     end
     
-    if n < 4
-        y = sqrt(nanvar(x,0,dim))./mu;
+    if flag == 2
+        if n < 4
+            y = sqrt(nanvar(x,0,dim))./mu;
+        else
+            y = sqrt((n-1)*nanvar(x,0,dim)./(n-0.75-0.25*kurtosis(x,0,dim)))./mu;
+        end
     else
-        y = sqrt((n-1)*nanvar(x,0,dim)./(n-0.75-0.25*kurtosis(x,0,dim)))./mu;
+        y = sqrt(nanvar(x,flag,dim))./mu;
     end
 else
     mui = n./sum(x,dim);
@@ -96,9 +118,13 @@ else
         end
     end
     
-    if n < 4
-        y = sqrt(var(x,0,dim)).*mui;
+    if flag == 2
+        if n < 4
+            y = sqrt(var(x,0,dim)).*mui;
+        else
+            y = sqrt((n-1)*var(x,0,dim)./(n-0.75-0.25*kurtosis(x,0,dim))).*mui;
+        end
     else
-        y = sqrt((n-1)*var(x,0,dim)./(n-0.75-0.25*kurtosis(x,0,dim))).*mui;
+        y = sqrt(var(x,flag,dim)).*mui;
     end
 end
