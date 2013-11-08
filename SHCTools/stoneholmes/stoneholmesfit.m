@@ -76,7 +76,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 11-7-13
+%   Revision: 1.0, 11-8-13
 
 
 % Check number of input and output arguments
@@ -319,7 +319,7 @@ end
 function z=likeeq_UInf(lambda_u,x,n,wtx,freq)
 lx=2*lambda_u*x;
 if any(lx > log(realmax))
-    ex=exp(vpa(lx));
+    ex=exp(vpa(sym(lx)));
 else
     ex=exp(lx);
 end
@@ -335,7 +335,7 @@ z=double(-3/lambda_u+n*sum(freq.*s1)-wtx ...
 function z=likeeq_US(lambda_u,lambda_s,x,n,wtx,freq)
 lx=2*lambda_u*x;
 if any(lx > log(realmax))
-    ex=exp(vpa(lx));
+    ex=exp(vpa(sym(lx)));
 else
     ex=exp(lx);
 end
