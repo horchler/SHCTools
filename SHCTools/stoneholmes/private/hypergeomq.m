@@ -7,10 +7,11 @@ function h=hypergeomq(n,d,z)
 %   single-precision, in which case, H will be as well.
 %
 %   HYPERGEOMQ uses the same low-level function as HYPERGEOM, but implements
-%   several optimizations to achieve a performance boost of an order of
-%   magnitude, or greater. Results from the two functions should agree to the
+%   several optimizations to achieve a performance boost of approximately an
+%   order of magnitude. Results from the two functions should agree to the
 %   precision of the inputs. Additionaly, HYPERGEOMQ can avoid some errors due
-%   to singularities that can occur when HYPERGEOM is evaluated with numeric Z.
+%   to singularities that can occur when HYPERGEOM is evaluated with numeric Z
+%   values.
 %
 %   Examples:
 %       % An identity for the hypergeomentric function 1F0(a;;z)
@@ -24,12 +25,15 @@ function h=hypergeomq(n,d,z)
 %       figure; loglog(z,abs(h1),'k',z,abs(h2)); grid on;
 %       xlabel('z'); ylabel('|1F1(a;b;z)|, |2F1(a,b;c;z)|');
 %       legend('_1F_1(a_1;b;z)','_2F_1(a_1,200;b;z/200)',...
-%           '_2F_1(a_1,500;b;z/500)','_2F_1(a_1,2000;b;z/2000)',2);       
+%           '_2F_1(a_1,500;b;z/500)','_2F_1(a_1,2000;b;z/2000)',2);
+%
+%   Class support for ouput H:
+%       float: double, single
 %
 %   See also: HYPERGEOM, SYM/HYPERGEOM.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-22-12
-%   Revision: 1.0, 8-11-12
+%   Revision: 1.1, 11-14-12
 
 
 % Check zeroes
@@ -70,90 +74,25 @@ if ~all(isfinite(z))
 end
 
 if isa(z,'single')
-    outType = 'single';
-    scanStr = '%f32';
+    dtype = 'single';
 else
-    outType = 'double';
-    scanStr = '%f64';
+    dtype = 'double';
 end
 if isempty(z)
-    h = zeros(size(z),outType);
+    h = zeros(size(z),dtype);
 else
     % Convert zeroes to a string
-    if isempty(n)
-        N = '[]';
-    else
-        if isfloat(n)
-            if isa(n,'single')
-                printStr = '%.7g';
-            else
-                printStr = '%.15g';
-            end
-        else
-            printStr = '%d';
-        end
-        if isreal(n)
-            N = sprintf(printStr,n(1));
-            if ~isscalar(n)
-                N = ['[' N sprintf([',' printStr],n(2:end)) ']'];
-            end
-        else
-            N = sprintf([printStr '+' printStr '*i'],real(n(1)),imag(n(1)));
-            if ~isscalar(n)
-                N = ['[' N sprintf([',' printStr '+' printStr '*i'],...
-                    real(n(2:end)),imag(n(2:end))) ']'];
-            end
-        end
-    end
+    N = float2str(n);
     
     % Convert poles to a string
-    if isempty(d)
-        D = '[]';
-    else
-        if isfloat(d)
-            if isa(d,'single')
-                printStr = '%.7g';
-            else
-                printStr = '%.15g';
-            end
-        else
-            printStr = '%d';
-        end
-        if isreal(d)
-            D = sprintf(printStr,d(1));
-            if ~isscalar(d)
-                D = ['[' D sprintf([',' printStr],d(2:end)) ']'];
-            end
-        else
-            D = sprintf([printStr '+' printStr '*i'],real(d(1)),imag(d(1)));
-            if ~isscalar(d)
-                D = ['[' D sprintf([',' printStr '+' printStr '*i'],...
-                    real(d(2:end)),imag(d(2:end))) ']'];
-            end
-        end
-    end
-    
-    % Set number of variable precision digits and format strings for writing z
-    if isa(z,'double') || isa(z,'int64') || isa(z,'uint64')
-        r = digits(17);
-        printStr = '%.15f';
-    elseif isa(z,'int32') || isa(z,'uint32')
-        r = digits(10);
-        printStr = '%.10f';
-    else
-        r = digits(9);
-        printStr = '%.7f';
-    end
-    
-    % Ensure the variable precision digits are reset to original value
-    C = onCleanup(@()digits(r));
+    D = float2str(d);
     
     % Try getting an analytic expression as a function of z
     mupadmexExists = (exist('mupadmex','file') == 3);
     
     if mupadmexExists
         % Low-level function with pre-formatted arguments, no validation
-        sy = mupadmex('symobj::map','z','symobj::hypergeom',N,D);
+        sy = mupadmex('symobj::hypergeom','z',N,D);
         sc = mupadmex('symobj::char',charcmd(sy),0);
         if ~isempty(strncmp(sc,'"_symans_',9))
             sc = char(sy);
@@ -172,39 +111,24 @@ else
             sc = strrep(sc,'^','.^');
         end
         
-        % Analytical expression can return errors, e.g. hypergeomq(1,0.5,-1)
+        % Analytical expression can return errors, e.g., hypergeomq(1,0.5,-1)
         try
-            h = eval(sc(2:end-1));
+            h = eval(sc);
             return;
         catch	%#ok<CTCH>  
         end
     end
     
     % Convert Z values to a string
-    if isreal(z)
-        Z = sprintf(printStr,z(1));
-        if ~isscalar(z)
-            Z = ['[' Z sprintf([',' printStr],z(2:end)) ']'];
-        end
-    else
-        Z = sprintf([printStr '+' printStr '*i'],real(z(1)),imag(z(1)));
-        if ~isscalar(z)
-            Z = ['[' Z sprintf([',' printStr '+' printStr '*i'],...
-                real(z(2:end)),imag(z(2:end))) ']'];
-        end
-    end
+    Z = float2str(z);
 
+    % Evaluate numerically
     try
         if mupadmexExists
             % Low-level function with pre-formatted arguments and no validation
-            hy = mupadmex('symobj::map',Z,'symobj::hypergeom',N,D);
-            hc = mupadmex('symobj::char',charcmd(hy),0);
-            if ~isempty(strncmp(hc,'"_symans_',9))
-                hc = char(hy);
-            end
+            h = mupadmex('map',Z,'symobj::hypergeom',N,D);
         else
-            % Pass string arguments and convert output to string
-            hc = char(hypergeom(N,D,Z));
+            h = hypergeom(N,D,Z);
         end
     catch ME
         if strcmp(ME.identifier,'symbolic:mupadmex:CommandError')...
@@ -217,31 +141,13 @@ else
         end
     end
     
-    % Replace special constants and format for conversion
-    hc = strrep(hc,'RD_INF','Inf');
-    hc = strrep(hc,'RD_NINF','-Inf');
-    hc = strrep(hc,'RD_NAN','NaN');
-    hc = strrep(hc,' ','');
-    hc = strrep(hc,'*i','i');
-    
     % Convert output to floating point - much faster than calling sym/double
-    if isscalar(z)
-        h = cast(str2double(hc(2:end-1)),outType);
-    else
-        % Trim "matrix([[ and ]])", format complex values as A + Bi
-        hc = hc(11:end-4);
-        if ~isempty(find(hc == 'i',1))
-            hc = regexprep(hc,'([^,]*i)([^,]*)','$2+$1');
-            hc = strrep(hc,'+-','-');
-        end
-        hc = textscan(hc,scanStr,'Delimiter',',');
-        h = [hc{:}];
-
-        % Reshape matrix and multi-dimensional array inputs
-        if ~isvector(z)
-            h = reshape(h,size(z));
-        elseif ~isscalar(z) && size(z,1) == 1
-            h = h.';
-        end
+	h = sym2float(h,dtype);
+    
+    % Reshape matrix and multi-dimensional array inputs
+    if ~isvector(z)
+        h = reshape(h,size(z));
+    elseif size(z,1) > 1
+        h = h.';
     end
 end
