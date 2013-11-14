@@ -1,28 +1,35 @@
-function y=gammaincNegative(z,a,varargin)
-%GAMMAINCNEGATIVE  Evaluates the unscaled incomplete gamma function for all A.
-%   Y = GAMMAINCNEGATIVE(Z,A) returns the lower incomplete gamma function not
-%   scaled by 1/GAMMA(A). Z and A must be the same size (or either can be a
-%   scalar) and non-sparse. Variable precision methods are used unless Z and A
-%   are real and the elements of A are nonnegative, in which case GAMMAINC is
-%   evaluated directly. The unscaled lower incomplete gamma function is defined
-%   as:
+function y=gammaincq(z,a,varargin)
+%GAMMAINCQ  Evaluates the unscaled incomplete gamma function for all A.
+%   Y = GAMMAINCQ(Z,A) returns the lower incomplete gamma function. Z and A must
+%   be the same size (or either can be a scalar) and non-sparse. Variable
+%   precision methods are used unless Z and A are real and the elements of A are
+%   nonnegative, in which case the numerical GAMMAINC is used directly. The
+%   unscaled lower incomplete gamma function is defined as:
 %
-%       gammaincNegative(Z,A) = integral from 0 to z of t^(a-1) exp(-t) dt
+%       gammaincq(Z,A) = integral from 0 to z of t^(a-1) exp(-t) dt
 %
-%   Y = GAMMAINCNEGATIVE(Z,A,TAIL) specifies the tail of the incomplete gamma
-%   function, 'upper' or 'lower' (default). These two options are related as
-%   follows:
+%   Y = GAMMAINCQ(Z,A,TAIL) specifies the tail of the incomplete gamma function,
+%   'upper' or 'lower' (default). The unscaled upper incomplete gamma function
+%   is defined as:
 %
-%       gammaincNegative(Z,A,'upper') = gamma(A) - gammaincNegative(Z,A,'lower')
+%       gammaincq(Z,A,'upper') = integral from z to +inf of t^(a-1) exp(-t) dt
 %
-%   Y = GAMMAINCNEGATIVE(Z1,Z2,A) uses variable precision methods to accurately
-%   evaluate the generalized incomplete gamma function defined as:
+%   These two options are related as follows:
 %
-%       gammaincNegative(Z1,Z2,A) = integral from z1 to z2 of t^(a-1) exp(-t) dt
+%       gammaincq(Z,A,'upper') = gamma(A) - gammaincq(Z,A,'lower')
 %
-%   which is mathematically equivalent to:
+%   Y = GAMMAINCQ(Z1,Z2,A) uses variable precision methods to avoids
+%   cancellation errors and accurately evaluate the generalized incomplete gamma
+%   function, which is defined as:
 %
-%       gammaincNegative(Z1,A,'upper') - gammaincNegative(Z2,A,'upper')
+%       gammaincq(Z1,Z2,A) = integral from z1 to z2 of t^(a-1) exp(-t) dt
+%
+%   This is mathematically equivalent to:
+%
+%       gammaincq(Z1,Z2,A) = gammaincq(Z1,A,'lower') - gammaincq(Z2,A,'lower')
+%                          = gammaincq(Z1,A,'upper') - gammaincq(Z2,A,'upper')
+%
+%   Additionally, GAMMAINCQ(Z1,Z2,A) is equal to -GAMMAINCQ(Z2,Z1,A).
 %
 %   Class support for inputs Z,A:
 %       float: double, single
@@ -32,13 +39,13 @@ function y=gammaincNegative(z,a,varargin)
 %   Based on: http://functions.wolfram.com/GammaBetaErf/Gamma3/
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-5-12
-%   Revision: 1.1, 11-13-13
+%   Revision: 1.1, 11-14-13
 
 
 isGeneralized = (nargin > 2 && isfloat(varargin{1}));
 if ~isfloat(z) || ~isfloat(a) || issparse(z) || issparse(a) ...
         || isGeneralized && issparse(varargin{1})
-    error('gammaincNegative:InvalidDatatype',...
+    error('gammaincq:InvalidDatatype',...
           'Inputs must be floating-point and non-sparse.');
 end
 
@@ -50,14 +57,14 @@ else
         if isscalar(z)
             y = a;
         else
-            error('gammaincNegative:EmptyInputA','Input sizes must match.');
+            error('gammaincq:EmptyInputA','Input sizes must match.');
         end
         return;
     elseif isempty(z)
         if isscalar(a)
             y = z;
         else
-            error('gammaincNegative:EmptyInputX','Input sizes must match.');
+            error('gammaincq:EmptyInputX','Input sizes must match.');
         end
         return;
     end
@@ -77,7 +84,7 @@ else
                 ['map(' as ',s->igamma(s,' z1s ')-igamma(s,' z2s '))']);
         elseif isscalar(z)
             if ndims(v) ~= ndims(a) || ~all(size(v) == size(a))
-                error('gammaincNegative:DimensionMismatchZ2A',...
+                error('gammaincq:DimensionMismatchZ2A',...
                       'Non-scalar inputs must have the same dimensions.');
             end
             
@@ -85,7 +92,7 @@ else
                 ['map(' as ',s->igamma(s,' z1s ')-zip(' as ',' z2s ',igamma)']);
         elseif isscalar(a)
             if ndims(z) ~= ndims(a) || ~all(size(z) == size(a))
-                error('gammaincNegative:DimensionMismatchZ1A',...
+                error('gammaincq:DimensionMismatchZ1A',...
                       'Non-scalar inputs must have the same dimensions.');
             end
             
@@ -93,7 +100,7 @@ else
                 ['zip(' as ',' z1s ',igamma)-map(' as ',s->igamma(s,' z2s ')']);
         else
             if ~isequal(size(z),size(a),size(v))
-                error('gammaincNegative:DimensionMismatch',...
+                error('gammaincq:DimensionMismatch',...
                       'Non-scalar inputs must have the same dimensions.');
             end
             
@@ -106,7 +113,7 @@ else
         elseif strcmp(varargin{1},'upper')
             isLower = false;
         else
-            error('gammaincNegative:InvalidTail',...
+            error('gammaincq:InvalidTail',...
                   'Tail must be ''upper'' or ''lower'' (default).');
         end
         
@@ -131,7 +138,7 @@ else
             end
         else
             if ndims(z) ~= ndims(a) || ~all(size(z) == size(a))
-                error('gammaincNegative:DimensionMismatch',...
+                error('gammaincq:DimensionMismatch',...
                       'Inputs must have the same dimensions.');
             end
 

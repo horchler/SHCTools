@@ -12,7 +12,7 @@ function tau=meanpassagetime(delta,epsilon,lambda_u,lambda_s)
 %   Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50, No. 3, pp. 726-743,
 %   Jun. 1990. http://jstor.org/stable/2101884
 
-%   Takes advantage of the private functions HYPERGEOMQ and GAMMAINCF for
+%   Takes advantage of the private functions HYPERGEOMQ and GAMMAINCQ for
 %   improved speed and accuracy for large noise cases. The generalized gamma
 %   function capability of the latter is used to avoid cancellation errors.
 
@@ -67,7 +67,7 @@ if any(~ii)
         dk = (-deslu2).^k;
         t = gk.*gammainc(deslu2,0.5+k)./dk;
         for j = 1:length(desls2)
-            s = isk.*(t+dk.*gammaincf(deslu2,desls2(j),0.5-k));
+            s = isk.*(t+dk.*gammaincq(deslu2,desls2(j),0.5-k));
 
             s = s(isfinite(s));
             S(j) = sum(s([diff(abs(s))>=0 true]));
@@ -76,7 +76,7 @@ if any(~ii)
         for j = 1:length(deslu2)
             dk = (-deslu2(j)).^k;
             s = isk.*(gk.*gammainc(deslu2(j),0.5+k)./dk ...
-                +dk.*gammaincf(deslu2(j),desls2,0.5-k));
+                +dk.*gammaincq(deslu2(j),desls2,0.5-k));
 
             s = s(isfinite(s));
             S(j) = sum(s([diff(abs(s))>=0 true]));
@@ -85,7 +85,7 @@ if any(~ii)
         for j = 1:length(deslu2)
             dk = (-deslu2(j)).^k;
             s = isk.*(gk.*gammainc(deslu2(j),0.5+k)./dk ...
-                +dk.*gammaincf(deslu2(j),desls2(j),0.5-k));
+                +dk.*gammaincq(deslu2(j),desls2(j),0.5-k));
 
             s = s(isfinite(s));
             S(j) = sum(s([diff(abs(s))>=0 true]));
