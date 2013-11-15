@@ -146,8 +146,8 @@ else
             sz = size(z);
             if isLower
                 y = evalin(symengine,...
-                    ['symobj::map(' zs ',t->igamma(' as ',t)'...
-                     '-gamma(' as '),infinity)'],0);
+                    ['symobj::mapcatch(' zs ',t->igamma(' as ',t)'...
+                     '-gamma(' as '),infinity)']);
             else
                 y = evalin(symengine,['map(' zs ',t->igamma(' as ',t))']);
             end
@@ -156,7 +156,7 @@ else
             if isLower
                 y = evalin(symengine,...
                     ['symobj::mapcatch(' as ',s->igamma(s,' zs ')'...
-                     '-gamma(s),infinity)'],0);
+                     '-gamma(s),infinity)']);
             else
                 y = evalin(symengine,['map(' as ',s->igamma(s,' zs '))']);
             end
