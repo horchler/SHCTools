@@ -11,7 +11,7 @@ function z=sym2float(s,dtype)
 %   See also DOUBLE, SINGLE, CAST, STR2DOUBLE, SYM.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 11-11-13
-%   Revision: 1.0, 11-13-13
+%   Revision: 1.0, 11-14-13
 
 
 if ~isa(s,'sym')
@@ -55,25 +55,40 @@ catch ME
 end
 
 % Replace special constants and format for conversion
-s = strrep(s(2:end-1),'RD_INF','Inf');
+s = strrep(s,'RD_INF','Inf');
 s = strrep(s,'RD_NINF','-Inf');
 s = strrep(s,'RD_NAN','NaN');
+s = strrep(s,'"','');
 s = strrep(s,' ','');
 
-if s(1) == 'm'
-    % Count rows and trim matrix([[ ... ] ... [ ... ]])
-    m = length(strfind(s,'],['))+1;
-    s = s(find(s == '[',1):end-2);
-    s = strrep(s,'[','');
-    s = strrep(s,']','');
-
+if s(1) == '['
+    % Trim [ ... ]
+    s = s(2:end-1);
+    
     % Format complex values as A + Bi
     if ~isempty(find(s == 'i',1))
         s = strrep(s,'*i','i');
         s = regexprep(s,'([^,]*i)([^,]*)','$2+$1');
         s = strrep(s,'+-','-');
     end
-
+    
+    s = textscan(s,scanStr,'Delimiter',',');
+    z = [s{:}];
+    d = [1 length(z)];
+elseif s(1) == 'm'
+    % Count rows and trim matrix([[ ... ] ... [ ... ]])
+    m = length(strfind(s,'],['))+1;
+    s = s(find(s == '[',1):end-2);
+    s = strrep(s,'[','');
+    s = strrep(s,']','');
+    
+    % Format complex values as A + Bi
+    if ~isempty(find(s == 'i',1))
+        s = strrep(s,'*i','i');
+        s = regexprep(s,'([^,]*i)([^,]*)','$2+$1');
+        s = strrep(s,'+-','-');
+    end
+    
     s = textscan(s,scanStr,'Delimiter',',');
     z = [s{:}];
     d = [m numel(z)/m];

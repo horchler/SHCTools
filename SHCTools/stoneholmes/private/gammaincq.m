@@ -54,36 +54,56 @@ if all(a(:) >= 0) && (isreal(a) || all(imag(a(:)) == 0)) ...
     y = gammainc(real(z),real(a),varargin{:}).*gamma(real(a));
 else
     if isempty(a)
-        if isscalar(z)
+        if isscalar(z) && ~isGeneralized
             y = a;
+            return;
         else
-            error('gammaincq:EmptyInputA','Input sizes must match.');
+            if isGeneralized
+                error('gammaincq:EmptyInputZ2','Input sizes must match.');
+            else
+                error('gammaincq:EmptyInputA','Input sizes must match.');
+            end
         end
-        return;
     elseif isempty(z)
-        if isscalar(a)
+        if isscalar(a) && ~isGeneralized
             y = z;
+            return;
         else
-            error('gammaincq:EmptyInputX','Input sizes must match.');
+            if isGeneralized
+                error('gammaincq:EmptyInputZ1','Input sizes must match.');
+            else
+                error('gammaincq:EmptyInputZ','Input sizes must match.');
+            end
         end
-        return;
     end
     
     if isGeneralized
         v = varargin{1};
+        if isempty(v)
+            error('gammaincq:EmptyInputAGeneralized','Input sizes must match.');
+        end
+        
         z1s = float2str(z);
         z2s = float2str(a);
         as = float2str(v);
         dtype = superiorfloat(z,a,v);
         if isscalar(v)
+            sz = size(z);
+            if ndims(z) ~= ndims(a) || any(sz ~= size(a))
+                error('gammaincq:DimensionMismatchZ1Z2',...
+                      'Non-scalar inputs must have the same dimensions.');
+            end
+            
             y = evalin(symengine,...
                 ['map(' z1s ',t->igamma(' as ',t))'...
                  '-map(' z2s ',t->igamma(' as ',t))']);
         elseif isscalar(z) && isscalar(a)
+            sz = size(v);
             y = evalin(symengine,...
                 ['map(' as ',s->igamma(s,' z1s ')-igamma(s,' z2s '))']);
         elseif isscalar(z)
-            if ndims(v) ~= ndims(a) || ~all(size(v) == size(a))
+            sz = size(a);
+            if ndims(v) ~= ndims(a) || any(size(v) ~= sz)
                 error('gammaincq:DimensionMismatchZ2A',...
                       'Non-scalar inputs must have the same dimensions.');
             end
@@ -91,7 +111,8 @@ else
             y = evalin(symengine,...
                 ['map(' as ',s->igamma(s,' z1s ')-zip(' as ',' z2s ',igamma)']);
         elseif isscalar(a)
-            if ndims(z) ~= ndims(a) || ~all(size(z) == size(a))
+            sz = size(z);
+            if ndims(z) ~= ndims(a) || any(sz ~= size(a))
                 error('gammaincq:DimensionMismatchZ1A',...
                       'Non-scalar inputs must have the same dimensions.');
             end
@@ -99,8 +120,9 @@ else
             y = evalin(symengine,...
                 ['zip(' as ',' z1s ',igamma)-map(' as ',s->igamma(s,' z2s ')']);
         else
-            if ~isequal(size(z),size(a),size(v))
-                error('gammaincq:DimensionMismatch',...
+            sz = size(z);
+            if ~isequal(sz,size(a),size(v))
+                error('gammaincq:DimensionMismatchGeneralized',...
                       'Non-scalar inputs must have the same dimensions.');
             end
             
@@ -121,23 +143,26 @@ else
         as = float2str(a);
         dtype = superiorfloat(z,a);
         if isscalar(a)
+            sz = size(z);
             if isLower
                 y = evalin(symengine,...
                     ['symobj::map(' zs ',t->igamma(' as ',t)'...
-                     '-gamma(' as '),infinity)']);
+                     '-gamma(' as '),infinity)'],0);
             else
                 y = evalin(symengine,['map(' zs ',t->igamma(' as ',t))']);
             end
         elseif isscalar(z)
+            sz = size(a);
             if isLower
                 y = evalin(symengine,...
                     ['symobj::mapcatch(' as ',s->igamma(s,' zs ')'...
-                     '-gamma(s),infinity)']);
+                     '-gamma(s),infinity)'],0);
             else
                 y = evalin(symengine,['map(' as ',s->igamma(s,' zs '))']);
             end
         else
-            if ndims(z) ~= ndims(a) || ~all(size(z) == size(a))
+            sz = size(z);
+            if ndims(z) ~= ndims(a) || all(sz ~= size(a))
                 error('gammaincq:DimensionMismatch',...
                       'Inputs must have the same dimensions.');
             end
@@ -154,4 +179,15 @@ else
     
     % Convert output to floating point - much faster than calling sym/double
     y = sym2float(y,dtype);
+    
+    % Reshape matrix and multi-dimensional array inputs
+    if all(sz > 1)
+        if isGeneralized
+            y = reshape(y,sz);
+        else
+            y = reshape(y,sz);
+        end
+    elseif sz(1) > 1
+        y = y.';
+    end
 end
