@@ -12,7 +12,7 @@ function [alp,bet,varargout]=shc_lv_params(tau,epsilon,bet,nu,options)
 %       FSOLVE, STONEHOLMESPASSAGETIME, SHC_LV_TRANSITIONTIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
-%   Revision: 1.0, 4-25-13
+%   Revision: 1.0, 11-16-13
 
 
 % Check variable outputs
@@ -129,12 +129,11 @@ if isa(epsilon,'single')
 end
 
 classNu = class(nu);
-if any(nu < 1) || any(nu > eps(realmax(classNu)))
+if any(nu <= 0) || any(nu > eps(realmax(classNu)))
     error('SHCTools:shc_lv_params:NuTooSmallOrLarge',...
-         ['The stability parameter, Nu, must be greater than 1 and less '...
-          'than or equal to EPS(REALMAX) (1 <= Nu <= 2^%d for %s '...
-          'precision).'],log2(eps(classNu)),log2(eps(realmax(classNu))),...
-          classNu);
+         ['The stability parameter, Nu, must be greater than 0 and less '...
+          'than or equal to EPS(REALMAX) (0 < Nu <= 2^%d for %s '...
+          'precision).'],log2(eps(realmax(classNu))),classNu);
 end
 if isa(nu,'single')
     nu = cast(nu,'double');
@@ -176,11 +175,13 @@ if n == 1 || all(alp0(1) == alp0)
     net = shc_create('contour',{1,1,nu(1)},3);
     
     % Create function handle for FZERO
-    afun = @(alp)alproot1d(alp,net,tau(1),delta(1),epsilon(1),nu(1));
+    afun = @(alp)alproot1d(alp,nu(1),net,tau(1),delta(1),epsilon(1));
     
     % Find root of Stone-Holmes mean first passage time in terms of Alpha
     bounds = bracketroot(afun,alp0(1),[eps eps(realmax)],'+');
     [alp,fval,exitflag] = fzero(afun,bounds,options);
+    
+    % Re-enable warning in stoneholmespassagetime()
     delete(CatchWarningObj);
     
     % Check output from FZERO
@@ -231,11 +232,17 @@ else
     end
     net = shc_create('contour',{1,1,nu},N);
     
-    % Create function handles for FSOLVE
-    afun = @(alp)alproot(alp,net,tau,delta,epsilon,net.nu(:),N);
+    % Scale Nu if required
+    nu = alp2nu(alp0,net.nu(:));
+    net.nu = nu;
+    
+    % Create function handle for FSOLVE
+    afun = @(alp)alproot(alp,nu,net,tau,delta,epsilon,N);
     
     % Find root of Stone-Holmes mean first passage time in terms of Alpha
     [alp,fval,exitflag] = fsolve(afun,alp0,options);
+
+    % Re-enable warning in stoneholmespassagetime()
     delete(CatchWarningObj);
     
     % Check output from FSOLVE
@@ -286,7 +293,23 @@ end
 
 
 
-function z=alproot(alp,net,tau,delta,epsilon,nu,n)
+function z=alproot1d(alp,nu,net,tau,delta,epsilon)
+% Stable and unstable eigenvalues
+lambda_s = alp;
+lambda_u = lambda_s/nu;
+
+% Adjust network structure
+net.rho = alp*net.rho;
+net.alpha(:) = alp;
+
+% Inter-passage transition time
+tt = shc_lv_transitiontime(net);
+
+% Zero of Stone-Holmes mean first passage time using analytical solution
+z = tau-tt(1)-stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
+
+
+function z=alproot(alp,nu,net,tau,delta,epsilon,n)
 % Stable and unstable eigenvalues
 lambda_s = alp;
 lambda_u = lambda_s./nu;
@@ -305,17 +328,16 @@ tt = shc_lv_transitiontime(net);
 z = tau-tt-stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
 
 
-function z=alproot1d(alp,net,tau,delta,epsilon,nu)
-% Stable and unstable eigenvalues
-lambda_s = alp;
-lambda_u = lambda_s/nu;
-
-% Adjust network structure
-net.rho = alp*net.rho;
-net.alpha(:) = alp;
-
-% Inter-passage transition time
-tt = shc_lv_transitiontime(net);
-
-% Zero of Stone-Holmes mean first passage time using analytical solution
-z = tau-tt(1)-stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
+function nu1=alp2nu(alp,nu0)
+persistent NU;
+if isempty(NU)
+    NU = nu0;
+end
+ar = alp./alp([2:end 1]);
+i = (NU < ar);
+j = i([end 1:end-1]);
+NU(j) = ar(i)*1.1;
+i = (nu0(~i) < ar(~i));
+j = i([end 1:end-1]);
+NU(j) = nu0(i);
+nu1 = NU;
