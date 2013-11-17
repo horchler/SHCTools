@@ -18,8 +18,8 @@ function y=gammaincq(z,a,varargin)
 %
 %       gammaincq(Z,A,'upper') = gamma(A) - gammaincq(Z,A,'lower')
 %
-%   Y = GAMMAINCQ(Z1,Z2,A) uses variable precision methods to avoids
-%   cancellation errors and accurately evaluate the generalized incomplete gamma
+%   Y = GAMMAINCQ(Z1,Z2,A) uses variable precision methods to avoid cancellation
+%   errors and accurately evaluate the unscaled generalized incomplete gamma
 %   function, which is defined as:
 %
 %       gammaincq(Z1,Z2,A) = integral from z1 to z2 of t^(a-1) exp(-t) dt
@@ -29,7 +29,8 @@ function y=gammaincq(z,a,varargin)
 %       gammaincq(Z1,Z2,A) = gammaincq(Z1,A,'lower') - gammaincq(Z2,A,'lower')
 %                          = gammaincq(Z1,A,'upper') - gammaincq(Z2,A,'upper')
 %
-%   Additionally, GAMMAINCQ(Z1,Z2,A) is equal to -GAMMAINCQ(Z2,Z1,A).
+%   Additionally, GAMMAINCQ(Z1,Z2,A) = -GAMMAINCQ(Z2,Z1,A). Z1, Z2, and A must
+%   be the same size (or scalar) and non-sparse.
 %
 %   Class support for inputs Z,A:
 %       float: double, single
@@ -39,7 +40,7 @@ function y=gammaincq(z,a,varargin)
 %   Based on: http://functions.wolfram.com/GammaBetaErf/Gamma3/
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-5-12
-%   Revision: 1.1, 11-14-13
+%   Revision: 1.1, 11-16-13
 
 
 isGeneralized = (nargin > 2 && isfloat(varargin{1}));
