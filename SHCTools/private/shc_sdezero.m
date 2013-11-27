@@ -5,7 +5,7 @@ function [te,ae,we,ie,vnew,stop] = shc_sdezero(EventsFUN,t,a,w,value)
 %       SHC_LV_INTEGRATE, SHC_SDEEVENTS, FUNCTION_HANDLE
         
 %   Andrew D. Horchler, adh9 @ case . edu, Created 12-30-11
-%   Revision: 1.2, 5-4-13
+%   Revision: 1.2, 11-26-13
 
 %   SHC_SDEZERO is loosely based on Matlab's ODEZERO helper function.
 
@@ -20,8 +20,8 @@ if any(z)
     ie = find(z(:));
     q = ones(length(ie),1);   
     te = t+q-1;
-    we = w(q,:);
-    ae = a(q,:);
+    ae = a(:,q).';
+    we = w(:,q).';
     stop = any(isterminal & z);
 else
     te = [];

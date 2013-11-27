@@ -9,7 +9,7 @@ function [N,tspan,lt,a0,rho,alpv,epsilon,mu,h,sh,ConstStep,dataType,...
 %       SHC_SDERESET_STREAM, FUNCTION_HANDLE
         
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.2, 5-6-13
+%   Revision: 1.2, 11-17-13
 
 %   SHC_SDEARGUMENTS is partially based on an updating of version 1.12.4.15 of
 %   Matlab's ODEARGUMENTS.
@@ -66,7 +66,7 @@ if ~isstruct(net) || ~isfield(net,'rho') || ~isfield(net,'alpha')
 end
 rho = net.rho.';
 alpv = net.alpha.';
-if ~shc_ismatrix(rho) || ~all(size(rho) == N)
+if ~shc_ismatrix(rho) || any(size(rho) ~= N)
     error('SHCTools:shc_sdearguments:RhoDimensionMismatch',...
           'RHO must be a square matrix the same dimension as A0.');
 end
