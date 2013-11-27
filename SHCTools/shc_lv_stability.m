@@ -24,7 +24,7 @@ function nu=shc_lv_stability(net,M)
 %       SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_CREATE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-30-12
-%   Revision: 1.2, 7-30-13
+%   Revision: 1.2, 11-27-13
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the
 %   Phase Plane," Nieuw Archief Voor Wiskunde (3), Vol. 27, 1979, pp. 238-254.
@@ -40,13 +40,13 @@ end
 alpv = net.alpha;
 if ~isvector(alpv) || ~(isfloat(alpv) || isa(alpv,'sym'))
     error('SHCTools:shc_lv_stability:AlphaVectorInvalid',...
-         ['The ''alpha'' field of the SHC network structure must be '...
-          'a symbolic or floating-point vector.']);
+         ['The ''alpha'' field of the SHC network structure must be a '...
+          'symbolic or floating-point vector.']);
 end
 if ~isreal(alpv) || ~all(isfinitesym(alpv))
     error('SHCTools:shc_lv_stability:AlphaVectorNonFiniteReal',...
-         ['The ''alpha'' field of the SHC network structure must be '...
-          'a finite real symbolic or floating-point vector.']);
+         ['The ''alpha'' field of the SHC network structure must be a '...
+          'finite real symbolic or floating-point vector.']);
 end
 
 % Check Rho
@@ -54,8 +54,8 @@ rho = net.rho;
 [m,n] = size(rho);
 if size(alpv,1) ~= n
     error('SHCTools:shc_lv_stability:AlphaVectorDimensionMismatch',...
-         ['The ''alpha'' field of the SHC network structure must be '...
-          'a column vector the same dimension as RHO.']);
+         ['The ''alpha'' field of the SHC network structure must be a '...
+          'column vector the same dimension as RHO.']);
 end
 if ~(isfloat(rho) || isa(rho,'sym'))
     error('SHCTools:shc_lv_stability:InvalidRhoStruct',...
@@ -64,8 +64,8 @@ if ~(isfloat(rho) || isa(rho,'sym'))
 end
 if ~isreal(rho) || ~all(isfinitesym(rho(:)))
     error('SHCTools:shc_lv_stability:RhoStructNonFiniteReal',...
-         ['The ''rho'' field of the SHC network structure must be a '...
-          'finite real symbolic or floating-point matrix.']);
+         ['The ''rho'' field of the SHC network structure must be a finite '...
+          'real symbolic or floating-point matrix.']);
 end
 if isempty(rho) || ~shc_ismatrix(rho) || m ~= n
     error('SHTools:shc_lv_stability:RhoDimensionMismatch',...

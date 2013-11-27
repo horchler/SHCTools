@@ -35,7 +35,7 @@ function varargout=shc_lv_eigs(rho,M)
 %       SHC_LV_JACOBIAN, SHC_LV_SYMEQUILIBRIA, SHC_CREATE, SHC_LV_LAMBDA_US
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-6-12
-%   Revision: 1.2, 5-4-13
+%   Revision: 1.2, 11-27-13
 
 
 if nargout > 2
@@ -105,7 +105,8 @@ if nargin == 2 && ~ischar(M)
     if nargout == 2
         [V,D] = eig(J);
     else
-        E = eig(J);
+        [~,D] = eig(J);     % Handles repeated eigenvalues in symbolic case
+        E = diag(D);
     end
 else
     if nargin == 2
@@ -136,7 +137,8 @@ else
         if nargout == 2
             [V{i},D{i}] = eig(J);
         else
-            E(:,i) = eig(J);
+            [~,D] = eig(J);     % Handles repeated eigenvalues in symbolic case
+            E(:,i) = diag(D);
         end
     end
 end
