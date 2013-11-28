@@ -52,7 +52,7 @@ function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,net,epsilon,varargin)
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.2, 5-30-13
+%   Revision: 1.2, 11-28-13
 
 
 solver = 'SHC_LV_INTEGRATE';
@@ -191,40 +191,7 @@ if D > 0 || isWNeeded
     else
         if CustomRandFUN
             % User-specified function handle
-            RandFUN = shc_sdeget(options,'RandFUN',[],'flag');
-
-            try
-                r = feval(RandFUN,lt-1,D);
-            catch err
-                switch err.identifier
-                    case 'MATLAB:TooManyInputs'
-                        error('SHCTools:shc_lv_integrate:RandFUNTooFewInputs',...
-                              'RandFUN must have at least two inputs.');
-                    case 'MATLAB:TooManyOutputs'
-                        error('SHCTools:shc_lv_integrate:RandFUNNoOutput',...
-                             ['The output of RandFUN was not specified. '...
-                              'RandFUN  must return a non-empty matrix.']);
-                    case 'MATLAB:unassignedOutputs'
-                        error('SHCTools:shc_lv_integrate:RandFUNUnassignedOutput',...
-                              'The first output of RandFUN was not assigned.');
-                    case 'MATLAB:minrhs'
-                        error('SHCTools:shc_lv_integrate:RandFUNTooManyInputs',...
-                              'RandFUN must not require more than two inputs.');
-                    otherwise
-                        rethrow(err);
-                end
-            end
-            if ~shc_ismatrix(r) || isempty(r) || ~isfloat(r)
-                error('SHCTools:shc_lv_integrate:RandFUNNot2DArray3',...
-                     ['RandFUN must return a non-empty matrix of '...
-                      'floating-point values.']);
-            end
-            [m,n] = size(r);
-            if m ~= lt-1 || n ~= D
-                error('SHCTools:shc_lv_integrate:RandFUNDimensionMismatch3',...
-                     ['The specified alternative RandFUN did not output a '...
-                      '%d by %d matrix as requested.',lt-1,D]);
-            end
+            r = feval(shc_sdeget(options,'RandFUN',[],'flag'),lt-1,D);
         
             % Calculate Wiener increments from normal variates
             if ConstStep || D == 1
