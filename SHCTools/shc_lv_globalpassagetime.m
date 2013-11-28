@@ -10,7 +10,7 @@ function varargout=shc_lv_globalpassagetime(net,epsilon,mu)
 %       SHC_LV_PASSAGETIME, SHC_LV_TRANSITIONTIME, STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 2-13-13
-%   Revision: 1.0, 4-29-13
+%   Revision: 1.0, 11-27-13
 
 
 if nargout > 3
@@ -37,7 +37,7 @@ if ~isreal(epsilon) || ~all(isfinite(epsilon)) || any(epsilon < 0)
 end
 
 % Check Mu
-if nargin > 3
+if nargin > 2
     if ~isvector(mu) || isempty(mu) || ~isfloat(mu)
         error('SHCTools:shc_lv_globalpassagetime:MuInvalid',...
              ['The input magnitude, Mu, must be a non-empty floating-point '...
@@ -59,8 +59,18 @@ if any(epsilon < sqrt(realmin) & mu < sqrt(realmin))
           '(2^%d for double precision).'],log2(sqrt(realmin)));
 end
 
-%Beta
+% Check Beta
 bet = net.beta;
+if ~isvector(bet)
+    error('SHCTools:shc_lv_ic:BetaVectorInvalid',...
+         ['The ''beta'' field of the SHC network structure must be a '...
+          'floating-point vector.']);
+end
+if ~isreal(bet) || ~all(isfinite(bet))
+    error('SHCTools:shc_lv_ic:BetaVectorNonFiniteReal',...
+         ['The ''beta'' field of the SHC network structure must be a finite '...
+          'real floating-point vector.']);
+end
 
 % Tp(i) = F(Epsilon(i+1)), scaled by Beta to match Delta
 epsilon = epsilon([2:end 1]).*bet;
@@ -93,11 +103,11 @@ if all(epsilon < mu)
 else
     % Stable and unstable eigenvalues
     [lambda_u,lambda_s] = shc_lv_lambda_us(net);
-
+    
     % Disable warning in stoneholmespassagetime(), allow Lambda_U == Lambda_S
     CatchWarningObj = catchwarning('',...
         'SHCTools:stoneholmespassagetime:LambdaScaling');
-
+    
     if all(epsilon >= mu)
         % Stone-Holmes mean first passage time using analytical solution
         tp = stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
