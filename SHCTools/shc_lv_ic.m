@@ -9,8 +9,10 @@ function a0=shc_lv_ic(net,a0,epsilon,varargin)
 %       SHC_LV_INTEGRATE, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-11-12
-%   Revision: 1.3, 11-28-13
+%   Revision: 1.3, 11-29-13
 
+
+persistent SHC_LV_IC_CACHE
 
 % Check network
 if ~isstruct(net) || ~isfield(net,'rho')
@@ -199,18 +201,15 @@ if isUniform
     end
 end
 
-persistent NET_CACHE A0IN_CACHE EPSILON_CACHE MU_CACHE OPTIONS_CACHE A0OUT_CACHE
-if isequal(NET_CACHE,net) && isequal(A0IN_CACHE,a0) ...
-        && isequal(EPSILON_CACHE,epsilon) && isequal(MU_CACHE,mu) ...
-        && isequal(OPTIONS_CACHE,options)
-    a0 = A0OUT_CACHE;
-    return;
+if isempty(SHC_LV_IC_CACHE)
+    SHC_LV_IC_CACHE = CACHE(10,net,a0,epsilon,mu,options);
+    CACHE_IDX = 1;
 else
-    NET_CACHE = net;
-    A0IN_CACHE = a0;
-    EPSILON_CACHE = epsilon;
-    MU_CACHE = mu;
-    OPTIONS_CACHE = options;
+    CACHE_IDX = SHC_LV_IC_CACHE.IN(net,a0,epsilon,mu,options);
+    if ~isempty(CACHE_IDX)
+        [~,a0] = SHC_LV_IC_CACHE.OUT(CACHE_IDX);
+        return;
+    end
 end
 
 % Find global mean first passage time to estimate integration time
@@ -278,4 +277,5 @@ else
         end
     end
 end
-A0OUT_CACHE = a0;
+
+SHC_LV_IC_CACHE.OUT(CACHE_IDX,a0);
