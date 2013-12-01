@@ -9,7 +9,7 @@ function a0=shc_lv_ic(net,a0,epsilon,varargin)
 %       SHC_LV_INTEGRATE, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-11-12
-%   Revision: 1.3, 11-29-13
+%   Revision: 1.3, 12-1-13
 
 
 persistent SHC_LV_IC_CACHE
@@ -201,11 +201,12 @@ if isUniform
     end
 end
 
+% Set up and/or check cache
 if isempty(SHC_LV_IC_CACHE)
     SHC_LV_IC_CACHE = CACHE(10,net,a0,epsilon,mu,options);
     CACHE_IDX = 1;
 else
-    CACHE_IDX = SHC_LV_IC_CACHE.IN(net,a0,epsilon,mu,options);
+    CACHE_IDX = SHC_LV_IC_CACHE.IN([],net,a0,epsilon,mu,options);
     if ~isempty(CACHE_IDX)
         [~,a0] = SHC_LV_IC_CACHE.OUT(CACHE_IDX);
         return;
@@ -278,4 +279,5 @@ else
     end
 end
 
+% Save a0 output to cache
 SHC_LV_IC_CACHE.OUT(CACHE_IDX,a0);
