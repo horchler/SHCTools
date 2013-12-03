@@ -9,7 +9,7 @@ function a0=shc_lv_ic(net,a0,epsilon,varargin)
 %       SHC_LV_INTEGRATE, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-11-12
-%   Revision: 1.3, 12-1-13
+%   Revision: 1.3, 12-3-13
 
 
 persistent SHC_LV_IC_CACHE
@@ -136,6 +136,11 @@ if nargin > 3 && ~isstruct(varargin{1})
               'magnitude, Beta (2^%d <= MU <= BETA/2 for double '...
               'precision).'],log2(sqrt(realmin)));
     end
+    if ~isscalar(mu) && all(mu(1) == mu)
+        mu = mu(1);
+    else
+        mu = mu(:);
+    end
 else
     mu = 0;
 end
@@ -161,11 +166,6 @@ if ~isscalar(epsilon) || ~isscalar(mu)
     else
         epsilon = epsilon(:);
     end
-    if ~isscalar(mu) && all(mu(1) == mu)
-        mu = mu(1);
-    else
-        mu = mu(:);
-    end
 end
 
 % Check Options
@@ -187,18 +187,16 @@ end
 % Reduce to three-dimensional network
 isUniform = (shc_lv_isuniform(net) && isscalar(epsilon) && isscalar(mu));
 n0 = n;
-if isUniform
-    if n > 3
-        if isvector(net.gamma)
-            gam = net.gamma(1);
-        else
-            gam = net.gamma(find(net.gamma(:)~=0,1));
-        end
-        net = shc_create('contour',{alpv(1),bet(1),gam,net.delta(1)},3);
-        rho = net.rho;
-        alpv = net.alpha;
-        n = 3;
+if isUniform && n > 3
+    if isvector(net.gamma)
+        gam = net.gamma(1);
+    else
+        gam = net.gamma(find(net.gamma(:)~=0,1));
     end
+    net = shc_create('contour',{alpv(1),bet(1),gam,net.delta(1)},3);
+    rho = net.rho;
+    alpv = net.alpha(1);
+    n = 3;
 end
 
 % Set up and/or check cache
@@ -216,7 +214,7 @@ end
 % Find global mean first passage time to estimate integration time
 taug = shc_lv_globalpassagetime(net,epsilon,mu);
 
-% Index of first non-zero value, state value, and magnitude-dependent direction 
+% Index of first non-zero value, state value, and magnitude-dependent direction
 i = find(a0~=0,1);
 d = a0(i);
 sgn = 2*(d<0.5*bet(i))-1;
@@ -231,7 +229,7 @@ a0 = a;
 dt = 1e-3;
 tol = max(sqrt(epsilon),1e-6);
 if isUniform
-    lt = floor(min(9*taug(1),1e3)/dt);
+    lt = ceil(min(9*taug(1),1e3)/dt);
     if epsilon == 0
         r = zeros(1,lt-1);
     else
@@ -258,7 +256,7 @@ if isUniform
     end
     a0 = circshift(a0,i-1);
 else
-    lt = floor(min(3*n*max(taug),1e3)/dt);
+    lt = ceil(min(3*n*max(taug),1e3)/dt);
     if isscalar(epsilon)
         r = sqrt(dt)*epsilon*feval(RandFUN,n,lt-1);
     else
