@@ -7,7 +7,7 @@ function epsilon=shc_lv_epsilonfit(epsilon_hat,tau,tau_bar,lambda_u)
 %       STONEHOLMESTAUFIT, STONEHOLMESINVPASSAGETIME, STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-21-13
-%   Revision: 1.0, 4-22-13
+%   Revision: 1.0, 12-4-13
 
 
 % Epsilon(i+1) = F(Tau(i), Tau_Bar(i), Lambda_U(i))

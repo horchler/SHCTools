@@ -7,9 +7,9 @@ function tau=shc_lv_taufit(tau_bar,epsilon,epsilon_hat,lambda_u)
 %       STONEHOLMESEPSILONFIT, STONEHOLMESINVPASSAGETIME, STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-21-13
-%   Revision: 1.0, 4-22-13
+%   Revision: 1.0, 12-4-13
 
 
 % Tau(i) = F(Epsilon(i+1), Epsilon_Hat(i+1))
 tau = stoneholmestaufit(tau_bar,epsilon([2:end 1]),epsilon_hat([2:end 1]),...
-    lambda_u);
+                                                                    lambda_u);
