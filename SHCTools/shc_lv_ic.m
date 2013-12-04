@@ -137,7 +137,7 @@ if any(epsilon < 0) || any(epsilon > bet/2)
 end
 
 % Check Mu
-if nargin > 2+offset
+if nargin > 2+offset && ~isstruct(varargin{3+offset})
     mu = varargin{3+offset};
     if ~isvector(mu) || isempty(mu) || ~isfloat(mu)
         error('SHCTools:shc_lv_ic:MuInvalid',...
@@ -189,8 +189,14 @@ if ~isscalar(epsilon) || ~isscalar(mu)
 end
 
 % Check Options
-if nargin > 3+offset
-    options = varargin{4+offset};
+if nargin == 3+offset
+    if ~isstruct(varargin{end})
+        error('SHCTools:shc_lv_ic:InvalidOptions',...
+              'Options must be specified as a struct.');
+    end
+    options = varargin{end};
+elseif nargin == 2+offset && isstruct(varargin{end})
+    options = varargin{end};
 else
     options = [];
 end
