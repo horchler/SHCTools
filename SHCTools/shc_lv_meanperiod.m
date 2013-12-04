@@ -139,7 +139,7 @@ if isempty(SHC_LV_MEANPERIOD_CACHE)
     CACHE_IDX = 1;
 else
     CACHE_IDX = SHC_LV_MEANPERIOD_CACHE.IN([],net,epsilon_hat,N,options);
-    if ~isempty(CACHE_IDX)
+    if ~isempty(CACHE_IDX) && SHC_LV_MEANPERIOD_CACHE.OUT(CACHE_IDX) > 1
         [~,tau_bar,tau] = SHC_LV_MEANPERIOD_CACHE.OUT(CACHE_IDX);
         return;
     end
@@ -213,12 +213,11 @@ TE = diff(TE);
 % Fit Tau period data using Stone-Holmes distribution
 if isUniform
     tau = TE;
-	[delhat,ephat,lamuhat,lamshat] = stoneholmesfit(tau,1,lambda_s(1));
+	[~,ephat,lamuhat,~] = stoneholmesfit(tau,bet(1),lambda_s(1));
 else
     for j = n:-1:1
         tau(:,j) = TE(mod(j-3,n)+1:n:end);
-      	[delhat(j),ephat(j),lamuhat(j),lamshat(j)] = ...
-            stoneholmesfit(tau(:,j),1,lambda_s(j));
+      	[~,ephat(j),lamuhat(j),~] = stoneholmesfit(tau(:,j),bet(j),lambda_s(j));
     end
 end
 
@@ -227,7 +226,7 @@ CatchWarningObj = catchwarning('',...
     'SHCTools:stoneholmespassagetime:LambdaScaling');
 
 % Use fitted parameters to estimate true mean of Tau
-tau_bar = stoneholmespassagetime(delhat,ephat,lamuhat,lamshat).';
+tau_bar = stoneholmespassagetime(bet,ephat(:),lamuhat(:),lambda_s);
 
 % Save output to cache
 SHC_LV_MEANPERIOD_CACHE.OUT(CACHE_IDX,tau_bar,tau);

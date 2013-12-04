@@ -229,7 +229,7 @@ if isempty(SHC_LV_IC_CACHE)
     CACHE_IDX = 1;
 else
     CACHE_IDX = SHC_LV_IC_CACHE.IN([],a0,net,epsilon,mu,options);
-    if ~isempty(CACHE_IDX)
+    if ~isempty(CACHE_IDX) && SHC_LV_IC_CACHE.OUT(CACHE_IDX) > 0
         [~,a0] = SHC_LV_IC_CACHE.OUT(CACHE_IDX);
         return;
     end
