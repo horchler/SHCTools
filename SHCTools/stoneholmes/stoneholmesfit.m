@@ -76,7 +76,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 11-8-13
+%   Revision: 1.0, 12-4-13
 
 
 % Check number of input and output arguments
@@ -244,7 +244,7 @@ elseif isNoCensoring
     % Estimate Lambda_U parameter as a starting value
     fx=freq.*x;
     wtx=sum(fx)/n;
-    lambda_uhat=sqrt((n-1)*4/(pi*(sum(x.*fx)-n*wtx^2)));   % = 2/sqrt(pi*var(x))
+    lambda_uhat=sqrt((n-1)*4/(pi*(sum(x.*fx)-n*wtx^2)))   % = 2/sqrt(pi*var(x))
 else
     xuncensored=x(uncensored);
     if range(xuncensored) < eps(min(xuncensored))
@@ -324,7 +324,7 @@ else
     ex=exp(lx);
 end
 ex1=1./(ex-1);
-s1=2*x.*ex.*ex1;
+s1=2*x.*(ex.*ex1);
 
 % Times -2/n
 z=double(-3/lambda_u+n*sum(freq.*s1)-wtx ...
@@ -341,7 +341,7 @@ else
 end
 lam1=1+lambda_u/lambda_s;
 ex1=1./(lam1*ex-1);
-s1=(1/lambda_s+2*lam1*x).*ex.*ex1;
+s1=(1/lambda_s+2*lam1*x).*(ex.*ex1);
 
 % Times -2/n
 z=double(-2/(lambda_u+lambda_s)-3/lambda_u+n*sum(freq.*s1)-wtx ...
