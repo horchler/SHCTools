@@ -103,6 +103,11 @@ if ~isreal(epsilon) || ~all(isfinite(epsilon))
          ['The noise magnitude, Epsilon, if specified, must be a finite '...
           'real floating-point scalar value or vector.']);
 end
+if ~isscalar(epsilon) && all(epsilon(1) == epsilon)
+    epsilon = epsilon(1);
+else
+    epsilon = epsilon(:);
+end
 if any(epsilon < 0) || any(epsilon > bet/2)
     error('SHCTools:shc_lv_ic:EpsilonNegativeOrTooLarge',...
          ['The noise magnitude, Epsilon, if specified, must be greater than '...
@@ -160,11 +165,6 @@ if ~isscalar(epsilon) || ~isscalar(mu)
         error('SHCTools:shc_lv_ic:DimensionMismatch',...
              ['If any combination of Epsilon and Mu are non-scalar vectors, '...
               'they must have the same length as the network size.']);
-    end
-    if ~isscalar(epsilon) && all(epsilon(1) == epsilon)
-        epsilon = epsilon(1);
-    else
-        epsilon = epsilon(:);
     end
 end
 
