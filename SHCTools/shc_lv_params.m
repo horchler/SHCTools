@@ -12,8 +12,10 @@ function [alp,bet,varargout]=shc_lv_params(tau,epsilon,bet,nu,options)
 %       FSOLVE, STONEHOLMESPASSAGETIME, SHC_LV_TRANSITIONTIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
-%   Revision: 1.0, 11-16-13
+%   Revision: 1.1, 12-3-13
 
+
+persistent SHC_LV_PARAMS_CACHE
 
 % Check variable outputs
 if nargout < 3
@@ -155,6 +157,28 @@ else
     options = struct('Display','off','TolX',eps(dtype));
 end
 
+% Set up and/or check cache
+if isempty(SHC_LV_PARAMS_CACHE)
+    SHC_LV_PARAMS_CACHE = CACHE(20,tau,epsilon,bet,nu,options);
+    CACHE_IDX = 1;
+else
+    CACHE_IDX = SHC_LV_PARAMS_CACHE.IN([],tau,epsilon,bet,nu,options);
+    if ~isempty(CACHE_IDX)
+        [~,alp,bet,nu] = SHC_LV_PARAMS_CACHE.OUT(CACHE_IDX);
+        
+        % Handle variable output
+        if nargout == 3
+            varargout{1} = nu;
+        else
+            % Find Gamma and Delta as function of Alpha solution, Beta, and Nu
+            varargout{1} = (alp+alp([2:end 1]))./bet([2:end 1]);
+            varargout{2} = (alp...
+                -alp([end 1:end-1])./nu([end 1:end-1]))./bet([end 1:end-1]);
+        end
+        return;
+    end
+end
+
 % First order estimate of Alpha in terms of Tau, Delta, Epsilon, and Nu
 eulergamma = 0.577215664901533;
 ttalp = log(bet./delta-1)+log(bet./delta([end 1:end-1])-1);
@@ -234,6 +258,9 @@ else
     
     % Scale Nu if required
     nu = alp2nu(alp0,net.nu(:));
+    if all(nu(1) == nu(:))
+        nu = nu(1);
+    end
     net.nu = nu;
     
     % Create function handle for FSOLVE
@@ -276,10 +303,11 @@ end
 if strcmp(dtype,'single')
     alp = cast(alp,'single');
     bet = cast(bet,'single');
-    if nargout == 3
-        nu = cast(nu,'single');
-    end
+    nu = cast(nu,'single');
 end
+
+% Save Alpha, Beta, and Nu output to cache
+SHC_LV_PARAMS_CACHE.OUT(CACHE_IDX,alp,bet,nu);
 
 % Handle variable output
 if nargout == 3

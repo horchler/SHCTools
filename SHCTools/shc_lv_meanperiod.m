@@ -5,7 +5,7 @@ function [tau_bar,tau]=shc_lv_meanperiod(net,epsilon_hat,N,options)
 %   TAU_BAR = SHC_LV_MEANPERIOD(NET,EPSILON_HAT,N)
 %   TAU_BAR = SHC_LV_MEANPERIOD(NET,EPSILON_HAT,N,OPTIONS)
 %
-%   [TAU_BAR, TAU] = SHC_LV_MEANPERIOD(NET,...)
+%   [TAU_BAR, TAU] = SHC_LV_MEANPERIOD(NET,EPSILON_HAT,...)
 %
 %   See also:
 %       SHC_LV_TAUFIT, SHC_LV_EPSILONFIT, TAUFIT, EPSILONFIT,
