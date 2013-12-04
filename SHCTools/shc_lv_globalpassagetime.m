@@ -10,7 +10,7 @@ function varargout=shc_lv_globalpassagetime(net,epsilon,mu)
 %       SHC_LV_PASSAGETIME, SHC_LV_TRANSITIONTIME, STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 2-13-13
-%   Revision: 1.0, 11-27-13
+%   Revision: 1.0, 12-4-13
 
 
 if nargout > 3
@@ -62,12 +62,12 @@ end
 % Check Beta
 bet = net.beta;
 if ~isvector(bet)
-    error('SHCTools:shc_lv_ic:BetaVectorInvalid',...
+    error('SHCTools:shc_lv_globalpassagetime:BetaVectorInvalid',...
          ['The ''beta'' field of the SHC network structure must be a '...
           'floating-point vector.']);
 end
 if ~isreal(bet) || ~all(isfinite(bet))
-    error('SHCTools:shc_lv_ic:BetaVectorNonFiniteReal',...
+    error('SHCTools:shc_lv_globalpassagetime:BetaVectorNonFiniteReal',...
          ['The ''beta'' field of the SHC network structure must be a finite '...
           'real floating-point vector.']);
 end

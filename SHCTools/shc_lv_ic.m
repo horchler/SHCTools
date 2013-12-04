@@ -1,23 +1,39 @@
-function a0=shc_lv_ic(net,a0,epsilon,varargin)
+function a0=shc_lv_ic(varargin)
 %SHC_LV_IC  Find initial conditions close to Lotka-Volterra SHC manifold.
 %
-%   A0 = SHC_LV_IC(NET,A0,EPSILON)
-%   A0 = SHC_LV_IC(NET,A0,EPSILON,MU)
+%   A0 = SHC_LV_IC(NET,EPSILON)
+%   A0 = SHC_LV_IC(NET,EPSILON,MU)
+%   A0 = SHC_LV_IC(A0,NET,...)
 %   A0 = SHC_LV_IC(...,OPTIONS)
 %
 %   See also:
 %       SHC_LV_INTEGRATE, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-11-12
-%   Revision: 1.3, 12-3-13
+%   Revision: 1.3, 12-4-13
 
 
 persistent SHC_LV_IC_CACHE
 
-% Check network
-if ~isstruct(net) || ~isfield(net,'rho')
+% Check network and get variable inputs
+if isstruct(varargin{1}) && isfield(varargin{1},'rho')
+    net = varargin{1};
+    epsilon = varargin{2};
+    offset = 0;
+elseif isstruct(varargin{2}) && isfield(varargin{2},'rho')
+    a0 = varargin{1};
+    net = varargin{2};
+    epsilon = varargin{3};
+    offset = 1;
+else
     error('SHCTools:shc_lv_ic:NetworkStructOrRhoInvalid',...
           'Input must be a valid SHC network structure.');
+end
+if nargin < 2+offset
+    error('SHCTools:shc_lv_ic:TooFewInputs','Too few input arguments.');
+end
+if nargin > 4+offset
+    error('SHCTools:shc_lv_ic:TooManyInputs','Too many input arguments.');
 end
 
 % Check Alpha
@@ -65,6 +81,11 @@ if isempty(rho) || ~shc_ismatrix(rho) || m ~= n
 end
 
 % Check A0
+if offset == 0
+    a0 = 0.5*bet(1);
+else
+    a0 = a0(:);
+end
 if ~isvector(a0) || isempty(a0) || ~isfloat(a0)
     error('SHCTools:shc_lv_ic:A0Invalid',...
           'The initial condition must be a non-empty floating-point vector.');
@@ -78,7 +99,6 @@ if ~any(length(a0) == [1 n])
          ['The initial condition must be a scalar or a vector the same '...
           'dimension as the SHC network Rho matrix.']);
 end
-a0 = a0(:);
 if any(a0 < 0) || (isscalar(a0) && any(a0 >= min(bet))) ...
         || (~isscalar(a0) && any(a0 >= bet))
     error('SHCTools:shc_lv_ic:A0InvalidFormat',...
@@ -117,8 +137,8 @@ if any(epsilon < 0) || any(epsilon > bet/2)
 end
 
 % Check Mu
-if nargin > 3 && ~isstruct(varargin{1})
-    mu = varargin{1};
+if nargin > 2+offset
+    mu = varargin{3+offset};
     if ~isvector(mu) || isempty(mu) || ~isfloat(mu)
         error('SHCTools:shc_lv_ic:MuInvalid',...
              ['The input magnitude, Mu, must be a non-empty floating-point '...
@@ -169,10 +189,8 @@ if ~isscalar(epsilon) || ~isscalar(mu)
 end
 
 % Check Options
-if nargin == 5 || nargin == 4 && isstruct(varargin{1})
-    options = varargin{end};
-elseif nargin > 5
-    error('SHCTools:shc_lv_ic:TooManyInputs','Too many input arguments.');
+if nargin > 3+offset
+    options = varargin{4+offset};
 else
     options = [];
 end
@@ -201,10 +219,10 @@ end
 
 % Set up and/or check cache
 if isempty(SHC_LV_IC_CACHE)
-    SHC_LV_IC_CACHE = CACHE(10,net,a0,epsilon,mu,options);
+    SHC_LV_IC_CACHE = CACHE(10,a0,net,epsilon,mu,options);
     CACHE_IDX = 1;
 else
-    CACHE_IDX = SHC_LV_IC_CACHE.IN([],net,a0,epsilon,mu,options);
+    CACHE_IDX = SHC_LV_IC_CACHE.IN([],a0,net,epsilon,mu,options);
     if ~isempty(CACHE_IDX)
         [~,a0] = SHC_LV_IC_CACHE.OUT(CACHE_IDX);
         return;

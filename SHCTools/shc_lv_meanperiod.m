@@ -13,7 +13,7 @@ function [tau_bar,tau]=shc_lv_meanperiod(net,epsilon_hat,N,options)
 %       STONEHOLMESPASSAGETIME, SHC_LV_PARAMS, SHC_CREATE, SHC_LV_INTEGRATE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.3, 12-3-13
+%   Revision: 1.3, 12-4-13
 
 
 persistent SHC_LV_MEANPERIOD_CACHE
@@ -216,7 +216,7 @@ if isUniform
 	[delhat,ephat,lamuhat,lamshat] = stoneholmesfit(tau,1,lambda_s(1));
 else
     for j = n:-1:1
-        tau(:,j) = TE(mod(j+1,n)+1:n:end);
+        tau(:,j) = TE(mod(j-3,n)+1:n:end);
       	[delhat(j),ephat(j),lamuhat(j),lamshat(j)] = ...
             stoneholmesfit(tau(:,j),1,lambda_s(j));
     end
