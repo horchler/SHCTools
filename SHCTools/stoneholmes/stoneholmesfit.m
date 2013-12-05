@@ -244,7 +244,7 @@ elseif isNoCensoring
     % Estimate Lambda_U parameter as a starting value
     fx=freq.*x;
     wtx=sum(fx)/n;
-    lambda_uhat=sqrt((n-1)*4/(pi*(sum(x.*fx)-n*wtx^2)))   % = 2/sqrt(pi*var(x))
+    lambda_uhat=sqrt((n-1)*4/(pi*(sum(x.*fx)-n*wtx^2)));   % = 2/sqrt(pi*var(x))
 else
     xuncensored=x(uncensored);
     if range(xuncensored) < eps(min(xuncensored))
