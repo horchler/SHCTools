@@ -10,7 +10,7 @@ function a0=shc_lv_ic(varargin)
 %       SHC_LV_INTEGRATE, SHC_LV_ODE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 5-11-12
-%   Revision: 1.3, 12-4-13
+%   Revision: 1.3, 1-26-14
 
 
 persistent SHC_LV_IC_CACHE
@@ -189,13 +189,13 @@ if ~isscalar(epsilon) || ~isscalar(mu)
 end
 
 % Check Options
-if nargin == 3+offset
+if nargin > 3+offset
     if ~isstruct(varargin{end})
         error('SHCTools:shc_lv_ic:InvalidOptions',...
               'Options must be specified as a struct.');
     end
     options = varargin{end};
-elseif nargin == 2+offset && isstruct(varargin{end})
+elseif nargin == 3+offset && isstruct(varargin{end})
     options = varargin{end};
 else
     options = [];
