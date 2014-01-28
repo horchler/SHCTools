@@ -24,4 +24,4 @@ if any(bet) <= 0
           'Beta must be greater than zero.');
 end
 
-delta = 0.04*bet;
+delta = 0.1*bet;
