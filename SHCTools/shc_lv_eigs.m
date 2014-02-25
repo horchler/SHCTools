@@ -14,6 +14,10 @@ function varargout=shc_lv_eigs(rho,M)
 %   the M-th node of the N-dimensional Lotka-Volterra SHC network described by
 %   the connection matrix RHO.
 %
+%   [...] = SHC_LV_EIGS(RHO,P) where P is a length N equilibrium point vector
+%   (not necessarily a node), produces the eigenvalues and/or eigenvectors of
+%   the  N-by-N Jacobian matrix for P as above.
+%
 %   E = SHC_LV_EIGS(RHO) returns an N-by-N matrix of eigenvalues for all N nodes
 %   of the SHC. The columns of the output matrix correspond to equilibrium point
 %   vectors from the columns of an identity matrix of size N.
@@ -35,7 +39,7 @@ function varargout=shc_lv_eigs(rho,M)
 %       SHC_LV_JACOBIAN, SHC_LV_SYMEQUILIBRIA, SHC_CREATE, SHC_LV_LAMBDA_US
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-6-12
-%   Revision: 1.2, 11-27-13
+%   Revision: 1.3, 2-25-14
 
 
 if nargout > 2
@@ -83,19 +87,32 @@ end
 
 if nargin == 2 && ~ischar(M)
     % Check M
-    if ~validateindex(M) || ~isnumeric(M) || M > n
-        error('SHTools:shc_lv_eigs:InvalidM',...
-             ['M must be a finite real integer greater than or equal to one '...
-              'and less than or equal to the dimension of RHO. Use the '...
-              '''all'' option to obtain eigenvalues and eigenvectors other '...
-              'than those for the N nodes.']);
+    if isscalar(M)
+        if ~validateindex(M) || ~isnumeric(M) || M > n
+            error('SHTools:shc_lv_eigs:InvalidM',...
+                 ['M must be a finite real integer greater than or equal to '...
+                  'one and less than or equal to the dimension of RHO. Use '...
+                  'the ''all'' option to obtain eigenvalues and '...
+                  'eigenvectors other than those for the N nodes.']);
+        end
+
+        eqpt(n,1) = 0;
+        if isa(p,'sym') || isa(alpv,'sym') || isa(betv,'sym')
+            eqpt = sym(eqpt);
+        end
+        eqpt(M) = -betv(M);
+    else
+        if ~isvector(M) || ~(isnumeric(M) || isa(M,'sym')) || length(M) ~= n
+            error('SHTools:shc_lv_eigs:InvalidEquilibriumPt',...
+                 ['Equilibrium points must be finite numeric or symbolic '...
+                  'vectors of the same length as the dimension of RHO.']);
+        end
+        
+        eqpt = -M(:);
+        if isa(p,'sym') || isa(alpv,'sym') || isa(betv,'sym')
+            eqpt = sym(eqpt);
+        end
     end
-    
-    eqpt(n,1) = 0;
-    if isa(p,'sym') || isa(alpv,'sym') || isa(betv,'sym')
-        eqpt = sym(eqpt);
-    end
-    eqpt(M) = -betv(M);
     
     % Calculate Jacobian
     J = p.*eqpt(:,ones(1,n));
