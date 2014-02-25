@@ -13,7 +13,7 @@ function [tau_bar,tau]=shc_lv_meanperiod(net,epsilon_hat,N,options)
 %       STONEHOLMESPASSAGETIME, SHC_LV_PARAMS, SHC_CREATE, SHC_LV_INTEGRATE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.3, 12-4-13
+%   Revision: 1.3, 2-24-14
 
 
 persistent SHC_LV_MEANPERIOD_CACHE
@@ -146,7 +146,7 @@ else
 end
 
 % Time step for integration
-dt = 1e-3;
+dt = min(min(shc_lv_mintransitiontime(net))*5e-2,1e-3);
 
 % Random number generation function
 esdt = sqrt(dt)*epsilon_hat;
