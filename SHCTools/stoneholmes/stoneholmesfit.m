@@ -23,7 +23,7 @@ function varargout=stoneholmesfit(x,varargin)
 %
 %   PARAMSHAT = STONEHOLMESFIT(X,...) returns a row vector of the estimated
 %   parameters containing [THETAHAT,LAMBDA_UHAT,LAMBDA_SHAT] or
-%   [DELTAHAT,EPSILONHAT,LAMBDA_UHAT,LAMBDA_SHAT] if an alternate value of delta
+%   [DELTAHAT,EPSILONHAT,LAMBDA_UHAT,LAMBDA_SHAT] if an alternate value of Delta
 %   is specified.
 %
 %   [...] = STONEHOLMESFIT(X,...,CENSORING,...) accepts a Boolean vector of the
@@ -76,7 +76,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 12-4-13
+%   Revision: 1.0, 2-27-14
 
 
 % Check number of input and output arguments

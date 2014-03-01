@@ -9,7 +9,7 @@ function tt=shc_lv_transitiontime(net,mu)
 %       STONEHOLMESPASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 12-17-12
-%   Revision: 1.0, 4-20-13
+%   Revision: 1.1, 2-26-14
 
 
 % Check network
@@ -183,11 +183,12 @@ else
         end
         tt(i) = tt(i)+0.5*dt;
     end
-    tt = tt([end 1:end-1]).';
+    tt = tt.';
+    %tt = tt([end 1:end-1]).';
 end
 
 if any(tt <= 0) || ~all(isfinite(tt))
     error('SHCTools:shc_lv_transitiontime:NonFinitePositiveTransitionTime',...
-         ['Cannot find valid inter-passage decay time, Tt. Input '...
+         ['Cannot find valid inter-passage transition time, Tt. Input '...
           'specifications may be illconditioned.']);
 end
