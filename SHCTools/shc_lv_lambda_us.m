@@ -23,7 +23,7 @@ function [lambda_u,lambda_s]=shc_lv_lambda_us(rho,M)
 %       SHC_LV_SYMEQUILIBRIA, SHC_CREATE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-29-12
-%   Revision: 1.2, 5-4-13
+%   Revision: 1.3, 2-28-14
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the
 %   Phase Plane," Nieuw Archief Voor Wiskunde (3), Vol. 27, 1979, pp. 238-254.
@@ -51,7 +51,6 @@ else
     end
 end
 
-% Get eigenvalues
 if nargin == 2
     % Check M
     if ~validateindex(M) || ~isnumeric(M) || M > m
@@ -60,10 +59,13 @@ if nargin == 2
               'and less than or equal to the dimension of RHO.']);
     end
     
+    % Get eigenvalues
     E = shc_lv_eigs(rho,M);
+    
     if isa(E,'sym')
-        lambda_u = minsym(E(relopsym(E > 0)));
-        lambda_s = -maxsym(E(relopsym(E < 0)));
+        Ec = num2cell(E);
+        lambda_u = feval(symengine,'min',Ec{isAlways(sym(E > 0))});
+    	lambda_s = -feval(symengine,'max',Ec{isAlways(sym(E < 0))});
     else
         lambda_u = min(E(E > 0));
         lambda_s = -max(E(E < 0));
@@ -76,12 +78,17 @@ if nargin == 2
               'Lambda_3 >= ... >= Lambda_N.'],M);
     end
 else
+    % Get eigenvalues
     E = shc_lv_eigs(rho);
+    
     isSym = isa(E,'sym');
+    if isSym
+        Ec = num2cell(E);
+    end
     for i = m:-1:1
         if isSym
-            lamu = minsym(E(relopsym(E(:,i) > 0),i));
-            lams = -maxsym(E(relopsym(E(:,i) < 0),i));
+            lamu = feval(symengine,'min',Ec{isAlways(sym(E(:,i) > 0)),i});
+            lams = -feval(symengine,'max',Ec{isAlways(sym(E(:,i) < 0)),i});
         else
             lamu = min(E(E(:,i) > 0,i));
             lams = -max(E(E(:,i) < 0,i));
@@ -94,6 +101,8 @@ else
                   'Lambda_3 >= ... >= Lambda_N.'],i);
         end
         lambda_u(i,1) = lamu;
-        lambda_s(i,1) = lams;
+        if nargout > 1
+            lambda_s(i,1) = lams;
+        end
     end
 end

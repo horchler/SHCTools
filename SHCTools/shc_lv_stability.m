@@ -24,7 +24,7 @@ function nu=shc_lv_stability(net,M)
 %       SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_CREATE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-30-12
-%   Revision: 1.2, 11-27-13
+%   Revision: 1.3, 2-28-14
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the
 %   Phase Plane," Nieuw Archief Voor Wiskunde (3), Vol. 27, 1979, pp. 238-254.
@@ -72,7 +72,6 @@ if isempty(rho) || ~shc_ismatrix(rho) || m ~= n
           'RHO must be a non-empty square matrix.');
 end
 
-% Get eigenvalues
 if nargin == 2
     % Check M
     if ~validateindex(M) || ~isnumeric(M) || M > m
@@ -81,16 +80,20 @@ if nargin == 2
               'and less than or equal to the dimension of RHO.']);
     end
     
+    % Get eigenvalues
     E = shc_lv_eigs(net,M);
+    
     if isa(E,'sym')
-        lambda_u = minsym(E(relopsym(E > 0)));
+        Ec = num2cell(E);
+        
+        lambda_u = feval(symengine,'min',Ec{isAlways(sym(E > 0))});
         if isequal(lambda_u,'undefined')
             error('SHTools:shc_lv_stability:IndeterminiteLambda_UNode',...
                  ['Cannot determine smallest unstable eigenvalue for node '...
                   '%d from symbolic assumptions.'],M);
         end
         
-        lambda_s = -maxsym(E(relopsym(E < 0)));
+        lambda_s = -feval(symengine,'max',Ec{isAlways(sym(E < 0))});
         if isequal(lambda_s,'undefined')
             error('SHTools:shc_lv_stability:IndeterminiteLambda_SNode',...
                  ['Cannot determine largest stable eigenvalue for node %d '...
@@ -109,18 +112,23 @@ if nargin == 2
     end
     nu = lambda_s/lambda_u;
 else
+    % Get eigenvalues
     E = shc_lv_eigs(net);
+    
     isSym = isa(E,'sym');
+    if isSym
+        Ec = num2cell(E);
+    end
     for i = m:-1:1
         if isSym
-            lambda_u = minsym(E(relopsym(E(:,i) > 0),i));
+            lambda_u = feval(symengine,'min',Ec{isAlways(sym(E(:,i) > 0)),i});
             if isequal(lambda_u,'undefined')
                 error('SHTools:shc_lv_stability:IndeterminiteLambda_U',...
                      ['Cannot determine smallest unstable eigenvalue for '...
                       'node %d from symbolic assumptions.'],i);
             end
             
-            lambda_s = -maxsym(E(relopsym(E(:,i) < 0),i));
+            lambda_s = -feval(symengine,'max',Ec{isAlways(sym(E(:,i) < 0)),i});
             if isequal(lambda_s,'undefined')
                 error('SHTools:shc_lv_stability:IndeterminiteLambda_S',...
                      ['Cannot determine largest stable eigenvalue for node '...

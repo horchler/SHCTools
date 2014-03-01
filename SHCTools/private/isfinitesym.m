@@ -2,11 +2,10 @@ function y=isfinitesym(x)
 %ISFINITESYM  True for finite symbolic elements.
 %   Y = ISFINITESYM(X)
 %
-%   See also ISINFSYM, RELOPSYM, MAXSYM, MINSYM, SYM, SYM/ISALWAYS, ISFINITE,
-%       ISNAN, ISINF
+%   See also ISINFSYM, SYM, SYM/ISALWAYS, ISFINITE, ISNAN, ISINF
 
 %   Andrew D. Horchler, adh9@case.edu, Created 4-19-13
-%   Revision: 1.0, 4-19-13
+%   Revision: 1.0, 2-28-14
 
 
 if isa(x,'sym')
