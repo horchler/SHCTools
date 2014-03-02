@@ -1,18 +1,17 @@
-function [alp,bet,varargout]=shc_lv_params(tau,epsilon,bet,nu,options)
+function [alp,bet,varargout]=shc_lv_params(tau,epsilon,bet,nu)
 %SHC_LV_PARAMS  Find Lotka-Volterra connection matrix parameters.
-%   [ALPHA,BETA,GAMMA,DELTA] = SHC_LV_PARAMS(TAU,EPSILON,BETA,NU)
 %   [ALPHA,BETA,NU] = SHC_LV_PARAMS(TAU,EPSILON,BETA,NU)
-%   [...] = SHC_LV_PARAMS(...,OPTIONS)
+%   [ALPHA,BETA,GAMMA,DELTA] = SHC_LV_PARAMS(TAU,EPSILON,BETA,NU)
 %
 %   Class support for inputs TAU, EPSILON, BETA, and NU:
 %       float: double, single
 %
 %   See also:
-%       SHC_CREATE, SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_LV_JACOBIAN, FZERO,
-%       FSOLVE, STONEHOLMESPASSAGETIME, SHC_LV_TRANSITIONTIME
+%       SHC_CREATE, SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_LV_JACOBIAN,
+%       STONEHOLMESPASSAGETIME, SHC_LV_MINTRANSITIONTIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
-%   Revision: 1.1, 12-3-13
+%   Revision: 1.3, 3-1-14
 
 
 persistent SHC_LV_PARAMS_CACHE
@@ -34,7 +33,6 @@ if ~isreal(tau) || ~all(isfinite(tau)) || any(tau <= 0)
          ['The global period, Tau, must be a positive finite real '...
           'floating-point vector.']);
 end
-tau = tau(:);
 
 % Check Epsilon
 if ~isvector(epsilon) || isempty(epsilon) || ~isfloat(epsilon)
@@ -47,7 +45,6 @@ if ~isreal(epsilon) || ~all(isfinite(epsilon)) || any(epsilon <= 0)
          ['The noise magnitude, Epsilon, must be a positive finite real '...
           'floating-point vector.']);
 end
-epsilon = epsilon(:);
 
 % Check Beta
 if ~isvector(bet) || isempty(bet) || ~isfloat(bet)
@@ -60,7 +57,6 @@ if ~isreal(bet) || ~all(isfinite(bet)) || any(bet <= 0)
          ['The state magnitude, Beta, must be a positive finite real '...
           'floating-point vector.']);
 end
-bet = bet(:);
 
 % Check Nu
 if ~isvector(nu) || isempty(nu) || ~isfloat(nu)
@@ -73,43 +69,62 @@ if ~isreal(nu) || ~all(isfinite(nu)) || any(nu <= 0)
          ['The state magnitude, Nu, must be a positive finite real '...
           'floating-point vector.']);
 end
-nu = nu(:);
 
 % Check lengths
 lv = [length(tau) length(epsilon) length(bet) length(nu)];
 n = max(lv);
 lv = lv(lv ~= 1);
-if length(lv) > 1 && ~all(lv(2:end) == lv(1))
+if length(lv) > 1 && ~all(lv==lv(1))
     error('SHCTools:shc_lv_params:DimensionMismatchParams',...
          ['If any combination of Tau, Epsilon, Beta, and Nu are non-scalar '...
           'vectors, they must have the same length as the network dimension.']);
 end
 
-% Check values, convert to double if necessary
-dtype = superiorfloat(tau,epsilon,bet,nu);
+% Check if parameters are uniform, collapse to scalars if possible
+isUniform = true;
+if all(tau==tau(1))
+    tau = tau(1);
+else
+    tau = tau(:);
+    isUniform = false;
+end
+if all(epsilon==epsilon(1))
+    epsilon = epsilon(1);
+else
+    epsilon = epsilon(:);
+    isUniform = false;
+end
+if all(bet==bet(1))
+    bet = bet(1);
+else
+    bet = bet(:);
+    isUniform = false;
+end
+if all(nu==nu(1))
+    nu = nu(1);
+else
+    nu = nu(:);
+    isUniform = false;
+end
 
-classTau = class(tau);
-if any(tau < eps(classTau)) || any(tau > eps(realmax(classTau)))
+% Check values according to floating-point type
+dtype = superiorfloat(tau,epsilon,bet,nu);
+eprm = eps(realmax(dtype));
+
+if any(tau < eps(dtype)) || any(tau > eprm)
     error('SHCTools:shc_lv_params:TauTooSmallOrLarge',...
          ['The global period, Tau, must be a positive value greater than or '...
           'equal to machine epsilon, EPS(1), and less than EPS(REALMAX) '...
-          '(2^%d <= TAU < 2^%d for %s precision).'],log2(eps(classTau)),...
-          log2(eps(realmax(classTau))),classTau);
-end
-if isa(tau,'single')
-    tau = cast(tau,'double');
+          '(2^%d <= TAU < 2^%d for %s precision).'],log2(eps(dtype)),...
+          log2(eprm),dtype);
 end
 
-classBet = class(bet);
-if any(bet < eps(classBet)) || any(bet > eps(realmax(classBet)))
+if any(bet < eps(dtype)) || any(bet > eprm)
     error('SHCTools:shc_lv_params:BetaTooSmallOrLarge',...
          ['The state magnitude, Beta, must be a positive value greater than '...
           'or equal to machine epsilon, EPS(1), and less than or equal to '...
           'EPS(REALMAX) (2^%d <= Beta <= 2^%d for %s precision).'],...
-          log2(eps(classBet)),log2(eps(realmax(classBet))),classBet);
-end
-if isa(bet,'single')
-    bet = cast(bet,'double');
+          log2(eps(dtype)),log2(eprm),dtype);
 end
 
 % Delta, neighborhood size
@@ -118,51 +133,27 @@ delta = shc_lv_neighborhood(bet);
 % Alpha(i) = F(Epsilon(i+1)), scaled by Beta to match Delta
 epsilon = epsilon([2:end 1]).*bet;
 
-classEp = class(epsilon);
-if any(epsilon < sqrt(realmin(classEp))) || any(epsilon > delta)
+if any(epsilon < sqrt(realmin(dtype))) || any(epsilon > delta)
     error('SHCTools:shc_lv_params:EpsilonTooSmallOrLarge',...
          ['The noise magnitude, Epsilon, must be a positive value greater '...
           'than or equal to SQRT(REALMIN) and less than or equal to the '...
           'neighborhood size, Delta (2^%d <= Epsilon <= Delta for %s '...
-          'precision).'],log2(sqrt(realmin(classEp))),classEp);
-end
-if isa(epsilon,'single')
-    epsilon = cast(epsilon,'double');
+          'precision).'],log2(sqrt(realmin(dtype))),dtype);
 end
 
-classNu = class(nu);
-if any(nu <= 0) || any(nu > eps(realmax(classNu)))
+if any(nu <= 0) || any(nu > eprm)
     error('SHCTools:shc_lv_params:NuTooSmallOrLarge',...
          ['The stability parameter, Nu, must be greater than 0 and less '...
           'than or equal to EPS(REALMAX) (0 < Nu <= 2^%d for %s '...
-          'precision).'],log2(eps(realmax(classNu))),classNu);
-end
-if isa(nu,'single')
-    nu = cast(nu,'double');
-end
-
-% Check or generate options structure for FZERO/FSOLVE
-if nargin == 5 && ~(isempty(options) && isnumeric(options))
-    if ~isstruct(options)
-        error('SHCTools:shc_lv_params:InvalidOptions',...
-              'Options should be a structure created using OPTIMSET.');
-    end
-    if ~isfield(options,'Display')
-        options.('Display') = 'off';
-    end
-    if ~isfield(options,'TolX')
-        options.('TolX') = eps(dtype);
-    end
-else
-    options = struct('Display','off','TolX',eps(dtype));
+          'precision).'],log2(eprm),dtype);
 end
 
 % Set up and/or check cache
 if isempty(SHC_LV_PARAMS_CACHE)
-    SHC_LV_PARAMS_CACHE = CACHE(20,tau,epsilon,bet,nu,options);
+    SHC_LV_PARAMS_CACHE = CACHE(20,tau,epsilon,bet,nu);
     CACHE_IDX = 1;
 else
-    CACHE_IDX = SHC_LV_PARAMS_CACHE.IN([],tau,epsilon,bet,nu,options);
+    CACHE_IDX = SHC_LV_PARAMS_CACHE.IN([],tau,epsilon,bet,nu);
     if ~isempty(CACHE_IDX)
         [~,alp,bet,nu] = SHC_LV_PARAMS_CACHE.OUT(CACHE_IDX);
         
@@ -171,139 +162,76 @@ else
             varargout{1} = nu;
         else
             % Find Gamma and Delta as function of Alpha solution, Beta, and Nu
-            varargout{1} = (alp+alp([2:end 1]))./bet([2:end 1]);
-            varargout{2} = (alp...
-                -alp([end 1:end-1])./nu([end 1:end-1]))./bet([end 1:end-1]);
+            [varargout{1:2}] = shc_lv_nu2gammadelta(alp,bet,nu);
         end
         return;
     end
 end
 
-% First order estimate of Alpha in terms of Tau, Delta, Epsilon, and Nu
+% Minimum transition time estimate times Alpha
+lbdm1 = log(bet./delta-1);
+tt = lbdm1+lbdm1([end 1:end-1]);
+
+% First order estimate of Alpha in terms of Tau, Tt, Delta, Epsilon, and Nu
 eulergamma = 0.577215664901533;
-ttalp = log(bet./delta-1)+log(bet./delta([end 1:end-1])-1);
-alp0 = -0.5*nu.*wrightOmegaq(2*(log(epsilon)-log(delta))+log1p(1./nu)...
-    -eulergamma+log(0.5*tau)-2*ttalp./nu-pi*1i)./tau;
-if any(alp0 < eps) || any(alp0 > realmax/2) || any(isnan(alp0))
-    error('SHCTools:shc_lv_params:NoSolutionAlpha01',...
-          'Unable to reach a solution.');
-end
+c = 2*(log(epsilon)-log(delta))-eulergamma+log(0.5*tau)-pi*1i;
+alp = -0.5*nu.*wrightOmegaq(c+log1p(1./nu)-2*tt./nu)./tau;
 
-% Disable warning in stoneholmespassagetime(), allow Lambda_U == Lambda_S
-CatchWarningObj = catchwarning('',...
-    'SHCTools:stoneholmespassagetime:LambdaScaling');
-
-% If elements of vector inputs identical, collapse to n = 1, expand at end
-if n == 1 || all(alp0(1) == alp0)
-    % Create 3-node connection matrix from parameters
-    net = shc_create('contour',{1,1,nu(1)},3);
-    
-    % Create function handle for FZERO
-    afun = @(alp)alproot1d(alp,nu(1),net,tau(1),delta(1),epsilon(1));
-    
-    % Find root of Stone-Holmes mean first passage time in terms of Alpha
-    bounds = bracketroot(afun,alp0(1),[eps eps(realmax)],'+');
-    [alp,fval,exitflag] = fzero(afun,bounds,options);
-    
-    % Re-enable warning in stoneholmespassagetime()
-    delete(CatchWarningObj);
-    
-    % Check output from FZERO
-    if exitflag < 0
-        error('SHCTools:shc_lv_params:NoSolutionAlpha1D',...
-              'Unable to find suitable parameters.');
-    elseif eps(fval) > options.TolX
-        if n ~= 1
-            warning('SHCTools:shc_lv_params:IllconditionedAllAlpha1D',...
-                   ['Tolerances not met for Alpha values. Input '...
-                    'specifications may be illconditioned.']);
-        else
-            warning('SHCTools:shc_lv_params:IllconditionedAlpha1D',...
-                   ['Tolerances not met for Alpha. Input specifications may '...
-                    'be illconditioned.']);
-        end
-    end
-    
-    % Expand parameter vectors
-    if n > 1
-        z = ones(n,1);
-        if isscalar(alp)
-            alp = alp(z);
-        end
-        if isscalar(bet)
-            bet = bet(z);
-        end
-        if isscalar(nu)
-            nu = nu(z);
-        end
-    end
-else
-    % Set additional options for FSOLVE
-    if ~isfield(options,'Algorithm')
-        options.('Algorithm') = 'trust-region-dogleg';
-    end
-    if ~isfield(options,'TolFun')
-        options.('TolFun') = 1024*eps(dtype);
-    end
-    if ~isfield(options,'MaxIter')
-        options.('MaxIter') = 20;
-    end
-    
-    % Create N-node connection matrix from parameters
-    N = max([length(alp0) length(nu) 3]);
-    if isscalar(alp0)
-        alp0 = alp0(ones(N,1));
-    end
-    net = shc_create('contour',{1,1,nu},N);
-    
-    % Scale Nu if required
-    nu = alp2nu(alp0,net.nu(:));
-    if all(nu(1) == nu(:))
-        nu = nu(1);
-    end
-    net.nu = nu;
-    
-    % Create function handle for FSOLVE
-    afun = @(alp)alproot(alp,nu,net,tau,delta,epsilon,N);
-    
-    % Find root of Stone-Holmes mean first passage time in terms of Alpha
-    [alp,fval,exitflag] = fsolve(afun,alp0,options);
-
-    % Re-enable warning in stoneholmespassagetime()
-    delete(CatchWarningObj);
-    
-    % Check output from FSOLVE
-    if exitflag < 0
-        error('SHCTools:shc_lv_params:NoSolutionAlpha',...
-              'Unable to find suitable parameters.');
-    elseif any(eps(fval) > options.TolX)
-        i = find(eps(fval) > options.TolX);
-        if length(i) == 1
-            warning('SHCTools:shc_lv_params:IllconditionedOneAlpha',...
-                   ['Tolerances not met for Alpha %d. Input specifications '...
-                    'may be illconditioned.'],i);
-        elseif length(i) < n
-            if length(i) == 2
-                str = sprintf('%d ',i(1));
-            else
-                str = sprintf('%d, ',i(1:end-1));
+% Solve for Nu to meet Alpha(i) >= Alpha(i-1)/Nu(i-1) requirement
+if ~isUniform
+    alpnu = alp([end 1:end-1])./nu([end 1:end-1]);
+    idx = (alpnu > alp);
+    if any(idx)
+        % Expand parameter vectors
+        z = zeros(n,1);
+        nu = nu+z;
+        tt = tt+z;
+        tau = tau+z;
+        
+        % Create function handle for FZERO
+        afun = @(nu,i)-0.5*nu.*wrightOmegaq(c(i)+log1p(1./nu)-2*tt(i)./nu)./tau(i);
+        
+        % Options structure for FZERO
+        opts = struct('Display','off','TolX',eps(dtype));
+        
+        % Find root in terms of Nu
+        for i = find(idx).'
+            nuroot = @(nu)afun(nu,i)-alpnu(i);
+            bounds = bracketroot(nuroot,nu(i),[eps(dtype) eprm],'+');
+            [nu(i),fval,exitflag] = fzero(nuroot,bounds,opts);
+            
+            % Check output from FZERO
+            if exitflag < 0
+                error('SHCTools:shc_lv_params:NoSolutionAlpha',...
+                      'Unable to find suitable parameters.');
+            elseif eps(fval) > opts.TolX
+                warning('SHCTools:shc_lv_params:IllconditionedAlpha',...
+                       ['Tolerances not met for Alpha %d. Input '...
+                        'specifications may be illconditioned.'],i);
             end
-            warning('SHCTools:shc_lv_params:IllconditionedSomeAlpha',...
-                   ['Tolerances not met for Alpha %sand %d. Input '...
-                    'specifications may be illconditioned.'],str,i(end));
-        else
-            warning('SHCTools:shc_lv_params:IllconditionedAllAlpha',...
-                   ['Tolerances not met for Alpha values. Input '...
-                    'specifications may be illconditioned.']);
         end
     end
+    nu(idx) = (1+eps(dtype))*nu(idx);
+    alp(idx) = afun(nu(idx),idx);
 end
 
-% Cast back to single precision if needed
-if strcmp(dtype,'single')
-    alp = cast(alp,'single');
-    bet = cast(bet,'single');
-    nu = cast(nu,'single');
+if any(alp < eps(dtype)) || any(alp > realmax(dtype)/2) || any(isnan(alp))
+    error('SHCTools:shc_lv_params:InvalidSolutionAlpha',...
+          'Unable to reach a valid solution.');
+end
+
+% Expand parameter vectors
+if n > 1
+    z = ones(n,1);
+    if isscalar(alp)
+        alp = alp(z);
+    end
+    if isscalar(bet)
+        bet = bet(z);
+    end
+    if isscalar(nu)
+        nu = nu(z);
+    end
 end
 
 % Save Alpha, Beta, and Nu output to cache
@@ -314,58 +242,5 @@ if nargout == 3
     varargout{1} = nu;
 else
     % Find Gamma and Delta as function of Alpha solution, Beta, and Nu
-    varargout{1} = (alp+alp([2:end 1]))./bet([2:end 1]);
-    varargout{2} = (alp...
-        -alp([end 1:end-1])./nu([end 1:end-1]))./bet([end 1:end-1]);
+    [varargout{1:2}] = shc_lv_nu2gammadelta(alp,bet,nu);
 end
-
-
-
-function z=alproot1d(alp,nu,net,tau,delta,epsilon)
-% Stable and unstable eigenvalues
-lambda_s = alp;
-lambda_u = lambda_s/nu;
-
-% Adjust network structure
-net.rho = alp*net.rho;
-net.alpha(:) = alp;
-
-% Inter-passage transition time
-tt = shc_lv_transitiontime(net);
-
-% Zero of Stone-Holmes mean first passage time using analytical solution
-z = tau-tt(1)-stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
-
-
-function z=alproot(alp,nu,net,tau,delta,epsilon,n)
-% Stable and unstable eigenvalues
-lambda_s = alp;
-lambda_u = lambda_s./nu;
-
-% Adjust network structure, build connection matrix
-rho = ones(n,1)*(alp.');
-rho([2:n+1:end n*(n-1)+1]) = -alp./nu;
-rho(1:n+1:end) = 0;
-net.rho = rho+alp*ones(1,n);
-net.alpha = alp;
-
-% Inter-passage transition time
-tt = shc_lv_transitiontime(net);
-
-% Zero of Stone-Holmes mean first passage time using analytical solution
-z = tau-tt-stoneholmespassagetime(delta,epsilon,lambda_u,lambda_s);
-
-
-function nu1=alp2nu(alp,nu0)
-persistent NU;
-if isempty(NU)
-    NU = nu0;
-end
-ar = alp./alp([2:end 1]);
-i = (NU < ar);
-j = i([end 1:end-1]);
-NU(j) = ar(i)*1.1;
-i = (nu0(~i) < ar(~i));
-j = i([end 1:end-1]);
-NU(j) = nu0(i);
-nu1 = NU;
