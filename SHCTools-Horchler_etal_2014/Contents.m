@@ -24,7 +24,7 @@
 %
 %   Utilities.
 %       coefvar             - Coefficient of variation for data samples.
-%       wrightomegaq        - Wright omega function, a solution to W+LOG(W) = Z
+%       wrightomegaq        - Wright omega function, a solution to W+LOG(W) = Z.
 
 %  This version tested with Matlab 8.2.0.701 (R2013b)
 %  Mac OS X 10.9.3 (Build: 13D65), Java 1.7.0_60-b19
