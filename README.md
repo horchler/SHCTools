@@ -3,6 +3,11 @@ SHCTools
 #####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems Based&nbsp;on&nbsp;Networks&nbsp;of&nbsp;Stable&nbsp;Heteroclinic&nbsp;Channels&nbsp;(SHCs).#####
 ######Version 1.2, 6-14-14######
 
+--------
+Code for *Designing Responsive Pattern Generators: Stable Heteroclinic Channel Cycles for Modeling and Control* by Horchler, et al. can be found [here](https://github.com/horchler/SHCTools/tree/SHC-Design-Paper).  
+--------
+
+&nbsp;  
 How to install (and uninstall) SHCTools:  
  1. Download and expand the *[SHCTools-master.zip](https://github.com/horchler/SHCTools/archive/master.zip)* ZIP archive of the repository.  
  2. Move the resultant *SHCTools-master* folder to the desired permanent location.  

@@ -1,12 +1,8 @@
 %SHCTools
-%  Version 1.1, 8-30-13
+%  Version 1.2, 6-14-14
 %
 %  SHC network creation, modification, and visualization, and conversion.
 %      buildrho               - Create RHO matrix from SHC network structure.
-%      loadnet                - Load SHC network structure from XML or MAT file.
-%      plotactivity           - Plot simulated SHC network activity.
-%      plotnet                - Visualization of SHC network topology.
-%      savenet                - Save SHC network structure as XML or MAT file.
 %      shc_addnetwork         - Insert a sub-network into SHC network structure.
 %      shc_create             - Create SHC network structure from parameters.
 %      shc_deletenetwork      - Remove a sub-network and its children.
@@ -16,7 +12,7 @@
 %
 %  Lotka-Volterra SHC network tools.
 %      shc_lv_eigs            - Eigenvalues/vectors of Lotka-Volterra system.
-%      shc_lv_epsilonfit      - Nonlinear-compensated (fitted) noise magnitude.
+%      shc_lv_epsilonfit      - Nonlinear-compensated (fitted) noise magnitudes.
 %      shc_lv_globalpassagetime - Find passage times from SHC network structure.
 %      shc_lv_ic              - Find initial conditions close to SHC manifold.
 %      shc_lv_integrate       - Solve Lotka-Volterra SDEs numerically.
@@ -27,12 +23,12 @@
 %      shc_lv_meanperiod      - Simulate system to find average mean period.
 %      shc_lv_mintransitiontime - Estimate minimum transition times of network.
 %      shc_lv_ode         	  - ODEs for N-dimensional Lotka-Volterra system.
-%      shc_lv_params          - Find RHO matrix parameters from description.
+%      shc_lv_params          - Connection matrix parameters from specification.
 %      shc_lv_passagetime     - Mean first passage times of SHC network.
 %      shc_lv_stability       - Saddle values of Lotka-Volterra system nodes.
 %      shc_lv_symequilibria   - Solve for all equlibrium points symbolically.
 %      shc_lv_symparams       - Create symbolic SHC parameters with assumptions.
-%      shc_lv_taufit          - Nonlinear-compensated (fitted) mean period.
+%      shc_lv_taufit          - Nonlinear-compensated (fitted) mean sub-periods.
 %      shc_lv_transitiontime  - Inter-passage transition times of SHC network.
 %
 %  Stone-Holmes distribution.
@@ -52,17 +48,13 @@
 %      stoneholmesrnd   	  - Random number generator.
 %      stoneholmesstat        - Mean and variance of distribution.
 %      stoneholmesvar         - Variance of Stone-Holmes distribution samples.
-%
-%  XML validation files.
-%      shc.dtd                - Document Type Definition.
-%      shc.xsd                - XML Schema.
 
-%  This version tested with Matlab 8.1.0.604 (R2013a)
-%  Mac OS X 10.8.4 (Build: 12E55), Java 1.6.0_51-b11-457-11M4509
+%  This version tested with Matlab 8.2.0.701 (R2013b)
+%  Mac OS X 10.9.3 (Build: 13D65), Java 1.7.0_60-b19
 %  Compatibility maintained back through Matlab 7.4 (R2007a)
 
 %  Andrew D. Horchler, adh9 @ case . edu
-%  Created: 1-4-12, Revision: 1.1, 8-30-13
+%  Created: 1-4-12, Version: 1.2, 6-14-14
 
 
 %  Acknowledgment of support: This material is based upon work supported by the
@@ -72,7 +64,7 @@
 %  of the National Science Foundation.
 
 
-%  Copyright © 2012-2013, Andrew D. Horchler
+%  Copyright © 2012-2014, Andrew D. Horchler
 %  All rights reserved.
 %
 %  Redistribution and use in source and binary forms, with or without
