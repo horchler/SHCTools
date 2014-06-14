@@ -88,7 +88,7 @@ if ~isscalar(epsilon_hat) && length(epsilon_hat) ~= n
          ['If Epsilon_Hat is a non-scalar vector, it must have the same '...
           'length as the network dimension.']);
 end
-if ~isscalar(epsilon_hat) && all(epsilon_hat(1) == epsilon_hat)
+if ~isscalar(epsilon_hat) && all(epsilon_hat(1) == epsilon_hat(:))
     epsilon_hat = epsilon_hat(1);
 else
     epsilon_hat = epsilon_hat(:);

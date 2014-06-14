@@ -11,7 +11,7 @@ function [alp,bet,varargout]=shc_lv_params(tau,epsilon,bet,nu)
 %       STONEHOLMESPASSAGETIME, SHC_LV_MINTRANSITIONTIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
-%   Revision: 1.3, 3-1-14
+%   Revision: 1.4, 6-14-14
 
 
 persistent SHC_LV_PARAMS_CACHE
@@ -61,13 +61,11 @@ end
 % Check Nu
 if ~isvector(nu) || isempty(nu) || ~isfloat(nu)
     error('SHCTools:shc_lv_params:NuInvalid',...
-         ['The state magnitude, Nu, must be a non-empty floating-point '...
-          'vector.']);
+          'The saddle value, Nu, must be a non-empty floating-point vector.');
 end
-if ~isreal(nu) || ~all(isfinite(nu)) || any(nu <= 0)
+if ~isreal(nu) || ~all(isfinite(nu))
     error('SHCTools:shc_lv_params:NuNonFiniteReal',...
-         ['The state magnitude, Nu, must be a positive finite real '...
-          'floating-point vector.']);
+          'The saddle value, Nu, must be a finite real floating-point vector.');
 end
 
 % Check lengths
@@ -109,29 +107,30 @@ end
 
 % Check values according to floating-point type
 dtype = superiorfloat(tau,epsilon,bet,nu);
+ept = eps(dtype);
 eprm = eps(realmax(dtype));
 
-if any(tau < eps(dtype)) || any(tau > eprm)
+if any(tau < ept) || any(tau > eprm)
     error('SHCTools:shc_lv_params:TauTooSmallOrLarge',...
          ['The global period, Tau, must be a positive value greater than or '...
           'equal to machine epsilon, EPS(1), and less than EPS(REALMAX) '...
-          '(2^%d <= TAU < 2^%d for %s precision).'],log2(eps(dtype)),...
+          '(2^%d <= TAU < 2^%d for %s precision).'],log2(ept),...
           log2(eprm),dtype);
 end
 
-if any(bet < eps(dtype)) || any(bet > eprm)
+if any(bet < ept) || any(bet > eprm)
     error('SHCTools:shc_lv_params:BetaTooSmallOrLarge',...
          ['The state magnitude, Beta, must be a positive value greater than '...
           'or equal to machine epsilon, EPS(1), and less than or equal to '...
           'EPS(REALMAX) (2^%d <= Beta <= 2^%d for %s precision).'],...
-          log2(eps(dtype)),log2(eprm),dtype);
+          log2(ept),log2(eprm),dtype);
 end
 
 % Delta, neighborhood size
 delta = shc_lv_neighborhood(bet);
 
-% Alpha(i) = F(Epsilon(i+1)), scaled by Beta to match Delta
-epsilon = epsilon([2:end 1]).*bet;
+% Alpha(i) = F(Epsilon(i+1))
+epsilon = epsilon([2:end 1]);
 
 if any(epsilon < sqrt(realmin(dtype))) || any(epsilon > delta)
     error('SHCTools:shc_lv_params:EpsilonTooSmallOrLarge',...
@@ -141,10 +140,10 @@ if any(epsilon < sqrt(realmin(dtype))) || any(epsilon > delta)
           'precision).'],log2(sqrt(realmin(dtype))),dtype);
 end
 
-if any(nu <= 0) || any(nu > eprm)
+if any(nu < 1) || any(nu > eprm)
     error('SHCTools:shc_lv_params:NuTooSmallOrLarge',...
-         ['The stability parameter, Nu, must be greater than 0 and less '...
-          'than or equal to EPS(REALMAX) (0 < Nu <= 2^%d for %s '...
+         ['The saddle value parameter, Nu, must be greater than 0 and less '...
+          'than or equal to EPS(REALMAX) (1 <= Nu <= 2^%d for %s '...
           'precision).'],log2(eprm),dtype);
 end
 
@@ -168,7 +167,7 @@ else
     end
 end
 
-% Minimum transition time estimate times Alpha
+% Minimum transition time estimate muliplied by Alpha
 lbdm1 = log(bet./delta-1);
 tt = lbdm1+lbdm1([end 1:end-1]);
 
@@ -177,7 +176,7 @@ eulergamma = 0.577215664901533;
 c = 2*(log(epsilon)-log(delta))-eulergamma+log(0.5*tau)-pi*1i;
 alp = -0.5*nu.*wrightOmegaq(c+log1p(1./nu)-2*tt./nu)./tau;
 
-% Solve for Nu to meet Alpha(i) >= Alpha(i-1)/Nu(i-1) requirement
+% Solve for Nu to meet Alpha(i) >= Alpha(i-1)/Nu(i-1) requirement if needed
 if ~isUniform
     alpnu = alp([end 1:end-1])./nu([end 1:end-1]);
     idx = (alpnu > alp);
@@ -192,13 +191,13 @@ if ~isUniform
         afun = @(nu,i)-0.5*nu.*wrightOmegaq(c(i)+log1p(1./nu)-2*tt(i)./nu)./tau(i);
         
         % Options structure for FZERO
-        opts = struct('Display','off','TolX',eps(dtype));
+        opts = struct('Display','off','TolX',ept);
         
         % Find root in terms of Nu
         for i = find(idx).'
             nuroot = @(nu)afun(nu,i)-alpnu(i);
-            bounds = bracketroot(nuroot,nu(i),[eps(dtype) eprm],'+');
-            [nu(i),fval,exitflag] = fzero(nuroot,bounds,opts);
+            bounds = bracketroot(nuroot,nu(i),[ept eprm],'+');
+            [nu(i),fval,exitflag] = fzero(@(nu)afun(nu,i)-alpnu(i),bounds,opts);
             
             % Check output from FZERO
             if exitflag < 0
@@ -210,12 +209,14 @@ if ~isUniform
                         'specifications may be illconditioned.'],i);
             end
         end
+        
+        % Scale Nu to ensure Rho is non-negative and recalculate Alpha
+        nu(idx) = (1+ept)*nu(idx);
+        alp(idx) = afun(nu(idx),idx);
     end
-    nu(idx) = (1+eps(dtype))*nu(idx);
-    alp(idx) = afun(nu(idx),idx);
 end
 
-if any(alp < eps(dtype)) || any(alp > realmax(dtype)/2) || any(isnan(alp))
+if any(alp < ept) || any(alp > realmax(dtype)/2) || any(isnan(alp))
     error('SHCTools:shc_lv_params:InvalidSolutionAlpha',...
           'Unable to reach a valid solution.');
 end
