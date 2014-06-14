@@ -1,7 +1,7 @@
 SHCTools
 ========
 #####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems Based&nbsp;on&nbsp;Networks&nbsp;of&nbsp;Stable&nbsp;Heteroclinic&nbsp;Channels&nbsp;(SHCs).#####
-######Version 1.1, 8-30-13######
+######Version 1.2, 6-14-14######
 
 How to install (and uninstall) SHCTools:  
  1. Download and expand the *[SHCTools-master.zip](https://github.com/horchler/SHCTools/archive/master.zip)* ZIP archive of the repository.  
@@ -13,10 +13,6 @@ How to install (and uninstall) SHCTools:
 
 SHC network creation, modification, and visualization, and conversion.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```buildrho```](https://github.com/horchler/SHCTools/blob/master/SHCTools/buildrho.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create RHO matrix from SHC network structure.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```loadnet```](https://github.com/horchler/SHCTools/blob/master/SHCTools/loadnet.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Load SHC network structure from XML or MAT file.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```plotactivity```](https://github.com/horchler/SHCTools/blob/master/SHCTools/plotactivity.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Plot simulated SHC network activity.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```plotnet```](https://github.com/horchler/SHCTools/blob/master/SHCTools/plotnet.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Visualization of SHC network topology.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```savenet```](https://github.com/horchler/SHCTools/blob/master/SHCTools/savenet.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Save SHC network structure as XML or MAT file.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_addnetwork```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_addnetwork.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Insert a sub-network into SHC network structure.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_create```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_create.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create SHC network structure from parameters.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_deletenetwork```](https://github.com/horchler/SHCTools/blob/master/SHCTools/shc_deletenetwork.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Remove a sub-network and its children.  
@@ -59,29 +55,26 @@ Stone-Holmes distribution.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmespassagetime```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmespassagetime.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Mean passage time.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmespdf```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmespdf.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Probability density function.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```stoneholmesrnd```](https://github.com/horchler/SHCTools/blob/master/SHCTools/stoneholmes/stoneholmesrnd.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Random number generator.
-
-XML validation files.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc.dtd```](https://github.com/horchler/SHCTools/blob/master/SHCTools/xml/shc.dtd)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Document Type Definition.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc.xsd```](https://github.com/horchler/SHCTools/blob/master/SHCTools/xml/shc.xsd)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- XML Schema.  
 &nbsp;  
 
 --------
 
 References  
  1. V.S. Afraimovich, M.I. Rabinovich, and P. Varona, &#8220;Heteroclinic contours in neural ensembles and the winnerless competition,&#8221; *Int. J. Bifurcation Chaos*, Vol. 14, 2004, pp. 1195&ndash;1208. [[PDF Preprint](http://arxiv.org/abs/nlin/0304016)] [[http://dx.doi.org/10.1142/S0218127404009806](http://dx.doi.org/10.1142/S0218127404009806)]  
- 2. M.I. Rabinovich, R. Huerta, P. Varona, and V.S. Afraimovich, &#8220;Transient Cognitive Dynamics, Metastability, and Decision Making,&#8221; *PLoS Comp. Biol.*, Vol. 4, No. 5, 2008, e1000072. [[http://dx.doi.org/10.1371/journal.pcbi.1000072](http://dx.doi.org/10.1371/journal.pcbi.1000072)]  
- 3. J.W. Reyn, &#8220;A Stability Criterion for Separatrix Polygons in the Phase Plane,&#8221; *Nieuw Archief Voor Wiskunde (3)*, Vol. 27, 1979, pp. 238&ndash;254. [[PDF](https://github.com/horchler/SHCTools/blob/master/references/reyn_criterion_1979.pdf?raw=true)]  
- 4. K.M. Shaw, Y.-M. Park, H.J. Chiel, and P.J. Thomas, &#8220;Phase Resetting in an Asymptotically Phaseless System: On the Phase Response of Limit Cycles Verging on a Heteroclinic Orbit,&#8221; *SIAM J. Appl. Dyn. Syst.*, Vol. 11, No. 1, 2012, pp. 350&ndash;391. [[http://dx.doi.org/10.1137/110828976](http://dx.doi.org/10.1137/110828976)]  
- 5. E. Stone and P. Holmes, &#8220;Random Perturbations of Heteroclinic Attractors,&#8221; *SIAM J. Appl. Math.*, Vol. 50, No. 3, 1990, pp. 726&ndash;743. [[http://jstor.org/stable/2101884](http://jstor.org/stable/2101884)]  
+ 2. A.D. Horchler, K.A. Daltorio, H.J. Chiel, and R.D Quinn &#8220;Designing Responsive Pattern Generators: Stable Heteroclinic Channel Cycles for Modeling and Control,&#8221; *Bioinspir. Biomim.*, Submitted for review, Jun. 2014. (Please contact me for a copy of the manuscript.)  
+ 3. M.I. Rabinovich, R. Huerta, P. Varona, and V.S. Afraimovich, &#8220;Transient Cognitive Dynamics, Metastability, and Decision Making,&#8221; *PLoS Comp. Biol.*, Vol. 4, No. 5, 2008, e1000072. [[http://dx.doi.org/10.1371/journal.pcbi.1000072](http://dx.doi.org/10.1371/journal.pcbi.1000072)]  
+ 4. J.W. Reyn, &#8220;A Stability Criterion for Separatrix Polygons in the Phase Plane,&#8221; *Nieuw Archief Voor Wiskunde (3)*, Vol. 27, 1979, pp. 238&ndash;254. [[PDF](https://github.com/horchler/SHCTools/blob/master/references/reyn_criterion_1979.pdf?raw=true)]  
+ 5. K.M. Shaw, Y.-M. Park, H.J. Chiel, and P.J. Thomas, &#8220;Phase Resetting in an Asymptotically Phaseless System: On the Phase Response of Limit Cycles Verging on a Heteroclinic Orbit,&#8221; *SIAM J. Appl. Dyn. Syst.*, Vol. 11, No. 1, 2012, pp. 350&ndash;391. [[http://dx.doi.org/10.1137/110828976](http://dx.doi.org/10.1137/110828976)]  
+ 6. E. Stone and P. Holmes, &#8220;Random Perturbations of Heteroclinic Attractors,&#8221; *SIAM J. Appl. Math.*, Vol. 50, No. 3, 1990, pp. 726&ndash;743. [[http://jstor.org/stable/2101884](http://jstor.org/stable/2101884)]  
 &nbsp;  
 
 --------
 
 Andrew D. Horchler, *adh9 @ case . edu*, [biorobots.case.edu](http://biorobots.case.edu/)  
-Created: 1-4-12, Revision: 1.1, 8-30-13  
+Created: 1-4-12, Revision: 1.2, 6-14-14  
 
-This version tested with Matlab 8.1.0.604 (R2013a)  
-Mac OS X 10.8.4 (Build: 12E55), Java 1.6.0_51-b11-457-11M4509  
+This version tested with Matlab 8.2.0.701 (R2013b)  
+Mac OS X 10.9.3 (Build: 13D65), Java 1.7.0_60-b19 
 Compatibility maintained back through Matlab 7.4 (R2007a)  
 &nbsp;  
 
@@ -90,7 +83,7 @@ Compatibility maintained back through Matlab 7.4 (R2007a)
 Acknowledgment of support: This material is based upon work supported by the [National Science Foundation](http://www.nsf.gov/) under [Grant No.&nbsp;1065489](http://www.nsf.gov/awardsearch/showAward.do?AwardNumber=1065489). Disclaimer: Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.  
 &nbsp;  
 
-Copyright &copy; 2012&ndash;2013, Andrew D. Horchler  
+Copyright &copy; 2012&ndash;2014, Andrew D. Horchler  
 All rights reserved.  
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
