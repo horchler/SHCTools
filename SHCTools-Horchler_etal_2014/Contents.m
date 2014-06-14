@@ -1,4 +1,4 @@
-%SHCTools - Horchler, et al. 2014 - Designing Responsive Pattern Generators
+%SHCTools - Horchler, et al. 2014
 %  Version 1.0, 6-14-14
 %
 %  Lotka-Volterra SHC cycle tools.
