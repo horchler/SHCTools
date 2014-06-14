@@ -35,8 +35,8 @@ Passage time.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_taufit```](https://github.com/horchler/SHCTools/blob/SHC-Design-Paper/SHCTools-Horchler_etal_2014/shc_taufit.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Nonlinear-compensated (fitted) mean period.  
 
 Utilities.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```coefvar```](https://github.com/horchler/SHCTools/blob/SHC-Design-Paper/SHCTools-Horchler_etal_2014/coefvar.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Coefficient of variation for data samples.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```wrightomegaq```](https://github.com/horchler/SHCTools/blob/SHC-Design-Paper/SHCTools-Horchler_etal_2014/wrightomegaq.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Wright omega function, a solution to W+LOG(W) = Z.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```coefvar```](https://github.com/horchler/SHCTools/blob/SHC-Design-Paper/SHCTools-Horchler_etal_2014/coefvar.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Coefficient of variation for data samples.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```wrightomegaq```](https://github.com/horchler/SHCTools/blob/SHC-Design-Paper/SHCTools-Horchler_etal_2014/wrightomegaq.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Wright *&omega;* function, a solution to *&omega;*+ln(*&omega;*) = *Z*.  
 &nbsp;  
 
 --------
