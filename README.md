@@ -5,7 +5,7 @@ SHCTools
 
 --------
 
-<span style="color:red;">**NOTICE**</span>: Code for *Designing Responsive Pattern Generators: Stable Heteroclinic Channel Cycles for Modeling and Control* by Horchler, et al. can be found [here](https://github.com/horchler/SHCTools/tree/SHC-Design-Paper).
+<div style="color:red;display:inline;">**NOTICE**</div>: Code for *Designing Responsive Pattern Generators: Stable Heteroclinic Channel Cycles for Modeling and Control* by Horchler, et al. can be found [here](https://github.com/horchler/SHCTools/tree/SHC-Design-Paper).
 
 --------
 
