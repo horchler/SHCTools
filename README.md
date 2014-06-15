@@ -9,8 +9,8 @@ This branch of the SHCTools repository maintains the code for the paper *Designi
 &nbsp;  
 How to install:  
  1. Download and expand the *[SHCTools-SHC-Design-Paper.zip](https://github.com/horchler/SHCTools/archive/SHC-Design-Paper.zip)* ZIP archive of the repository.  
- 2. Move the resultant *SHC-Design-Paper* folder to the desired permanent location.  
- 3. In Matlab, navigate to *SHC-Design-Paper/SHCTools-Horchler_etal_2014/*. Add this folder to your Matlab search ```path``` if desired.  
+ 2. Move the resultant *SHCTools-SHC-Design-Paper* folder to the desired permanent location.  
+ 3. In Matlab, navigate to *SHCTools-SHC-Design-Paper/SHCTools-Horchler_etal_2014/*. Add this folder to your Matlab search ```path``` if desired.  
 &nbsp;  
 
 --------
