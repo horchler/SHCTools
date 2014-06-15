@@ -12,6 +12,7 @@ SHCTools
 --------
 
 &nbsp;  
+&nbsp;  
 How to install (and uninstall) SHCTools:  
  1. Download and expand the *[SHCTools-master.zip](https://github.com/horchler/SHCTools/archive/master.zip)* ZIP archive of the repository.  
  2. Move the resultant *SHCTools-master* folder to the desired permanent location.  
