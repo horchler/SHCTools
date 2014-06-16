@@ -11,7 +11,7 @@ How to install:
  1. Download and expand the *[SHCTools-SHC-Design-Paper.zip](https://github.com/horchler/SHCTools/archive/SHC-Design-Paper.zip)* ZIP archive of the repository.  
  2. Move the resultant *SHCTools-SHC-Design-Paper* folder to the desired permanent location.  
  3. In Matlab, navigate to *SHCTools-SHC-Design-Paper/SHCTools-Horchler_etal_2014/*. Add this folder to your Matlab search ```path``` if desired.  
- 4. Code to produce the basic form of the figures in the paper can be found in *SHCTools-SHC-Design-Paper/Figures-Horchler_etal_2014/*. These M-files use the functions in the *SHCTools-Horchler_etal_2014/* folder. Either move these M-files or set the Matlab search path as described in step 3.  
+ 4. Code to produce the basic form of the figures in the paper can be found in *SHCTools-SHC-Design-Paper/Figures-Horchler_etal_2014/*. These M-files use the functions in the *SHCTools-Horchler_etal_2014/* folder. Either move these M-files or set the search path as described in step 3.  
 &nbsp;  
 
 --------
