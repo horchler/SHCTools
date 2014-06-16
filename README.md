@@ -1,7 +1,7 @@
 SHCTools
 ========
 #####A Matlab Toolbox for the Simulation, Analysis, and Design of Continuous Dynamical Systems Based&nbsp;on&nbsp;Networks&nbsp;of&nbsp;Stable&nbsp;Heteroclinic&nbsp;Channels&nbsp;(SHCs).#####
-######Version 1.2, 6-14-14######
+######Version 1.2, 6-15-14######
 
 &nbsp;  
 
@@ -83,7 +83,7 @@ References
 --------
 
 Andrew D. Horchler, *adh9 @ case . edu*, [biorobots.case.edu](http://biorobots.case.edu/)  
-Created: 1-4-12, Version: 1.2, 6-14-14  
+Created: 1-4-12, Version: 1.2, 6-15-14  
 
 This version tested with Matlab 8.2.0.701 (R2013b)  
 Mac OS X 10.9.3 (Build: 13D65), Java 1.7.0_60-b19 
