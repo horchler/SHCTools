@@ -19,6 +19,7 @@ function shc_lv_demo(dt,tau,epsilon_hat,bet,nu,N)
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-16-14
 %   Revision: 1.0, 6-16-14
 
+
 if nargin == 0
     dt = 1e-4;            	% Integration step size
     tau = 1;              	% Sub-period for design
@@ -56,9 +57,9 @@ disp('Connection matrix:');
 disp('Rho =');
 disp(rho);
 
-% Actual mean sub-period
+% Uncompensated mean sub-period
 tau_bar = shc_lv_meanperiod(dt,rho,alp,epsilon_hat,N);
-disp('Actual mean sub-period:');
+disp('Uncompensated mean sub-period:');
 disp('Tau_bar =');
 disp(tau_bar);
 
@@ -69,6 +70,7 @@ disp('Epsilon =');
 disp(epsilon);
 
 % Find initial condition and simulate
+disp('Simulating...');
 t0 = 0; tf = 10*tau; t = t0:dt:tf;
 a0 = shc_lv_ic(dt,rho,alp,epsilon);
 a = shc_lv_integrate(t,a0,rho,alp,epsilon);
@@ -79,4 +81,12 @@ plot(t,a);
 axis([t0-0.4*tau tf -0.05*max(bet) max(bet)]);
 box off;
 xlabel('Time','FontSize',14);
-ylabel('Activity','FontSize',14)
+ylabel('Activity','FontSize',14);
+
+% Compensated mean sub-period
+tau_comp = shc_lv_meanperiod(dt,rho,alp,epsilon,N);
+disp('Compensated mean sub-period:');
+disp('Tau_comp =');
+disp(tau_comp);
+disp('Absolute Error =');
+disp(abs(tau-tau_comp));
