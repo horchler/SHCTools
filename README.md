@@ -1,7 +1,7 @@
 SHCTools &ndash; Horchler, et al. 2014
 ========
 #####Matlab Tools for the Simulation, Analysis, and Design of Stable Heteroclinic Channel (SHC) cycles.#####
-######Version 1.0, 6-15-14######
+######Version 1.0, 6-16-14######
 
 This branch of the SHCTools repository maintains the code for the paper *Designing Responsive Pattern Generators: Stable Heteroclinic Channel Cycles for Modeling and Control* by Horchler, et al. The code in this branch is meant for readability and is specific to the subject the paper: mean first passage time and Lotka-Volterra SHC cycles. Many optimizations and features found in the [master SHCTools branch](https://github.com/horchler/SHCTools/tree/master) are not present. The functions here will remain static and will only be updated to fix bugs.
 
@@ -18,7 +18,8 @@ How to install:
 
 Lotka-Volterra SHC cycle tools.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_createcycle```](https://github.com/horchler/SHCTools/blob/SHC-Design-Paper/SHCTools-Horchler_etal_2014/shc_lv_createcycle.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create Lotka-Volterra SHC cycle connection matrix.  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_eigs```](https://github.com/horchler/SHCTools/blob/SHC-Design-Paper/SHCTools-Horchler_etal_2014/shc_lv_eigs.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Eigenvalues/vectors of Lotka-Volterra system.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_demo```](https://github.com/horchler/SHCTools/blob/SHC-Design-Paper/SHCTools-Horchler_etal_2014/shc_lv_demo.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Eigenvalues/vectors of Lotka-Volterra system.  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_eigs```](https://github.com/horchler/SHCTools/blob/SHC-Design-Paper/SHCTools-Horchler_etal_2014/shc_lv_eigs.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Basic demonstration of SHC cycle design and simulation.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_epsilonfit```](https://github.com/horchler/SHCTools/blob/SHC-Design-Paper/SHCTools-Horchler_etal_2014/shc_lv_epsilonfit.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Nonlinear-compensated (fitted) noise magnitudes.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_ic```](https://github.com/horchler/SHCTools/blob/SHC-Design-Paper/SHCTools-Horchler_etal_2014/shc_lv_ic.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Find initial conditions on the SHC manifold.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[```shc_lv_integrate```](https://github.com/horchler/SHCTools/blob/SHC-Design-Paper/SHCTools-Horchler_etal_2014/shc_lv_integrate.m)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Solve Lotka-Volterra SDEs numerically.  
@@ -56,7 +57,7 @@ Key references.
 --------
 
 Andrew D. Horchler, *adh9 @ case . edu*, [biorobots.case.edu](http://biorobots.case.edu/)  
-Created: 1-4-12, Version: 1.0, 6-15-14  
+Created: 1-4-12, Version: 1.0, 6-16-14  
 
 This version tested with Matlab 8.2.0.701 (R2013b)  
 Mac OS X 10.9.3 (Build: 13D65), Java 1.7.0_60-b19 
