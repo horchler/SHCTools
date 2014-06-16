@@ -2,8 +2,6 @@ Figures &ndash; Horchler, et al. 2014
 ========
 ######Version 1.0, 6-16-14######
 
-&nbsp;  
-About this code:  
 The functions in this folder produce the basic forms of the programmatically-generated parts of the figures in the paper. The default setting are the same as those specified in the paper. In some cases this may mean that the scripts will take a long time to complete, even on a fast computer (figures 7 and 8 in particular).
 &nbsp;  
 &nbsp;  
