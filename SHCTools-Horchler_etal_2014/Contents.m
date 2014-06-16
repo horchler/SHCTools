@@ -1,5 +1,5 @@
 %SHCTools - Horchler, et al. 2014
-%  Version 1.0, 6-14-14
+%  Version 1.0, 6-15-14
 %
 %  Lotka-Volterra SHC cycle tools.
 %      shc_lv_createcycle   - Create Lotka-Volterra SHC cycle connection matrix.
@@ -24,14 +24,14 @@
 %
 %   Utilities.
 %       coefvar             - Coefficient of variation for data samples.
-%       wrightomegaq        - Wright omega function, a solution to W+LOG(W) = Z.
+%       wrightOmegaq        - Wright omega function, a solution to W+LOG(W) = Z.
 
 %  This version tested with Matlab 8.2.0.701 (R2013b)
 %  Mac OS X 10.9.3 (Build: 13D65), Java 1.7.0_60-b19
 %  Compatibility maintained back through Matlab 7.4 (R2007a)
 
 %  Andrew D. Horchler, adh9 @ case . edu
-%  Created: 1-4-12, Version: 1.0, 6-14-14
+%  Created: 1-4-12, Version: 1.0, 6-15-14
 
 
 %  Acknowledgment of support: This material is based upon work supported by the
