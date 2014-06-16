@@ -6,7 +6,8 @@ Figures &ndash; Horchler, et al. 2014
 About this code:  
 The functions in this folder produce the basic forms of the programmatically-generated parts of the figures in the paper. The default setting are the same as those specified in the paper. In some cases this may mean that the scripts will take a long time to complete, even on a fast computer (figures 7 and 8 in particular).
 &nbsp;  
-These M-files use the functions in the *SHCTools-SHC-Design-Paper/SHCTools-Horchler_etal_2014/* folder. Either move these M-files or set the Matlab search ```path```.  
+&nbsp;  
+These M-files use the functions in the *SHCTools-SHC-Design-Paper/SHCTools-Horchler_etal_2014/* folder. Either move these M&#8209;files or set the Matlab search ```path```.  
 &nbsp;  
 
 --------
