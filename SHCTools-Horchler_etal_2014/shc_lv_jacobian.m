@@ -14,27 +14,27 @@ function J=shc_lv_jacobian(rho,alpha,eqpt)
 %       SHC_LV_EIGS, SHC_LV_LAMBDA_US, SHC_LV_ODE, SHC_LV_CREATECYCLE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 12-1-10
-%   Revision: 1.2, 2-27-14
+%   Revision: 1.2, 6-15-14
 
 
 n = size(rho,1);
 alpha = alpha(:);
-beta = alpha./diag(rho);
+rhoii = diag(rho);
 
+z = ones(1,n);
 if nargin == 3
     eqpt = -eqpt(:);
     
     % Calculate Jacobian
-    J = rho.*eqpt(:,ones(1,n));
-    J(1:n+1:end) = alpha.*(1+eqpt./beta)+rho*eqpt;
+    J = rho.*eqpt(:,z);
+    J(1:n+1:end) = alpha+rhoii.*eqpt+rho*eqpt;
 else
-    eqpt = diag(-beta);
+    eqpt = diag(-alpha./rhoii);
     
-    z = ones(1,n);
     for i = n:-1:1
         % Calculate Jacobian
         v = eqpt(:,i);
         J{i} = rho.*v(:,z);
-        J{i}(1:n+1:end) = alpha.*(1+v./beta)+rho*v;
+        J{i}(1:n+1:end) = alpha+rhoii.*v+rho*v;
     end
 end

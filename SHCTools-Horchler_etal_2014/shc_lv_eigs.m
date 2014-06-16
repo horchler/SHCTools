@@ -28,7 +28,7 @@ function varargout=shc_lv_eigs(rho,alpha,M)
 %       SHC_LV_JACOBIAN, SHC_CREATECYCLE, SHC_LV_LAMBDA_US
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-6-12
-%   Revision: 1.3, 6-4-14
+%   Revision: 1.3, 6-15-14
 
     
 n = size(rho,1);
@@ -37,8 +37,7 @@ alpha = alpha(:);
 if nargin > 2
     if isscalar(M)
         eqpt(n,1) = zeros(1,class(rho));
-        beta = alpha./diag(rho);
-        eqpt(M) = beta(M);
+        eqpt(M) = (alpha(M)+zeros(n,1))./rho((M-1)*n+M);
     else
         eqpt = M(:);
     end
