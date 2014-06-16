@@ -1,12 +1,13 @@
 function tau=shc_passagetime(delta,epsilon,lambda_u,lambda_s)
-%SHC_PASSAGETIME  Mean passage time for Stone-Holmes distribution.
-%   TAU = SHC_PASSAGETIME(DELTA,EPSILON,LAMBDA_U,LAMBDA_S) returns the mean
-%   passage time of the Stone-Holmes distribution with positive parameters
+%SHC_PASSAGETIME  Mean first passage time for Stone-Holmes distribution.
+%   TAU = SHC_PASSAGETIME(DELTA,EPSILON,LAMBDA_U,LAMBDA_S) returns mean first
+%   passage times for the Stone-Holmes distribution with positive parameters
 %   DELTA, EPSILON, LAMBDA_U, and LAMBDA_S. DELTA is the size of the
 %   neighborhood, EPSILON (0 <= EPSILON << DELTA) is the root-mean-square of the
 %   noise, and LAMBDA_U and LAMBDA_S (LAMBDA_U < LAMBDA_S) are the absolute
 %   value of the eigenvalues with the largest positive and negative real parts,
-%   respectively. The parameters must be scalars or length M vectors.
+%   respectively. The parameters must be scalars or equal length vectors, which
+%   are applied elementwise to the output.
 %
 %   Note:
 %       A warning is generated if the noise magnitude, Epsilon, is too large
@@ -27,7 +28,7 @@ function tau=shc_passagetime(delta,epsilon,lambda_u,lambda_s)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-19-12
-%   Revision: 1.1, 5-29-14
+%   Revision: 1.1, 6-15-14
 
 
 if isa(delta,'sym') || isa(epsilon,'sym') || isa(lambda_u,'sym') ...

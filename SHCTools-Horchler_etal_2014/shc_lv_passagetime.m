@@ -1,19 +1,28 @@
 function tau=shc_lv_passagetime(rho,alpha,epsilon)
-%SHC_LV_PASSAGETIME  Mean passage times for Lotka-Volterra SHC cycle.
+%SHC_LV_PASSAGETIME  Mean first passage times for Lotka-Volterra SHC cycle.
+%   TAU = SHC_LV_PASSAGETIME(RHO,ALPHA,EPSILON) returns the mean first passage
+%   time estimates TAU for the nodes of a Lotka-Volterra SHC cycle. RHO is an
+%   N-by-N connection matrix, ALPHA is a scalar or length N vector of growth
+%   rates, and EPSILON is a scalar or length N vector of noise magnitudes.
 %   
 %   See also:
 %       SHC_PASSAGETIME, SHC_LV_TAUFIT, SHC_LV_EPSILONFIT, SHC_LV_MEANPERIOD,
 %       SHC_LV_MINTRANSITIONTIME, SHC_LV_NEIGHBORHOOD
 
+%   Uses a personally derived analytical solution and approximation based on
+%   Eq. (2.28) in: Emily Stone and Philip Holmes, "Random Perturbations of
+%   Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50, No. 3, pp. 726-743,
+%   Jun. 1990. http://jstor.org/stable/2101884
+
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-20-14
-%   Revision: 1.0, 5-29-14
+%   Revision: 1.0, 6-15-14
 
 
 n = size(rho,1);
 alpha = alpha(:)+zeros(n,1);
 beta = alpha./diag(rho);
 
-% Scaled neighborhood size
+% Scaled neighborhood size(s)
 delta = shc_lv_neighborhood(beta);
 
 % Tau(i) = F(Delta(i), Epsilon(i+1), Lambda_U(i), Lambda_S(i))
