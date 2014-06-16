@@ -1,7 +1,7 @@
 SHCTools &ndash; Horchler, et al. 2014
 ========
 #####Matlab Tools for the Simulation, Analysis, and Design of Stable Heteroclinic Channel (SHC) cycles.#####
-######Version 1.0, 6-14-14######
+######Version 1.0, 6-15-14######
 
 This branch of the SHCTools repository maintains the code for the paper *Designing Responsive Pattern Generators: Stable Heteroclinic Channel Cycles for Modeling and Control* by Horchler, et al. The code in this branch is meant for readability and is specific to the subject the paper: mean first passage time and Lotka-Volterra SHC cycles. Many optimizations and features found in the [master SHCTools branch](https://github.com/horchler/SHCTools/tree/master) are not present. The functions here will remain static and will only be updated to fix bugs.
 
@@ -11,6 +11,7 @@ How to install:
  1. Download and expand the *[SHCTools-SHC-Design-Paper.zip](https://github.com/horchler/SHCTools/archive/SHC-Design-Paper.zip)* ZIP archive of the repository.  
  2. Move the resultant *SHCTools-SHC-Design-Paper* folder to the desired permanent location.  
  3. In Matlab, navigate to *SHCTools-SHC-Design-Paper/SHCTools-Horchler_etal_2014/*. Add this folder to your Matlab search ```path``` if desired.  
+ 4. Code to produce the basic form of the figures in the paper can be found in *SHCTools-SHC-Design-Paper/Figures-Horchler_etal_2014/*. These M-files use the functions in the *SHCTools-Horchler_etal_2014/* folder. Either move these M-files or set the Matlab search path as described in step 3.  
 &nbsp;  
 
 --------
@@ -55,7 +56,7 @@ Key references.
 --------
 
 Andrew D. Horchler, *adh9 @ case . edu*, [biorobots.case.edu](http://biorobots.case.edu/)  
-Created: 1-4-12, Version: 1.0, 6-14-14  
+Created: 1-4-12, Version: 1.0, 6-15-14  
 
 This version tested with Matlab 8.2.0.701 (R2013b)  
 Mac OS X 10.9.3 (Build: 13D65), Java 1.7.0_60-b19 
