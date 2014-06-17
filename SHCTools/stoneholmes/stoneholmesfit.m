@@ -76,7 +76,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 2-27-14
+%   Revision: 1.0, 6-16-14
 
 
 % Check number of input and output arguments
@@ -91,146 +91,147 @@ end
 % Check X
 if ~isreal(x) || ~isfloat(x)
     error('SHCTools:stoneholmesfit:XInvalid',...
-          'X must be a real floating point array.')
+          'X must be a real floating point array.');
 end
-sx=size(x);
+sx = size(x);
 
 % Check variable inputs
-deltaset=true;
-lambda_sset=true;
-censoringset=true;
-freqset=true;
-optsset=true;
-options=[];
-for i=1:nargin-1
-    v=varargin{i};
+deltaset = true;
+lambda_sset = true;
+censoringset = true;
+freqset = true;
+optsset = true;
+options = [];
+for i = 1:nargin-1
+    v = varargin{i};
     if  i == 1 && isscalar(v)
         if ~isreal(v) || ~isnumeric(v) || v <= 0 || ~isfinite(v)
             error('SHCTools:stoneholmesfit:DeltaInvalid',...
-                  'Delta must be a finite real positive scalar.')
+                  'Delta must be a finite real positive scalar.');
         end
-        delta=v;
-        deltaset=false;
+        delta = v;
+        deltaset = false;
     elseif  i == 2 && isscalar(v)
         if ~isreal(v) || ~isnumeric(v) || v <= 0 || isnan(v)
             error('SHCTools:stoneholmesfit:Lambda_SInvalid',...
-                  'Lambda_S must be a real positive scalar.')
+                  'Lambda_S must be a real positive scalar.');
         end
-        lambda_s=v;
-        lambda_sset=false;
+        lambda_s = v;
+        lambda_sset = false;
     elseif censoringset && (islogical(v) || all(v == 0 | v == 1))
         if ~isequal(size(v),sx)
             error('SHCTools:stoneholmesfit:FreqInvalid',...
                  ['The censoring vector must have the same length as data '...
-                  'vector, X.'])
+                  'vector, X.']);
         end
         if ~islogical(v) 
             if ~isreal(v) || ~isnumeric(v)
                 error('SHCTools:stoneholmesfit:CensoringInvalid',...
                      ['The censoring vector must either be a logical array '...
-                      'or a numeric array containing only the values 0 and 1.'])
+                      'or a numeric array containing only the values 0 and '...
+                      '1.']);
             end
-            censoring=logical(v);
+            censoring = logical(v);
         else
-            censoring=v;
+            censoring = v;
         end
-        censoringset=false;
+        censoringset = false;
     elseif freqset && isnumeric(v)
         if ~isequal(size(v),sx)
             error('SHCTools:stoneholmesfit:FreqInvalid',...
                  ['The frequency vector must have the same length as the, '...
-                  'data vector, X.'])
+                  'data vector, X.']);
         end
         if ~isreal(v) || any(v < 0) || ~all(isfinite(v))
             error('SHCTools:stoneholmesfit:FreqInvalid',...
                  ['All elements of the frequency vector must be finite real '...
-                  'positive values.'])
+                  'positive values.']);
         end
-        freq=v;
-        freqset=false;
+        freq = v;
+        freqset = false;
     elseif optsset && (isstruct(v) || (isnumeric(v) || iscell(v))...
             && all(size(v) == 0))
-        options=v;
-        optsset=false;
+        options = v;
+        optsset = false;
     else
         error('SHCTools:stoneholmesfit:UnknownArgument',...
-              'Unknown input argument.')
+              'Unknown input argument.');
     end
 end
 
 % Set optional inputs if not specified, handle censoring and frequency data
 if deltaset && (nargout <= 1 || nargout == 4)
-    delta=1;
+    delta = 1;
 end
 if lambda_sset
-    lambda_s=Inf;
+    lambda_s = Inf;
 end
-isNoCensoring=(censoringset || ~any(censoring));
+isNoCensoring = (censoringset || ~any(censoring));
 if freqset
-    freq=1;
-    n=numel(x);
+    freq = 1;
+    n = numel(x);
 else
-    ifreq=(freq > 0);
+    ifreq = (freq > 0);
     if ~all(ifreq)
-        x=x(ifreq);
-        freq=freq(ifreq);
+        x = x(ifreq);
+        freq = freq(ifreq);
         if ~censoringset
-            censoring=censoring(ifreq);
-            isNoCensoring=~any(censoring);
+            censoring = censoring(ifreq);
+            isNoCensoring = ~any(censoring);
         end
     end
-    n=sum(freq);
+    n = sum(freq);
 end
 if ~isNoCensoring
-    uncensored=~censoring;
+    uncensored = ~censoring;
     if freqset
-        frequncensored=1;
-        n=sum(uncensored);
+        frequncensored = 1;
+        n = sum(uncensored);
     else
-        frequncensored=freq(uncensored);
-        n=sum(frequncensored);
+        frequncensored = freq(uncensored);
+        n = sum(frequncensored);
     end
 end
 
 % Generate options structure for fzero
 if isempty(options)
     if isa(x,'single')
-        options=struct('Display','off','TolX',eps('single'),...
-                       'FunValCheck','off');
+        options = struct('Display','off','TolX',eps('single'),...
+                         'FunValCheck','off');
     else
-        options=struct('Display','off','TolX',1e-9,'FunValCheck','off');
+        options = struct('Display','off','TolX',1e-9,'FunValCheck','off');
     end
 else
     if ~isfield(options,'Display')
-        options.('Display')='off';
+        options.Display = 'off';
     end
     if ~isfield(options,'TolX')
         if isa(x,'single')
-            options.('TolX')=eps('single');
+            options.TolX = eps('single');
         else
-            options.('TolX')=1e-9;
+            options.TolX = 1e-9;
         end
     end
     if ~isfield(options,'FunValCheck')
-        options.('FunValCheck')='off';
+        options.FunValCheck = 'off';
     end
 end
 
 % Check for edge cases
-classX=class(x);
+classX = class(x);
 if n == 0 || any(x < 0) || any(x == Inf)
     if nargout <= 1
         if deltaset
-            varargout{1}=NaN(1,3,classX);
+            varargout{1} = NaN(1,3,classX);
         else
-            varargout{1}=NaN(1,4,classX);
+            varargout{1} = NaN(1,4,classX);
         end
     else
-        varargout{1}=NaN(classX);
-        varargout{2}=NaN(classX);
-        varargout{3}=NaN(classX);
+        varargout{1} = NaN(classX);
+        varargout{2} = NaN(classX);
+        varargout{3} = NaN(classX);
         if ~deltaset
-            varargout{4}=NaN(classX);
+            varargout{4} = NaN(classX);
         end
     end
     return
@@ -242,11 +243,11 @@ elseif isNoCensoring
     end
     
     % Estimate Lambda_U parameter as a starting value
-    fx=freq.*x;
-    wtx=sum(fx)/n;
-    lambda_uhat=sqrt((n-1)*4/(pi*(sum(x.*fx)-n*wtx^2)));   % = 2/sqrt(pi*var(x))
+    fx = freq.*x;
+    wtx = sum(fx)/n;
+    lambda_uhat = sqrt((n-1)*4/(pi*(sum(x.*fx)-n*wtx^2))); % = 2/sqrt(pi*var(x))
 else
-    xuncensored=x(uncensored);
+    xuncensored = x(uncensored);
     if range(xuncensored) < eps(min(xuncensored))
         error('SHCTools:stoneholmesfit:NoSolutionNonDistictUncensored',...
              ['The uncensored data in X are not sufficiently distinct for '...
@@ -255,28 +256,28 @@ else
     
     % Use least squares line fit to estimate Lambda_U parameter
     if freqset
-        [p,xp]=ecdf(x,'censoring',censoring);
+        [p,xp] = ecdf(x,'censoring',censoring);
     else
-        [p,xp]=ecdf(x,'censoring',censoring,'frequency',freq);
+        [p,xp] = ecdf(x,'censoring',censoring,'frequency',freq);
     end
-    [Q,R]=qr([log(-log(0.5*(p(1:end-1)+p(2:end)))) ones(n,1,classX)],0);
-    lambda_uhat=R(1)*R(4)/(xp(2:end)'*Q*[-R(4);R(3)]);	% = -1./(R\(Q'*xp))
-    wtx=sum(frequncensored.*xuncensored)/n;
+    [Q,R] = qr([log(-log(0.5*(p(1:end-1)+p(2:end)))) ones(n,1,classX)],0);
+    lambda_uhat = R(1)*R(4)/(xp(2:end).'*Q*[-R(4);R(3)]);	% = -1./(R\(Q'*xp))
+    wtx = sum(frequncensored.*xuncensored)/n;
 end
 
 % Create function handles for FZERO
 if isinf(lambda_s)
-    likelihood=@(lambda_u)likeeq_UInf(lambda_u,x,3/n,4*wtx,freq);
+    likelihood = @(lambda_u)likeeq_UInf(lambda_u,x,3/n,4*wtx,freq);
 else
-    likelihood=@(lambda_u)likeeq_US(lambda_u,lambda_s,x,3/n,4*wtx,freq);
+    likelihood = @(lambda_u)likeeq_US(lambda_u,lambda_s,x,3/n,4*wtx,freq);
 end
 
 % Bracket the root of the Lambda_U likelihood equation
-bnds=bracketroot(likelihood,lambda_uhat,...
-    [realmin(classX) eps(realmax(classX))],'+');
+bnds = bracketroot(likelihood,lambda_uhat,...
+                   [realmin(classX) eps(realmax(classX))],'+');
 
 % Find root of of the likelihood equation, MLE for Lambda_U
-[lambda_uhat,likelihoodval,err]=fzero(likelihood,bnds,options);
+[lambda_uhat,likelihoodval,err] = fzero(likelihood,bnds,options);
 
 if err < 0
     error('SHCTools:stoneholmesfit:NoSolution',...
@@ -287,62 +288,63 @@ elseif eps(likelihoodval) > options.TolX
 end
 
 % Calculate explicit MLE for Theta (Epsilon/Delta) in terms of Lambda_U
-lx=2*lambda_uhat*x;
+lx = 2*lambda_uhat*x;
 if any(lx > log(realmax))
-    theta=double(sqrt(2*lambda_uhat*sum(freq./((1+...
-          lambda_uhat/lambda_s)*exp(vpa(lx))-1))/n));
+    theta = double(sqrt(2*lambda_uhat*sum(freq./((1+...
+            lambda_uhat/lambda_s)*exp(vpa(lx))-1))/n));
 else
-    theta=sqrt(2*lambda_uhat*sum(freq./((1+lambda_uhat/lambda_s)*exp(lx)-1))/n);
+    theta = sqrt(2*lambda_uhat*sum(freq./((1+...
+            lambda_uhat/lambda_s)*exp(lx)-1))/n);
 end
 
 % Output fitted parameters
 if nargout <= 1
     if deltaset
-        varargout{1}=[theta lambda_uhat lambda_s];
+        varargout{1} = [theta lambda_uhat lambda_s];
     else
-        varargout{1}=[cast(delta,classX) delta*theta lambda_uhat lambda_s];
+        varargout{1} = [cast(delta,classX) delta*theta lambda_uhat lambda_s];
     end
 elseif nargout == 3
-    varargout{1}=theta;
-    varargout{2}=lambda_uhat;
-	varargout{3}=lambda_s;
+    varargout{1} = theta;
+    varargout{2} = lambda_uhat;
+	varargout{3} = lambda_s;
 else
-    varargout{1}=cast(delta,classX);
-    varargout{2}=delta*theta;
-    varargout{3}=lambda_uhat;
-    varargout{4}=lambda_s;
+    varargout{1} = cast(delta,classX);
+    varargout{2} = delta*theta;
+    varargout{3} = lambda_uhat;
+    varargout{4} = lambda_s;
 end
 
 
 
 % Negative likelihood equation for Lambda_U, Lambda_S = Inf
 function z=likeeq_UInf(lambda_u,x,n,wtx,freq)
-lx=2*lambda_u*x;
+lx = 2*lambda_u*x;
 if any(lx > log(realmax))
-    ex=exp(vpa(sym(lx)));
+    ex = exp(vpa(sym(lx)));
 else
-    ex=exp(lx);
+    ex = exp(lx);
 end
-ex1=1./(ex-1);
-s1=2*x.*(ex.*ex1);
+ex1 = 1./(ex-1);
+s1 = 2*x.*(ex.*ex1);
 
 % Times -2/n
-z=double(-3/lambda_u+n*sum(freq.*s1)-wtx ...
+z = double(-3/lambda_u+n*sum(freq.*s1)-wtx ...
     -sum(freq.*(lambda_u*s1-1).*ex1)/(lambda_u*sum(freq.*ex1)));
  
 
 % Negative likelihood equation for Lambda_U given Lambda_S
 function z=likeeq_US(lambda_u,lambda_s,x,n,wtx,freq)
-lx=2*lambda_u*x;
+lx = 2*lambda_u*x;
 if any(lx > log(realmax))
-    ex=exp(vpa(sym(lx)));
+    ex = exp(vpa(sym(lx)));
 else
-    ex=exp(lx);
+    ex = exp(lx);
 end
-lam1=1+lambda_u/lambda_s;
-ex1=1./(lam1*ex-1);
-s1=(1/lambda_s+2*lam1*x).*(ex.*ex1);
+lam1 = 1+lambda_u/lambda_s;
+ex1 = 1./(lam1*ex-1);
+s1 = (1/lambda_s+2*lam1*x).*(ex.*ex1);
 
 % Times -2/n
-z=double(-2/(lambda_u+lambda_s)-3/lambda_u+n*sum(freq.*s1)-wtx ...
-     -sum(freq.*(lambda_u*s1-1).*ex1)/(lambda_u*sum(freq.*ex1)));
+z = double(-2/(lambda_u+lambda_s)-3/lambda_u+n*sum(freq.*s1)-wtx ...
+    -sum(freq.*(lambda_u*s1-1).*ex1)/(lambda_u*sum(freq.*ex1)));

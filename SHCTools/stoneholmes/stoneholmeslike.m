@@ -51,178 +51,175 @@ function nlogL=stoneholmeslike(x,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 4-22-13
+%   Revision: 1.0, 6-16-14
 
 
 % Check X
 if ~isreal(x) || ~isfloat(x)
     error('SHCTools:stoneholmeslike:XInvalid',...
-          'X must be a real floating point array.')
+          'X must be a real floating point array.');
 end
-sx=size(x);
+sx = size(x);
 
 % Check variable inputs
-deltaset=true;
-censoringset=true;
-freqset=true;
+deltaset = true;
+censoringset = true;
+freqset = true;
 if nargin >= 5 && nargin <= 7
-    v=varargin{4};
+    v = varargin{4};
     if size(v,1) <= 1 && isfloat(v)
-        delta=varargin{1};
-        epsilon=varargin{2};
-        lambda_u=varargin{3};
-        lambda_s=varargin{4};
-        offset=5;
+        delta = varargin{1};
+        epsilon = varargin{2};
+        lambda_u = varargin{3};
+        lambda_s = varargin{4};
+        offset = 5;
     else
-        delta=1;
-        epsilon=varargin{1};
-        lambda_u=varargin{2};
-        lambda_s=varargin{3};
-        deltaset=false;
-        offset=4;
+        delta = 1;
+        epsilon = varargin{1};
+        lambda_u = varargin{2};
+        lambda_s = varargin{3};
+        deltaset = false;
+        offset = 4;
     end
-    for i=offset:nargin-1
-        v=varargin{i};
+    for i = offset:nargin-1
+        v = varargin{i};
         if censoringset && (islogical(v) || all(v == 0 | v == 1))
             if ~isequal(size(v),sx)
                 error('SHCTools:stoneholmeslike:FreqInvalid',...
                      ['The censoring array must have the same size as the '...
-                      'data array, X.'])
+                      'data array, X.']);
             end
             if ~islogical(v) 
                 if ~isreal(v) || ~isnumeric(v)
                     error('SHCTools:stoneholmeslike:CensoringInvalid',...
                          ['The censoring array must either be a logical '...
                           'array or a numeric array containing only the '...
-                          'values 0 and 1.'])
+                          'values 0 and 1.']);
                 end
-                censoring=logical(v);
+                censoring = logical(v);
             else
-                censoring=v;
+                censoring = v;
             end
             warning('SHCTools:stoneholmeslike:CensoringUnimplemented',...
                    ['Censoring is not yet implemented for this function. '...
-                    'The data will be processed as uncensored.'])
-            censoringset=false;
+                    'The data will be processed as uncensored.']);
+            censoringset = false;
         elseif freqset && isnumeric(v)
             if ~isequal(size(v),sx)
                 error('SHCTools:stoneholmeslike:FreqInvalid',...
                      ['The frequency array must have the same size as '...
-                      'the, data array, X.'])
+                      'the, data array, X.']);
             end
             if ~isreal(v) || any(v < 0) || ~all(isfinite(v))
                 error('SHCTools:stoneholmeslike:FreqInvalid',...
                      ['All elements of the frequency array must be finite '...
-                      'real positive values.'])
+                      'real positive values.']);
             end
-            freq=v;
-            freqset=false;
+            freq = v;
+            freqset = false;
         else
             error('SHCTools:stoneholmeslike:UnknownArgument',...
-                  'Unknown input argument.')
+                  'Unknown input argument.');
         end
     end
 elseif nargin == 4
-    delta=1;
-    epsilon=varargin{1};
-    lambda_u=varargin{2};
-    lambda_s=varargin{3};
-    deltaset=false;
+    delta = 1;
+    epsilon = varargin{1};
+    lambda_u = varargin{2};
+    lambda_s = varargin{3};
+    deltaset = false;
 elseif nargin < 4
-	error('SHCTools:stoneholmeslike:TooFewInputs','Not enough input arguments.')
+	error('SHCTools:stoneholmeslike:TooFewInputs',...
+          'Not enough input arguments.');
 else
-	error('SHCTools:stoneholmeslike:TooManyInputs','Too many input arguments.')
+	error('SHCTools:stoneholmeslike:TooManyInputs','Too many input arguments.');
 end
 
 % Check three parameters
 if deltaset && (~isreal(delta) || ~isfloat(delta))
 	error('SHCTools:stoneholmeslike:DeltaInvalid',...
-          'Delta must be a real floating point array.')
+          'Delta must be a real floating point array.');
 end
 if ~isreal(epsilon) || ~isfloat(epsilon)
     if deltaset
         error('SHCTools:stoneholmeslike:EpsilonInvalid',...
-              'Epsilon must be a real floating point array.')
+              'Epsilon must be a real floating point array.');
     else
         error('SHCTools:stoneholmeslike:ThetaInvalid',...
-              'Theta must be a real floating point array.')
+              'Theta must be a real floating point array.');
     end
 end
 if ~isreal(lambda_u) || ~isfloat(lambda_u)
 	error('SHCTools:stoneholmeslike:Lambda_uInvalid',...
-          'Lambda_U must be a real floating point array.')
+          'Lambda_U must be a real floating point array.');
 end
 if ~isreal(lambda_s) || ~isfloat(lambda_s)
 	error('SHCTools:stoneholmeslike:Lambda_sInvalid',...
-          'Lambda_S must be a real floating point array.')
+          'Lambda_S must be a real floating point array.');
 end
 
 % Check that sizes of X and parameter inputs are consistent, return size of L
-if deltaset
-    [szL,expansion]=stoneholmesargs('like',sx,size(delta),size(epsilon),...
-                                    size(lambda_u),size(lambda_s));
-else
-    [szL,expansion]=stoneholmesargs('like',sx,size(epsilon),size(lambda_u),...
-                                    size(lambda_s));
-end
+[szL,expansion] = stoneholmesargs('like',sx,size(delta),size(epsilon),...
+                                         size(lambda_u),size(lambda_s));
 
 % Set optional inputs if not specified, handle censoring and frequency data
 if freqset
-    freq=1;
-    n=szL(1);
+    freq = 1;
+    n = szL(1);
 else
     ifreq=(freq > 0);
     if ~all(ifreq)
-        x=x(ifreq);
-        freq=freq(ifreq);
+        x = x(ifreq);
+        freq = freq(ifreq);
         if ~censoringset
-            censoring=censoring(ifreq);	%#ok<NASGU>
+            censoring = censoring(ifreq);	%#ok<NASGU>
         end
     end
-    n=sum(freq);
+    n = sum(freq);
 end
 
 % Check for empty output
-dtype=superiorfloat(x,delta,epsilon,lambda_u,lambda_s);
+dtype = superiorfloat(x,delta,epsilon,lambda_u,lambda_s);
 if any(szL == 0)
-    nlogL=zeros([min(szL(1),1) szL(2:end)],dtype);
+    nlogL = zeros([min(szL(1),1) szL(2:end)],dtype);
 else
     % Initialize nlogL to NaN to set columns of out-of-range parameters
-	nlogL=NaN([1 szL(2:end)],dtype);
+	nlogL = NaN([1 szL(2:end)],dtype);
     
     % Column vector expansion
     if expansion
-        z=ones(prod(szL(2:end)),1);
-        x=x(:,z);
+        z = ones(prod(szL(2:end)),1);
+        x = x(:,z);
         if ~freqset
-            freq=freq(:,z);
+            freq = freq(:,z);
         end
     end
     
     % Logical column indices for X and in-range parameters, X: (0,Inf]
     % Delta: (0, Inf], Epsilon: [0, Inf), Lambda_U: (0, Inf), Lambda_S: (0, Inf]
-    j=(all(x > 0,1) & all(delta > 0,1) & all(epsilon >= 0 & epsilon < Inf,1) ...
+    j = (all(x > 0,1) & all(delta > 0,1) ...
+        & all(epsilon >= 0 & epsilon < Inf,1) ...
         & all(lambda_u > 0 & lambda_u < Inf,1) & all(lambda_s > 0,1));
     
     % If all values for a column are in-range
     if any(j)
         if ~isscalar(x)
-            x=x(:,j);
+            x = x(:,j);
             if ~freqset
-                freq=freq(:,j);
+                freq = freq(:,j);
             end
         end
         if ~isscalar(delta)
-            delta=delta(1,j);
+            delta = delta(1,j);
         end
         if ~isscalar(epsilon)
-            epsilon=epsilon(1,j);
+            epsilon = epsilon(1,j);
         end
         if ~isscalar(lambda_u)
-            lambda_u=lambda_u(1,j);
+            lambda_u = lambda_u(1,j);
         end
         if ~isscalar(lambda_s)
-            lambda_s=lambda_s(1,j);
+            lambda_s = lambda_s(1,j);
         end
         
         if any(epsilon > delta)
@@ -230,12 +227,12 @@ else
                 warning('SHCTools:stoneholmeslike:DeltaEpsilonScaling',...
                        ['One or more Epsilon values is greater than the '...
                         'corresponding Delta value(s), but the Stone-Holmes '...
-                        'distribution defines Epsilon << Delta.'])
+                        'distribution defines Epsilon << Delta.']);
             else
                 warning('SHCTools:stoneholmeslike:ThetaScaling',...
                        ['One or more Theta = Epsilon/Delta values is '...
                         'greater than 1, but the the Stone-Holmes '...
-                        'distribution defines Epsilon << Delta.'])
+                        'distribution defines Epsilon << Delta.']);
             end
         end
         
@@ -243,19 +240,19 @@ else
             warning('SHCTools:stoneholmeslike:LambdaScaling',...
                    ['One or more Lambda_U values is greater than or equal '...
                     'to the corresponding Lambda_S value(s), but the '...
-                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.'])
+                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.']);
         end
         
         % Calculate negative log-likelihood of in-range columns
-        lam2x=2*bsxfun(@times,lambda_u,x);
-        lam1=1+lambda_u./lambda_s;
-        ex=bsxfun(@rdivide,lambda_u,(bsxfun(@times,lam1,exp(lam2x))-1));
-        th=delta./epsilon;
+        lam2x = 2*bsxfun(@times,lambda_u,x);
+        lam1 = 1+lambda_u./lambda_s;
+        ex = bsxfun(@rdivide,lambda_u,(bsxfun(@times,lam1,exp(lam2x))-1));
+        th = delta./epsilon;
         
-        nlogL(j)=th.^2.*sum(freq.*ex)-1.5*sum(freq.*log(ex)) ...
-            -sum(freq.*lam2x)-n*log((2/sqrt(pi))*th.*lam1);
+        nlogL(j) = th.^2.*sum(freq.*ex)-1.5*sum(freq.*log(ex)) ...
+                   -sum(freq.*lam2x)-n*log((2/sqrt(pi))*th.*lam1);
         
         % Resolve NaNs from overflows
-        nlogL(any(x == Inf) | th == Inf)=Inf;
+        nlogL(any(x == Inf) | th == Inf) = Inf;
     end
 end

@@ -41,127 +41,122 @@ function x=stoneholmesinv(p,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-5-12
-%   Revision: 1.0, 4-22-13
+%   Revision: 1.0, 6-16-14
 
 
 % Check variable inputs
 if nargin == 5
-    delta=varargin{1};
-    epsilon=varargin{2};
-    lambda_u=varargin{3};
-    lambda_s=varargin{4};
+    delta = varargin{1};
+    epsilon = varargin{2};
+    lambda_u = varargin{3};
+    lambda_s = varargin{4};
 elseif nargin == 4
-    delta=1;
-    epsilon=varargin{1};
-    lambda_u=varargin{2};
-    lambda_s=varargin{3};
+    delta = 1;
+    epsilon = varargin{1};
+    lambda_u = varargin{2};
+    lambda_s = varargin{3};
 elseif nargin < 4
-	error('SHCTools:stoneholmesinv:TooFewInputs','Not enough input arguments.')
+	error('SHCTools:stoneholmesinv:TooFewInputs','Not enough input arguments.');
 else
-	error('SHCTools:stoneholmesinv:TooManyInputs','Too many input arguments.')
+	error('SHCTools:stoneholmesinv:TooManyInputs','Too many input arguments.');
 end
 
 % Check P and four parameters
 if ~isreal(p) || ~isfloat(p)
     error('SHCTools:stoneholmesinv:PInvalid',...
-          'P must be a real floating point array.')
+          'P must be a real floating point array.');
 end
 if nargin == 5 && (~isreal(delta) || ~isfloat(delta))
 	error('SHCTools:stoneholmesinv:DeltaInvalid',...
-          'Delta must be a real floating point array.')
+          'Delta must be a real floating point array.');
 end
 if ~isreal(epsilon) || ~isfloat(epsilon)
 	if nargin == 5
         error('SHCTools:stoneholmesinv:EpsilonInvalid',...
-              'Epsilon must be a real floating point array.')
+              'Epsilon must be a real floating point array.');
     else
         error('SHCTools:stoneholmesinv:ThetaInvalid',...
-              'Theta must be a real floating point array.')
+              'Theta must be a real floating point array.');
 	end
 end
 if ~isreal(lambda_u) || ~isfloat(lambda_u)
 	error('SHCTools:stoneholmesinv:Lambda_uInvalid',...
-          'Lambda_U must be a real floating point array.')
+          'Lambda_U must be a real floating point array.');
 end
 if ~isreal(lambda_s) || ~isfloat(lambda_s)
 	error('SHCTools:stoneholmesinv:Lambda_sInvalid',...
-          'Lambda_S must be a real floating point array.')
+          'Lambda_S must be a real floating point array.');
 end
 
 % Check that sizes of P and parameter inputs are consistent, return size of X
-if nargin == 5
-    [szx,expansion]=stoneholmesargs('inv',size(p),size(delta),size(epsilon),...
-                                    size(lambda_u),size(lambda_s));
-else
-    [szx,expansion]=stoneholmesargs('inv',size(p),size(epsilon),...
-                                    size(lambda_u),size(lambda_s));
-end
+[szx,expansion] = stoneholmesargs('inv',size(p),size(delta),size(epsilon),...
+                                        size(lambda_u),size(lambda_s));
 
 % Column vector expansion
 if any(expansion)
-    z=ones(prod(szx(2:end)),1);
+    z = ones(prod(szx(2:end)),1);
     if expansion(1)
-        p=p(:,z);
+        p = p(:,z);
     end
     if expansion(2)
-        delta=delta(:,z);
+        delta = delta(:,z);
     end
     if expansion(3)
-        epsilon=epsilon(:,z);
+        epsilon = epsilon(:,z);
     end
     if expansion(4)
-        lambda_u=lambda_u(:,z);
+        lambda_u = lambda_u(:,z);
     end
     if expansion(5)
-        lambda_s=lambda_s(:,z);
+        lambda_s = lambda_s(:,z);
     end
 end
 
 % Use linear indices, everything is a scalar or equal length vector after here
-p=p(:);
-delta=delta(:);
-epsilon=epsilon(:);
-lambda_u=lambda_u(:);
-lambda_s=lambda_s(:);
+p = p(:);
+delta = delta(:);
+epsilon = epsilon(:);
+lambda_u = lambda_u(:);
+lambda_s = lambda_s(:);
 
 % Logical linear indices for out-of-range P and parameters, P: [0, 1]
 % Delta: (0, Inf], Epsilon: [0, Inf), Lambda_U: (0, Inf), Lambda_S: (0, Inf]
-i=(p < 0 | p > 1 | isnan(p) | delta <= 0 | isnan(delta) | ...
+i = (p < 0 | p > 1 | isnan(p) | delta <= 0 | isnan(delta) | ...
     epsilon < 0 | isnan(epsilon) | lambda_u <= 0 | isnan(lambda_u) | ...
     lambda_s <= 0 | isnan(lambda_s));
 
 % Check for empty output or if all values of any parameter or P are out-of-range
-dtype=superiorfloat(p,delta,epsilon,lambda_u,lambda_s);
+dtype = superiorfloat(p,delta,epsilon,lambda_u,lambda_s);
 if any(szx == 0) || all(i)
     % Return empty array or NaN array for out-of-range parameters
-    x=NaN(szx,dtype);
+    x = NaN(szx,dtype);
 else
     % Initialize X to zero for all values of P
-    x=zeros(szx,dtype);
+    x = zeros(szx,dtype);
     
     % Set out-of-range parameters to NaN
-    x(i)=NaN;
+    x(i) = NaN;
     
     % Logical linear indices for in-range P and parameters                              
-    i=(~i & p ~= 0 & epsilon < Inf & lambda_u < Inf);
+    i = (~i & p ~= 0 & epsilon < Inf & lambda_u < Inf);
     
     % If any values in-range
     if any(i)
         if ~all(i)
             if ~isscalar(p)
-                p=p(i);
+                p = p(i);
             end
             if ~isscalar(delta)
-                delta=delta(i);
+                delta = delta(i);
             end
             if ~isscalar(epsilon)
-                epsilon=epsilon(i);
+                epsilon = epsilon(i);
             end
             if ~isscalar(lambda_u)
-                lambda_u=lambda_u(i);
+                lambda_u = lambda_u(i);
             end
             if ~isscalar(lambda_s)
-                lambda_s=lambda_s(i);
+                lambda_s = lambda_s(i);
             end
         end
         
@@ -170,12 +165,12 @@ else
                 warning('SHCTools:stoneholmesinv:DeltaEpsilonScaling',...
                        ['One or more Epsilon values is greater than the '...
                         'corresponding Delta value(s), but the Stone-Holmes '...
-                        'distribution defines Epsilon << Delta.'])
+                        'distribution defines Epsilon << Delta.']);
             else
                 warning('SHCTools:stoneholmesinv:ThetaScaling',...
                        ['One or more Theta = Epsilon/Delta values is '...
                         'greater than 1, but the the Stone-Holmes '...
-                        'distribution defines Epsilon << Delta.'])
+                        'distribution defines Epsilon << Delta.']);
             end
         end
         
@@ -183,7 +178,7 @@ else
             warning('SHCTools:stoneholmesinv:LambdaScaling',...
                    ['One or more Lambda_U values is greater than or equal '...
                     'to the corresponding Lambda_S value(s), but the '...
-                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.'])
+                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.']);
         end
         
         % Matlab 7.14 (R2012a), 7.13 (R2011b), and possibly earlier, has a bug
@@ -192,17 +187,17 @@ else
         % ERFCINV has large absolute and relative error (up to approximately
         % 3e-3 and 1e-4, respectively) for input values less than 2^-1033, with
         % the error growing as input values decrease.
-        ecip=erfcinv(p);
+        ecip = erfcinv(p);
         if verLessThan('matlab','8.0')
             if isa(p,'double')
-                ecip(p == 2^-1074)=27.216482834230213;
+                ecip(p == 2^-1074) = 27.216482834230213;
             else
-                ecip(p == 2^-149)=10.0198345;
+                ecip(p == 2^-149) = 10.0198345;
             end
         end
         
         % Calculate Stone-Holmes inverse CDF of in-range values using ERFCINV
-        x(i)=(log1p(lambda_u.*(delta./(epsilon.*ecip)).^2)...
-             -log1p(lambda_u./lambda_s))./(2*lambda_u);
+        x(i) = (log1p(lambda_u.*(delta./(epsilon.*ecip)).^2)...
+               -log1p(lambda_u./lambda_s))./(2*lambda_u);
     end
 end

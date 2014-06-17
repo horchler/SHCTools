@@ -30,13 +30,13 @@ function y=stoneholmescv(x,flag,dim)
 %       STONEHOLMESPASSAGETIME, STONEHOLMESSTAT
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-6-13
-%   Revision: 1.0, 11-8-13
+%   Revision: 1.0, 6-16-14
 
 
 %Check x
 if ~isfloat(x)
     error('SHCTools:stoneholmescv:InvalidData',...
-          'The input X must be a floating-point array.')
+          'The input X must be a floating-point array.');
 end
 
 % Check flag
@@ -66,7 +66,7 @@ else
                 || dim > ndims(x) || floor(dim) ~= dim
             error('SHCTools:stoneholmescv:InvalidDimension',...
                  ['The dimension argument must be a finite real positive '...
-                  'integer scalar within the indexing range of X.'])
+                  'integer scalar within the indexing range of X.']);
         end
     end
 end
@@ -82,13 +82,13 @@ if any(xnan)
             warning('SHCTools:stoneholmescv:MeanNearZeroScalarAllNaN',...
                    ['The mean of X is close to zero. The coefficient of '...
                     'variation will approach infinity and thus is sensitive '...
-                    'to small changes in the mean in this regime.'])
+                    'to small changes in the mean in this regime.']);
         else
             warning('SHCTools:stoneholmescv:MeanNearZeroNaN',...
                    ['The mean of X is close to zero in one or more '...
                     'dimensions. The coefficient of variation will approach '...
                     'infinity and thus is sensitive to small changes in the '...
-                    'mean in this regime.'])
+                    'mean in this regime.']);
         end
     end
     
@@ -108,13 +108,13 @@ else
             warning('SHCTools:stoneholmescv:MeanNearZeroScalarAll',...
                    ['The mean of X is close to zero. The coefficient of '...
                     'variation will approach infinity and thus is sensitive '...
-                    'to small changes in the mean in this regime.'])
+                    'to small changes in the mean in this regime.']);
         else
             warning('SHCTools:stoneholmescv:MeanNearZero',...
                    ['The mean of X is close to zero in one or more '...
                     'dimensions. The coefficient of variation will approach '...
                     'infinity and thus is sensitive to small changes in the '...
-                    'mean in this regime.'])
+                    'mean in this regime.']);
         end
     end
     

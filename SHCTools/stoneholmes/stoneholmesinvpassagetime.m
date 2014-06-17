@@ -61,21 +61,20 @@ function epsilon=stoneholmesinvpassagetime(tau,varargin)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-6-12
-%   Revision: 1.0, 2-12-13
+%   Revision: 1.1, 6-16-14
 
 
 % Check variable inputs
 if nargin < 3
 	error('SHCTools:stoneholmesinvpassagetime:TooFewInputs',...
-          'Not enough input arguments.')
+          'Not enough input arguments.');
 end
 if nargin > 4
 	error('SHCTools:stoneholmesinvpassagetime:TooManyInputs',...
-          'Too many input arguments.')
+          'Too many input arguments.');
 end
 
-isTheta = (nargin == 3);
-if isTheta
+if nargin == 3
     delta = 1;
     lambda_u = varargin{1};
     lambda_s = varargin{2};
@@ -88,25 +87,21 @@ end
 % Check parameters
 if nargin == 4 && (~isreal(delta) || ~isfloat(delta))
 	error('SHCTools:stoneholmesinvpassagetime:DeltaInvalid',...
-          'Delta must be a real floating point array.')
+          'Delta must be a real floating point array.');
 end
 if ~isreal(lambda_u) || ~isfloat(lambda_u)
 	error('SHCTools:stoneholmesinvpassagetime:Lambda_uInvalid',...
-          'Lambda_U must be a real floating point array.')
+          'Lambda_U must be a real floating point array.');
 end
 if ~isreal(lambda_s) || ~isfloat(lambda_s)
 	error('SHCTools:stoneholmesinvpassagetime:Lambda_sInvalid',...
-          'Lambda_S must be a real floating point array.')
+          'Lambda_S must be a real floating point array.');
 end
 
 % Check that sizes of parameter inputs are consistent, return size of Epsilon
-if isTheta
-    [szt,expansion] = stoneholmesargs('invpassagetime',size(tau),...
-        size(lambda_u),size(lambda_s));
-else
-    [szt,expansion] = stoneholmesargs('invpassagetime',size(tau),size(delta),...
-        size(lambda_u),size(lambda_s));
-end
+[szt,expansion] = stoneholmesargs('invpassagetime',size(tau),size(delta),...
+                                                   size(lambda_u),...
+                                                   size(lambda_s));
 
 % Column vector expansion
 if any(expansion)
@@ -172,7 +167,7 @@ else
             warning('SHCTools:stoneholmesinvpassagetime:LambdaScaling',...
                    ['One or more Lambda_U values is greater than or equal '...
                     'to the corresponding Lambda_S value(s), but the '...
-                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.'])
+                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.']);
         end
         
         % Options structure for fzero
@@ -181,7 +176,7 @@ else
         % Initial quess for delta/epsilon assuming small noise
         eulergamma = 0.577215664901533;
         de0 = max(real(1./sqrt(-2*lambda_u.*wrightOmegaq(eulergamma...
-            +log(2)+pi*1i-log1p(lambda_u./lambda_s)-2*lambda_u.*tau))),0);
+              +log(2)+pi*1i-log1p(lambda_u./lambda_s)-2*lambda_u.*tau))),0);
         n = length(de0);
         
         if any(~isfinite(de0))
@@ -200,29 +195,12 @@ else
             end
         end
         
-        deslu = de0.*sqrt(lambda_u);
-        
         for j = n:-1:1
-            tauj = tau((j-1)*(~isscalar(tau))+1);
-            lambda_uj = lambda_u((j-1)*(~isscalar(lambda_u))+1);
-            lambda_sj = lambda_s((j-1)*(~isscalar(lambda_s))+1);
-            
-            % Create function handle
-            if deslu(j) > 5
-                derng = [1 eps(realmax(dtype))];
-                
-                % Fast small noise (and/or large Lambda) approximation
-                eprootfun = @(de)epsilonroot_small(de,tauj,lambda_uj,lambda_sj);
-            else
-                deltaj = delta((j-1)*(~isscalar(delta))+1);
-                derng = eps([realmin(dtype) realmax(dtype)]);
-                
-                % Full analytical solution for large noise (and/or small Lambda)
-                eprootfun = @(de)epsilonroot(de,tauj,deltaj,lambda_uj,...
-                                             lambda_sj);
-            end
+            % Create function handle for FZERO
+            eprootfun = @(de)meanpassagetime(de,1,lambda_u,lambda_s)-tau;
             
             % Bracket and find delta/epsilon via root of first passage time
+            derng = eps([realmin(dtype) realmax(dtype)]);
             bounds = bracketroot(eprootfun,de0(j),derng,'+');
             [de(j),fval,exitflag] = fzero(eprootfun,bounds,options);
             
@@ -262,7 +240,7 @@ else
         epsilon(i) = delta./de(:);
         
         if any(epsilon > delta)
-            if isTheta
+            if nargin == 3
                 warning('SHCTools:stoneholmesinvpassagetime:ThetaScaling',...
                        ['One or more Theta = Epsilon/Delta value is '...
                         'greater than 1, but the the Stone-Holmes '...
@@ -276,34 +254,3 @@ else
         end
     end
 end
-
-
-
-function z=epsilonroot_small(de,tau,lambda_u,lambda_s)
-% Based on asymptotic series expansion of 2F2(1/2,1/2;3/2,3/2;-1/Z^2) at Z=Inf
-ideslu2 = 1./(4*lambda_u*de^2);
-s = ideslu2.*(2-ideslu2.*(6-ideslu2.*(40-ideslu2.*(420-ideslu2.*(6048 ...
-    -ideslu2.*(110880-2436480*ideslu2))))));
-eulergamma = 0.577215664901533;
-z = (s+log(4*lambda_u)-log1p(lambda_u/lambda_s)+eulergamma...
-    +2*log(de))/(2*lambda_u)-tau;
-
-
-function z=epsilonroot(de,tau,delta,lambda_u,lambda_s)
-% Based on full analytical solution to Stone-Holmes mean passage time
-de = max(de,delta);
-desls = de*sqrt(lambda_s);
-deslu = de*sqrt(lambda_u);
-deslu2 = deslu^2;
-
-% Terms for infinite series, sum from small to large avoiding non-finite values
-k = 172:-1:1;
-dk = (-deslu2).^k;
-s = (gamma(0.5+k).*gammainc(deslu2,0.5+k)./dk ...
-    +dk.*(gammaincNegative(deslu2,0.5-k,'upper')...
-    -gammaincNegative(desls^2,0.5-k,'upper')))./(sqrt(pi)*k);
-s = s(isfinite(s));
-
-z = (-sum(s([diff(abs(s))>=0 true]))-erf(desls)*log1p(lambda_u/lambda_s)...
-    +(4/sqrt(pi))*deslu*hypergeomq([0.5 0.5],[1.5 1.5],-deslu2))/(2*lambda_u)...
-    -tau;

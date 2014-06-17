@@ -14,7 +14,7 @@ function y=varpassagetime(delta,epsilon,lambda_u,lambda_s,tau)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-7-13
-%   Revision: 1.1, 6-8-13
+%   Revision: 1.1, 6-16-14
 
 
 tol = 1e-16;
@@ -44,18 +44,18 @@ else
     % Right tail function: 1-CDF
     lambda_u = @(i)lambda_u(min(i,lenu));
     Hi = @(t,i)erf(delta(min(i,lend))*sqrt(lambda_u(i)./expm1(2*lambda_u(i)*t...
-        +log1p(lambda_u(i)/lambda_s(min(i,lens)))))/epsilon(min(i,lene)));
+         +log1p(lambda_u(i)/lambda_s(min(i,lens)))))/epsilon(min(i,lene)));
     
     % Use specified mean passage time if provided
     if nargin == 5
         for i = n:-1:1
             y(i) = 2*quadgk(@(t)t.*Hi(t,i),0,Inf,'AbsTol',tol,'RelTol',tol)...
-                -tau(i)^2;
+                   -tau(i)^2;
         end
     else
         for i = n:-1:1
             y(i) = 2*quadgk(@(t)t.*Hi(t,i),0,Inf,'AbsTol',tol,'RelTol',tol)...
-                -quadgk(@(t)Hi(t,i),0,Inf,'AbsTol',tol,'RelTol',tol)^2;
+                   -quadgk(@(t)Hi(t,i),0,Inf,'AbsTol',tol,'RelTol',tol)^2;
         end
     end
 end

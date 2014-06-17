@@ -33,21 +33,19 @@ function [m,v]=stoneholmesstat(varargin)
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-7-13
-%   Revision: 1.1, 6-8-13
+%   Revision: 1.1, 6-16-14
 
 
 % Check variable inputs
 if nargin < 3
 	error('SHCTools:stoneholmesstat:TooFewInputs',...
-          'Not enough input arguments.')
+          'Not enough input arguments.');
 end
 if nargin > 4
-	error('SHCTools:stoneholmesstat:TooManyInputs',...
-          'Too many input arguments.')
+	error('SHCTools:stoneholmesstat:TooManyInputs','Too many input arguments.');
 end
 
-isTheta = (nargin == 3);
-if isTheta
+if nargin == 3
     delta = 1;
     epsilon = varargin{1};
     lambda_u = varargin{2};
@@ -62,34 +60,29 @@ end
 % Check parameters
 if nargin == 4 && (~isreal(delta) || ~isfloat(delta))
 	error('SHCTools:stoneholmesstat:DeltaInvalid',...
-          'Delta must be a real floating point array.')
+          'Delta must be a real floating point array.');
 end
 if ~isreal(epsilon) || ~isfloat(epsilon)
-	if isTheta
+	if nargin == 3
         error('SHCTools:stoneholmesstat:ThetaInvalid',...
-              'Theta must be a real floating point array.')
+              'Theta must be a real floating point array.');
     else
         error('SHCTools:stoneholmesstat:EpsilonInvalid',...
-              'Epsilon must be a real floating point array.')
+              'Epsilon must be a real floating point array.');
 	end
 end
 if ~isreal(lambda_u) || ~isfloat(lambda_u)
 	error('SHCTools:stoneholmesstat:Lambda_uInvalid',...
-          'Lambda_U must be a real floating point array.')
+          'Lambda_U must be a real floating point array.');
 end
 if ~isreal(lambda_s) || ~isfloat(lambda_s)
 	error('SHCTools:stoneholmesstat:Lambda_sInvalid',...
-          'Lambda_S must be a real floating point array.')
+          'Lambda_S must be a real floating point array.');
 end
 
 % Check that sizes of parameter inputs are consistent, return size of Tau
-if isTheta
-    [szt,expansion] = stoneholmesargs('stat',size(epsilon),size(lambda_u),...
-        size(lambda_s));
-else
-    [szt,expansion] = stoneholmesargs('stat',size(delta),size(epsilon),...
-        size(lambda_u),size(lambda_s));
-end
+[szt,expansion] = stoneholmesargs('stat',size(delta),size(epsilon),...
+                                         size(lambda_u),size(lambda_s));
 
 % Column vector expansion
 if any(expansion)
@@ -157,7 +150,7 @@ else
         end
         
         if any(epsilon > delta)
-            if isTheta
+            if nargin == 3
                 warning('SHCTools:stoneholmesstat:ThetaScaling',...
                        ['One or more Theta = Epsilon/Delta values is '...
                         'greater than 1, but the the Stone-Holmes '...
@@ -174,7 +167,7 @@ else
             warning('SHCTools:stoneholmesstat:LambdaScaling',...
                    ['One or more Lambda_U values is greater than or equal '...
                     'to the corresponding Lambda_S value(s), but the '...
-                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.'])
+                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.']);
         end
         
         % Call private function to calculate mean first passage time

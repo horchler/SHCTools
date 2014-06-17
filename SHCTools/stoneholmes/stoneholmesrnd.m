@@ -55,134 +55,134 @@ function r=stoneholmesrnd(delta,epsilon,lambda_u,lambda_s,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-6-12
-%   Revision: 1.0, 4-22-13
+%   Revision: 1.0, 6-16-14
 
 
 % Check four parameters
 if ~isreal(delta) || ~isfloat(delta)
 	error('SHCTools:stoneholmesrnd:DeltaInvalid',...
-          'Delta must be a real floating point array.')
+          'Delta must be a real floating point array.');
 end
 if ~isreal(epsilon) || ~isfloat(epsilon)
 	error('SHCTools:stoneholmesrnd:EpsilonInvalid',...
-          'Epsilon must be a real floating point array.')
+          'Epsilon must be a real floating point array.');
 end
 if ~isreal(lambda_u) || ~isfloat(lambda_u)
 	error('SHCTools:stoneholmesrnd:Lambda_uInvalid',...
-          'Lambda_U must be a real floating point array.')
+          'Lambda_U must be a real floating point array.');
 end
 if ~isreal(lambda_s) || ~isfloat(lambda_s)
 	error('SHCTools:stoneholmesrnd:Lambda_sInvalid',...
-          'Lambda_S must be a real floating point array.')
+          'Lambda_S must be a real floating point array.');
 end
 
 % Check user-supplied RandStream, else set to the global (default) stream
-v=varargin;
+v = varargin;
 if ~isempty(v) && isa(v{1},'RandStream') 
-     stream=v{1};
-     v=v(2:end);
+     stream = v{1};
+     v = v(2:end);
 elseif length(v) > 1 && isa(v{end},'RandStream')
-     stream=v{end};
-     v=v(1:end-1);
+     stream = v{end};
+     v = v(1:end-1);
 else
-    if verLessThan('matlab','7.12')
-        stream=RandStream.getDefaultStream; %#ok<*GETRS>
-    else
-        stream=RandStream.getGlobalStream;
+    try
+        stream = RandStream.getGlobalStream;
+    catch
+        stream = RandStream.getDefaultStream;	%#ok<GETRS>
     end
 end
 
 % Check optional dimensions
 if length(v) == 1
-    M=v{1};
+    M = v{1};
     if isempty(M) || ~isvector(M) || ~isreal(M) || ~isnumeric(M) || ...
             ~all(isfinite(M)) || any(M < 0) || ~(isinteger(M) || ...
             all(M == floor(M)))
         error('SHCTools:stoneholmesrnd:DimensionInvalid',...
              ['Size vector must be a row vector of positive finite real '...
-              'integers.'])
+              'integers.']);
     end
     if isscalar(M)
-        szr=[M M];
+        szr = [M M];
     else
-        szr=M(:)';
+        szr = M(:).';
     end
 elseif length(v) > 1
     if any(cellfun('ndims',v) ~= 2) || any(cellfun('length',v) ~= 1)
         error('SHCTools:stoneholmesrnd:DimensionsNonScalar',...
-              'Size information is inconsitent.')
+              'Size information is inconsitent.');
     end
-    szr=[v{:}];
+    szr = [v{:}];
     if ~isreal(szr) || ~isnumeric(szr) || ~all(isfinite(szr)) || ...
             any(szr < 0) || ~(isinteger(szr) || all(szr-floor(szr) == 0))
         error('SHCTools:stoneholmesrnd:DimensionVectorInvalid',...
-              'Size inputs must be positive finite real integers.')
+              'Size inputs must be positive finite real integers.');
     end
 else
-    szr=[1 1];
+    szr = [1 1];
 end
 
 % Check that sizes of R and parameter inputs are consistent, return size of R
-[szr,expansion]=stoneholmesargs('rnd',szr,size(delta),size(epsilon),...
-                                size(lambda_u),size(lambda_s));
+[szr,expansion] = stoneholmesargs('rnd',szr,size(delta),size(epsilon),...
+                                        size(lambda_u),size(lambda_s));
 
 % Column vector expansion
 if any(expansion)
-    z=ones(prod(szr(2:end)),1);
+    z = ones(prod(szr(2:end)),1);
     if expansion(2)
-        delta=delta(:,z);
+        delta = delta(:,z);
     end
     if expansion(3)
-        epsilon=epsilon(:,z);
+        epsilon = epsilon(:,z);
     end
     if expansion(4)
-        lambda_u=lambda_u(:,z);
+        lambda_u = lambda_u(:,z);
     end
     if expansion(5)
-        lambda_s=lambda_s(:,z);
+        lambda_s = lambda_s(:,z);
     end
 end
 
 % Use linear indices, everything is a scalar or equal length vector after here
-delta=delta(:);
-epsilon=epsilon(:);
-lambda_u=lambda_u(:);
-lambda_s=lambda_s(:);
+delta = delta(:);
+epsilon = epsilon(:);
+lambda_u = lambda_u(:);
+lambda_s = lambda_s(:);
 
 % Logical linear indices for out-of-range parameters
 % Delta: (0, Inf], Epsilon: [0, Inf), Lambda_U: (0, Inf), Lambda_S: (0, Inf]
-i=(delta <= 0 | isnan(delta) | epsilon < 0 | isnan(epsilon) | ...
+i = (delta <= 0 | isnan(delta) | epsilon < 0 | isnan(epsilon) | ...
     lambda_u <= 0 | isnan(lambda_u) | lambda_s <= 0 | isnan(lambda_s));
 
 % Check for empty output or if all values of any parameter are out-of-range
-dtype=superiorfloat(delta,epsilon,lambda_u,lambda_s);
+dtype = superiorfloat(delta,epsilon,lambda_u,lambda_s);
 if any(szr == 0) || all(i)
     % Return empty array or NaN array for out-of-range parameters
-    r=NaN(szr,dtype);
+    r = NaN(szr,dtype);
 else
     % Initialize R to zero
-    r=zeros(szr,dtype);
+    r = zeros(szr,dtype);
     
     % Set out-of-range parameters to NaN
-    r(i)=NaN;
+    r(i) = NaN;
     
     % Logical linear indices for in-range parameters
-    i=(~i & true(prod(szr),1) & epsilon < Inf & lambda_u < Inf);
+    i = (~i & true(prod(szr),1) & epsilon < Inf & lambda_u < Inf);
     
     % If any values in-range
     if any(i)
         if ~all(i)
             if ~isscalar(delta)
-                delta=delta(i);
+                delta = delta(i);
             end
             if ~isscalar(epsilon)
-                epsilon=epsilon(i);
+                epsilon = epsilon(i);
             end
             if ~isscalar(lambda_u)
-                lambda_u=lambda_u(i);
+                lambda_u = lambda_u(i);
             end
             if ~isscalar(lambda_s)
-                lambda_s=lambda_s(i);
+                lambda_s = lambda_s(i);
             end
         end
         
@@ -190,18 +190,18 @@ else
             warning('SHCTools:stoneholmesrnd:DeltaEpsilonScaling',...
                    ['One or more Epsilon values is greater than the '...
                     'corresponding Delta value(s), but the Stone-Holmes '...
-                    'distribution defines Epsilon << Delta.'])
+                    'distribution defines Epsilon << Delta.']);
         end
         
         if any(lambda_u >= lambda_s)
             warning('SHCTools:stoneholmesrnd:LambdaScaling',...
                    ['One or more Lambda_U values is greater than or equal '...
                     'to the corresponding Lambda_S value(s), but the '...
-                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.'])
+                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.']);
         end
         
         % Generate uniformly-distributed probabilities on (0, 1)
-        p=rand(stream,[nnz(i) 1],dtype);
+        p = rand(stream,[nnz(i) 1],dtype);
         
         % Matlab 7.14 (R2012a), 7.13 (R2011b), and possibly earlier, has a bug
         % where erfcinv(eps(realmin)) returns NaN instead of a finite real
@@ -211,17 +211,17 @@ else
         % applied. Also, note that ERFCINV has large absolute and relative error
         % (up to approximately 3e-3 and 1e-4, respectively) for input values
         % less than 2^-1033, with the error growing as input values decrease.
-        ecip=erfcinv(p);
+        ecip = erfcinv(p);
         if verLessThan('matlab','8.0')
             if isa(p,'double')
-                ecip(p == 2^-1074)=27.216482834230213;
+                ecip(p == 2^-1074) = 27.216482834230213;
             else
-                ecip(p == 2^-149)=10.0198345;
+                ecip(p == 2^-149) = 10.0198345;
             end
         end
         
         % Use inverse Stone-Holmes CDF to turn random probabilities, p, into x
-        r(i)=(log1p(lambda_u.*(delta./(epsilon.*ecip)).^2)...
-             -log1p(lambda_u./lambda_s))./(2*lambda_u);
+        r(i) = (log1p(lambda_u.*(delta./(epsilon.*ecip)).^2)...
+               -log1p(lambda_u./lambda_s))./(2*lambda_u);
     end
 end

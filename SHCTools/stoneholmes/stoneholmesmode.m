@@ -44,115 +44,111 @@ function y=stoneholmesmode(varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-23-12
-%   Revision: 1.0, 4-22-13
+%   Revision: 1.0, 6-16-14
 
 
 % Check variable inputs
 if nargin == 4
-    delta=varargin{1};
-    epsilon=varargin{2};
-    lambda_u=varargin{3};
-    lambda_s=varargin{4};
+    delta = varargin{1};
+    epsilon = varargin{2};
+    lambda_u = varargin{3};
+    lambda_s = varargin{4};
 elseif nargin == 3
-    delta=1;
-    epsilon=varargin{1};
-    lambda_u=varargin{2};
-    lambda_s=varargin{3};
+    delta = 1;
+    epsilon = varargin{1};
+    lambda_u = varargin{2};
+    lambda_s = varargin{3};
 elseif nargin < 3
-	error('SHCTools:stoneholmesmode:TooFewInputs','Not enough input arguments.')
+	error('SHCTools:stoneholmesmode:TooFewInputs',...
+          'Not enough input arguments.');
 else
-	error('SHCTools:stoneholmesmode:TooManyInputs','Too many input arguments.')
+	error('SHCTools:stoneholmesmode:TooManyInputs','Too many input arguments.');
 end
 
 % Check four parameters
 if nargin == 4 && (~isreal(delta) || ~isfloat(delta))
 	error('SHCTools:stoneholmesmode:DeltaInvalid',...
-          'Delta must be a real floating point array.')
+          'Delta must be a real floating point array.');
 end
 if ~isreal(epsilon) || ~isfloat(epsilon)
 	if nargin == 4
         error('SHCTools:stoneholmesmode:EpsilonInvalid',...
-              'Epsilon must be a real floating point array.')
+              'Epsilon must be a real floating point array.');
     else
         error('SHCTools:stoneholmesmode:ThetaInvalid',...
-              'Theta must be a real floating point array.')
+              'Theta must be a real floating point array.');
 	end
 end
 if ~isreal(lambda_u) || ~isfloat(lambda_u)
 	error('SHCTools:stoneholmesmode:Lambda_uInvalid',...
-          'Lambda_U must be a real floating point array.')
+          'Lambda_U must be a real floating point array.');
 end
 if ~isreal(lambda_s) || ~isfloat(lambda_s)
 	error('SHCTools:stoneholmesmode:Lambda_sInvalid',...
-          'Lambda_S must be a real floating point array.')
+          'Lambda_S must be a real floating point array.');
 end
 
 % Check that sizes of parameter inputs are consistent, return size of Y
-if nargin == 4
-    [szy,expansion]=stoneholmesargs('mode',size(delta),size(epsilon),...
-                                    size(lambda_u),size(lambda_s));
-else
-    [szy,expansion]=stoneholmesargs('mode',size(epsilon),size(lambda_u),...
-                                    size(lambda_s));
-end
+[szy,expansion] = stoneholmesargs('mode',size(delta),size(epsilon),...
+                                         size(lambda_u),size(lambda_s));
 
 % Column vector expansion
 if any(expansion)
-    z=ones(prod(szy(2:end)),1);
+    z = ones(prod(szy(2:end)),1);
     if expansion(1)
-        delta=delta(:,z);
+        delta = delta(:,z);
     end
     if expansion(2)
-        epsilon=epsilon(:,z);
+        epsilon = epsilon(:,z);
     end
     if expansion(3)
-        lambda_u=lambda_u(:,z);
+        lambda_u = lambda_u(:,z);
     end
     if expansion(4)
-        lambda_s=lambda_s(:,z);
+        lambda_s = lambda_s(:,z);
     end
 end
 
 % Use linear indices, everything is a scalar or equal length vector after here
-delta=delta(:);
-epsilon=epsilon(:);
-lambda_u=lambda_u(:);
-lambda_s=lambda_s(:);
+delta = delta(:);
+epsilon = epsilon(:);
+lambda_u = lambda_u(:);
+lambda_s = lambda_s(:);
 
 % Logical linear index for out-of-range parameters
 % Delta: (0, Inf], Epsilon: [0, Inf), Lambda_U: (0, Inf), Lambda_S: (0, Inf]
-i=(delta <= 0 | isnan(delta) | epsilon < 0 | isnan(epsilon) | ...
+i = (delta <= 0 | isnan(delta) | epsilon < 0 | isnan(epsilon) | ...
 	lambda_u <= 0 | isnan(lambda_u) | lambda_s <= 0 | isnan(lambda_s));
 
 % Check for empty output or if all values of any parameter are out-of-range
-dtype=superiorfloat(delta,epsilon,lambda_u,lambda_s);
+dtype = superiorfloat(delta,epsilon,lambda_u,lambda_s);
 if any(szy == 0) || all(i)
     % Return empty array or NaN array for out-of-range parameters
-    y=NaN(szy,dtype);
+    y = NaN(szy,dtype);
 else
     % Initialize Y to zero
-    y=zeros(szy,dtype);
+    y = zeros(szy,dtype);
     
     % Set out-of-range parameters to NaN
-    y(i)=NaN;
+    y(i) = NaN;
     
     % Logical linear index for in-range parameters
-    i=(~i & epsilon < Inf & lambda_u < Inf);
+    i = (~i & epsilon < Inf & lambda_u < Inf);
     
     % If any values in-range
     if any(i)
         if ~all(i)
             if ~isscalar(delta)
-                delta=delta(i);
+                delta = delta(i);
             end
             if ~isscalar(epsilon)
-                epsilon=epsilon(i);
+                epsilon = epsilon(i);
             end
             if ~isscalar(lambda_u)
-                lambda_u=lambda_u(i);
+                lambda_u = lambda_u(i);
             end
             if ~isscalar(lambda_s)
-                lambda_s=lambda_s(i);
+                lambda_s = lambda_s(i);
             end
         end
         
@@ -161,12 +157,12 @@ else
                 warning('SHCTools:stoneholmesmode:DeltaEpsilonScaling',...
                        ['One or more Epsilon values is greater than the '...
                         'corresponding Delta value(s), but the Stone-Holmes '...
-                        'distribution defines Epsilon << Delta.'])
+                        'distribution defines Epsilon << Delta.']);
             else
                 warning('SHCTools:stoneholmesmode:ThetaScaling',...
                        ['One or more Theta = Epsilon/Delta values is '...
                         'greater than 1, but the the Stone-Holmes '...
-                        'distribution defines Epsilon << Delta.'])
+                        'distribution defines Epsilon << Delta.']);
             end
         end
         
@@ -174,16 +170,16 @@ else
             warning('SHCTools:stoneholmesmode:LambdaScaling',...
                    ['One or more Lambda_U values is greater than or equal '...
                     'to the corresponding Lambda_S value(s), but the '...
-                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.'])
+                    'Stone-Holmes distribution defines Lambda_U < Lambda_S.']);
         end
         
         % Calculate Stone-Holmes distribution mode of in-range parameters
-        d2=2*delta.^2.*lambda_u;
-        ep2=epsilon.^2;
-        y(i)=log((sqrt(d2.*(d2-2*ep2)+9*ep2.^2)+d2-ep2)./(2*ep2.*(1 ...
-             +lambda_u./lambda_s)))./(2*lambda_u);
+        d2 = 2*delta.^2.*lambda_u;
+        ep2 = epsilon.^2;
+        y(i) = log((sqrt(d2.*(d2-2*ep2)+9*ep2.^2)+d2-ep2)./(2*ep2.*(1 ...
+               +lambda_u./lambda_s)))./(2*lambda_u);
         
         % Resolve any underflow or overlow conditions
-        y(i & isnan(y(:)))=0;
+        y(i & isnan(y(:))) = 0;
     end
 end
