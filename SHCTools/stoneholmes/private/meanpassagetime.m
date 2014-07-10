@@ -5,6 +5,11 @@ function tau=meanpassagetime(delta,epsilon,lambda_u,lambda_s)
 %   Delta, Epsilon, Lambda_U, and Lambda_S. All non-scalar parameters must have
 %   the same dimensions as each other.
 %
+%   If any inputs are symbolic, a fully symbolic solution is evaluated. In the
+%   case of floating-point inputs, this symbolic solution method is used for any
+%   components where (Delta/Epsilon)*SQRT(Lambda_U) < 8, i.e., large noise.
+%   Symbolic integration is used if (Delta/Epsilon)*SQRT(Lambda_U) < 1.
+%
 %   See also: VARPASSAGETIME, STONEHOLMESPASSAGETIME, STONEHOLMESSTAT
 
 %   Uses a personally derived analytical solution and approximation based on
@@ -17,85 +22,100 @@ function tau=meanpassagetime(delta,epsilon,lambda_u,lambda_s)
 %   function capability of the latter is used to avoid cancellation errors.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-19-12
-%   Revision: 1.2, 11-14-13
+%   Revision: 1.3, 7-9-14
 
 
-% Compute mean passage time of Stone-Holmes distribution in-range values
-de = delta./epsilon;
-desls = de.*sqrt(lambda_s);
-deslu = de.*sqrt(lambda_u);
-eulergamma = 0.577215664901533;
+isSym = isa(delta,'sym') || isa(epsilon,'sym') || isa(lambda_u,'sym') ...
+    || isa(lambda_s,'sym');
+eu = (delta./epsilon).*sqrt(lambda_u);
+ii = eu < 8;
 
 % Use fast small noise (and/or large Lambda) approximation by default
-ii = (deslu > 5);
-if any(ii)
+if ~isSym
     % Asymptotic series expansion of 2F2(1/2,1/2;3/2,3/2;-Z^2) at Z=Inf
-    ideslu2 = 1./(4*deslu.^2);
-    s = ideslu2.*(2-ideslu2.*(6-ideslu2.*(40-ideslu2.*(420 ...
-        -ideslu2.*(6048-ideslu2.*(110880-2436480*ideslu2))))));
-    tau = (s+log(4*lambda_u)-log1p(lambda_u./lambda_s)...
-          +eulergamma+2*log(de))./(2*lambda_u);
-end
-
-% Recalculate using full analytical solution for any large noise cases
-if any(~ii)
-    ii = ~ii;
+    eulergamma = 0.577215664901533;
+    tau0 = log(4*lambda_u)-log1p(lambda_u./lambda_s)...
+           +eulergamma+2*(log(delta)-log(epsilon));
     
-    if ~isscalar(lambda_u)
-        lambda_u = lambda_u(ii);
-    end
-    if ~isscalar(lambda_s)
-        lambda_s = lambda_s(ii);
-    end
-    if ~isscalar(deslu)
-        deslu = deslu(ii);
-    end
-    if ~isscalar(desls)
-        desls = desls(ii);
-    end
-    
-    % Full analytical solution to Stone-Holmes mean passage time
-    desls2 = desls.^2;
-    deslu2 = deslu.^2;
-    
-    % Sum infinite series from small to large avoiding non-finite values
-    k = 172:-1:1;
-    gk = gamma(0.5+k);
-    isk = -1./(sqrt(pi)*k);
-    S = zeros(max(size(deslu),size(desls)));
-    if isscalar(deslu2) && ~isscalar(desls2)
-        dk = (-deslu2).^k;
-        t = gk.*gammainc(deslu2,0.5+k)./dk;
-        for j = 1:length(desls2)
-            s = isk.*(t+dk.*gammaincq(deslu2,desls2(j),0.5-k));
-
-            s = s(isfinite(s));
-            S(j) = sum(s([diff(abs(s))>=0 true]));
-        end
-    elseif isscalar(desls2)
-        for j = 1:length(deslu2)
-            dk = (-deslu2(j)).^k;
-            s = isk.*(gk.*gammainc(deslu2(j),0.5+k)./dk ...
-                +dk.*gammaincq(deslu2(j),desls2,0.5-k));
-
-            s = s(isfinite(s));
-            S(j) = sum(s([diff(abs(s))>=0 true]));
-        end
+    ieu2 = 1./eu.^2;
+    if any(ieu2 > eps(tau0))
+        c = [-1/2 3/4 5/3 21/8 18/5 55/12 39/7 105/16 ...
+             68/9 171/20 105/11 253/24 150/13 351/28 203/15 465/32];
+        idx = 17-min(max(floor(-log10(min(ieu2))),1),16);
+        S = sum(cumprod(bsxfun(@times,-c(1:idx),ieu2),2),2);
+        tau = (tau0+S)./(2*lambda_u);
     else
-        for j = 1:length(deslu2)
-            dk = (-deslu2(j)).^k;
-            s = isk.*(gk.*gammainc(deslu2(j),0.5+k)./dk ...
-                +dk.*gammaincq(deslu2(j),desls2(j),0.5-k));
-
-            s = s(isfinite(s));
-            S(j) = sum(s([diff(abs(s))>=0 true]));
-        end
+        tau = tau0./(2*lambda_u);
     end
-    
-    tau(ii) = (S-erf(desls).*log1p(lambda_u./lambda_s)...
-              +(4/sqrt(pi))*deslu.*hypergeomq([0.5 0.5],[1.5 1.5],...
-              -deslu2))./(2*lambda_u);
 end
 
-% Resolve any possible underflow and error conditions
-tau(tau(:) <= 0) = 0;
+% Use full analytical solution for symbolic and any large noise cases
+if isSym || any(ii)
+    jj = eu < 1;
+    if any(jj)
+        if isscalar(delta)
+            deltaj = sym(delta);
+        else
+            deltaj = sym(delta(jj));
+        end
+        if isscalar(epsilon)
+            epsilonj = sym(epsilon);
+        else
+            epsilonj = sym(epsilon(jj));
+        end
+        if isscalar(lambda_u)
+            lambda_uj = sym(lambda_u);
+        else
+            lambda_uj = sym(lambda_u(jj));
+        end
+        if isscalar(lambda_s)
+            lambda_sj = sym(lambda_s);
+        else
+            lambda_sj = sym(lambda_s(jj));
+        end
+        eu = (deltaj./epsilonj).*sqrt(lambda_uj);
+        
+        % Integrate symbolically for cases that SYMSUM cannot handle
+        syms t real;
+        f = erf(eu./sqrt((1+lambda_uj./lambda_sj).*exp(2*lambda_uj.*t)-1));
+        tau(jj,1) = int(f,t,0,Inf);
+    end
+    
+    ii = ii & ~jj;
+    if any(ii)
+        if isscalar(delta)
+            deltaj = sym(delta);
+        else
+            deltaj = sym(delta(ii));
+        end
+        if isscalar(epsilon)
+            epsilonj = sym(epsilon);
+        else
+            epsilonj = sym(epsilon(ii));
+        end
+        if isscalar(lambda_u)
+            lambda_uj = sym(lambda_u);
+        else
+            lambda_uj = sym(lambda_u(ii));
+        end
+        if isscalar(lambda_s)
+            lambda_sj = sym(lambda_s);
+        else
+            lambda_sj = sym(lambda_s(ii));
+        end
+        de = deltaj./epsilonj;
+        eu = de.*sqrt(lambda_uj);
+        es = de.*sqrt(lambda_sj);
+        eu2 = eu.^2;
+        
+        % Sum infinite series
+        spi = sqrt(sym('pi'));
+        syms n real;
+        assume(n,'integer');
+        S = -symsum(((-1./eu2).^n.*gammaincq(eu2,0.5+n) ...
+            +(-eu2).^n.*gammaincq(eu2,es.^2,0.5-n))./(n*spi),n,1,Inf);
+        
+        tau(ii,1) = 0.5*(S-erf(es).*log(1+lambda_uj./lambda_sj) ...
+            +4*eu.*hypergeomq([0.5 0.5],[1.5 1.5],-eu2)/spi)./lambda_uj;
+    end
+end
