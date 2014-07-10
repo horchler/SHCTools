@@ -33,16 +33,17 @@ function h=hypergeomq(n,d,z)
 %   See also: HYPERGEOM, SYM/HYPERGEOM.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-22-12
-%   Revision: 1.1, 11-14-12
+%   Revision: 1.2, 6-20-14
 
 
 % Check zeroes
 if ~isvector(n) && ~isempty(n)
     error('SHCTools:hypergeomq:NonVectorN','The first input must be a vector.');
 end
-if ~isnumeric(n) && ~islogical(n)
+if ~isnumeric(n) && ~islogical(n) && ~isa(n,'sym')
     error('SHCTools:hypergeomq:NonNumericN',...
-          'The first input argument must be a numeric or logical vector.');
+         ['The first input argument must be a numeric, logical, or symbolic'...
+          'vector.']);
 end
 if ~all(isfinite(n))
     error('SHCTools:hypergeomq:NonFiniteN',...
@@ -54,9 +55,10 @@ if ~isvector(d) && ~isempty(d)
     error('SHCTools:hypergeomq:NonVectorD',...
           'The second input must be a vector.');
 end
-if ~isnumeric(d) && ~islogical(d)
+if ~isnumeric(d) && ~islogical(d) && ~isa(d,'sym')
     error('SHCTools:hypergeomq:NonNumericD',...
-          'The second input argument must be a numeric or logical vector.');
+         ['The second input argument must be a numeric, logical, or symbolic'...
+          'vector.']);
 end
 if ~all(isfinite(d))
     error('SHCTools:hypergeomq:NonFiniteD',...
@@ -64,16 +66,20 @@ if ~all(isfinite(d))
 end
 
 % Check Z values
-if ~isnumeric(z) && ~islogical(z)
-    error('SHCTools:hypergeomq:NonNumericD',...
-          'The third input argument must be a numeric or logical array.');
+if ~isnumeric(z) && ~islogical(z) && ~isa(z,'sym')
+    error('SHCTools:hypergeomq:NonNumericZ',...
+         ['The first input argument must be a numeric, logical, or symbolic'...
+          'array.']);
 end
 if ~all(isfinite(z))
     error('SHCTools:hypergeomq:NonFiniteZ',...
           'The third input must be an array of finite values.');
 end
 
-if isa(z,'single')
+isSym = isa(n,'sym') || isa(d,'sym') || isa(z,'sym');
+if isSym
+    dtype = 'sym';
+elseif isa(z,'single')
     dtype = 'single';
 else
     dtype = 'double';
@@ -82,10 +88,18 @@ if isempty(z)
     h = zeros(size(z),dtype);
 else
     % Convert zeroes to a string
-    N = float2str(n);
+    if isa(n,'sym')
+        N = sym2str(n);
+    else
+        N = float2str(n);
+    end
     
     % Convert poles to a string
-    D = float2str(d);
+    if isa(d,'sym')
+        D = sym2str(d);
+    else
+        D = float2str(d);
+    end
     
     % Try getting an analytic expression as a function of z
     mupadmexExists = (exist('mupadmex','file') == 3);
@@ -120,7 +134,11 @@ else
     end
     
     % Convert Z values to a string
-    Z = float2str(z);
+    if isa(z,'sym')
+        Z = sym2str(z);
+    else
+        Z = float2str(z);
+    end
 
     % Evaluate numerically
     try
@@ -142,7 +160,9 @@ else
     end
     
     % Convert output to floating point - much faster than calling sym/double
-	h = sym2float(h,dtype);
+    if ~isSym
+        h = sym2float(h,dtype);
+    end
     
     % Reshape matrix and multi-dimensional array inputs
     if ~isvector(z)
