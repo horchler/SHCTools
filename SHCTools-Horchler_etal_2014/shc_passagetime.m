@@ -8,27 +8,34 @@ function tau=shc_passagetime(delta,epsilon,lambda_u,lambda_s)
 %   value of the eigenvalues with the largest positive and negative real parts,
 %   respectively. The parameters must be scalars or equal length vectors, which
 %   are applied elementwise to the output.
-%
+%   
 %   Note:
 %       A warning is generated if the noise magnitude, Epsilon, is too large
 %       relative to the neighborhood size, Delta, and the unstable eigenvalue,
 %       Lambda_U, ie., if:
-%
+%   
 %           2*EXP(EULERGAMMA)*LAMBDA_U*(DELTA/EPSILON)^2 < 20
-%
+%   
 %       where EULERGAMMA is the Euler-Mascheroni constant. 
 %   
 %   See also:
 %       SHC_LV_PASSAGETIME, SHC_LV_TAUFIT, SHC_LV_EPSILONFIT, SHC_LV_MEANPERIOD,
 %       SHC_LV_MINTRANSITIONTIME, SHC_LV_NEIGHBORHOOD
 
+%   For details of the methods used, see:
+%   
+%   Andrew D. Horchler, Kathryn A. Daltorio, Hillel J. Chiel, and Roger D.
+%   Quinn, "Designing Responsive Pattern Generators: Stable Heteroclinic Channel
+%   Cycles for Modeling and Control," Bioinspiration & Biomimetics, Vol. 10,
+%   No. 2., 2015, pp. 1-16.
+%   
 %   Uses a personally derived analytical solution and approximation based on
 %   Eq. (2.28) in: Emily Stone and Philip Holmes, "Random Perturbations of
 %   Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50, No. 3, pp. 726-743,
 %   Jun. 1990. http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-19-12
-%   Revision: 1.1, 6-15-14
+%   Revision: 1.1, 4-5-15
 
 
 if isa(delta,'sym') || isa(epsilon,'sym') || isa(lambda_u,'sym') ...

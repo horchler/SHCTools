@@ -7,27 +7,27 @@ function [alpha,beta,nu]=shc_lv_params(tau,epsilon,beta,nu,flag)
 %   magnitudes BETA, and saddle values NU. The saddle values must all be greater
 %   than or equal to one. The input arguments must all be finite real
 %   floating-point scalars or equal length vectors.
-%
+%   
 %   Note:
 %       In the case of non-uniform specifications (i.e., not the same values for
 %       every node), if the specified saddle values are not sufficiently large
 %       to achieve the desired period, on an individual basis they will be
 %       increased by the minimum ammount necessary such that
 %       ALPHA(i+1) >= ALPHA(i)/NU(i). These augmented NU values are returned.
-%
+%   
 %   See also:
 %       SHC_LV_CREATECYCLE, SHC_LV_EIGS, SHC_LV_JACOBIAN, SHC_LV_PASSAGETIME,
 %       SHC_LV_MINTRANSITIONTIME, WRIGHTOMEGA, WRIGHTOMEGAQ
 
-%   For details of the methods used, see
-%
+%   For details of the methods used, see:
+%   
 %   Andrew D. Horchler, Kathryn A. Daltorio, Hillel J. Chiel, and Roger D.
 %   Quinn, "Designing Responsive Pattern Generators: Stable Heteroclinic Channel
-%   Cycles for Modeling and Control," Bioinspiration & Biomimetics,
-%   Submitted for review, Jun. 2014.
+%   Cycles for Modeling and Control," Bioinspiration & Biomimetics, Vol. 10,
+%   No. 2., 2015, pp. 1-16.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
-%   Revision: 1.4, 6-14-14
+%   Revision: 1.4, 4-5-15
 
 
 if (isscalar(tau) || all(tau==tau(1))) ...

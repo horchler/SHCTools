@@ -12,8 +12,16 @@ function tt=shc_lv_mintransitiontime(alpha)
 %   See also:
 %       SHC_LV_PASSAGETIME, SHC_LV_NEIGHBORHOOD
 
+%   For details of the methods used, see:
+%   
+%   Andrew D. Horchler, Kathryn A. Daltorio, Hillel J. Chiel, and Roger D.
+%   Quinn, "Designing Responsive Pattern Generators: Stable Heteroclinic Channel
+%   Cycles for Modeling and Control," Bioinspiration & Biomimetics, Vol. 10,
+%   No. 2., 2015, pp. 1-16.
+%  
+
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-29-14
-%   Revision: 1.2, 6-15-14
+%   Revision: 1.2, 4-5-15
 
 
 % Calculate minimum transition time estimate (assuming uniform alpha)

@@ -1,9 +1,9 @@
-SHCTools &ndash; Horchler, et al. 2014
+SHCTools &ndash; Horchler, et al. 2015
 ========
 #####Matlab Tools for the Simulation, Analysis, and Design of Stable Heteroclinic Channel (SHC) cycles.#####
-######Version 1.0, 6-16-14######
+######Version 1.0, 4-5-15######
 
-This branch of the SHCTools repository maintains the code for the paper *Designing Responsive Pattern Generators: Stable Heteroclinic Channel Cycles for Modeling and Control* by Horchler, et al. The code in this branch is meant for readability and is specific to the subject the paper: mean first passage time and Lotka-Volterra SHC cycles. Many optimizations and features found in the [master SHCTools branch](https://github.com/horchler/SHCTools/tree/master) are not present. The functions here will remain static and will only be updated to fix bugs.
+This branch of the SHCTools repository maintains the code for the paper *Designing Responsive Pattern Generators: Stable Heteroclinic Channel Cycles for Modeling and Control* (Horchler, et al. 2015) The code in this branch is meant for readability and is specific to the subject the paper: mean first passage time and Lotka-Volterra SHC cycles. Many optimizations and features found in the [master SHCTools branch](https://github.com/horchler/SHCTools/tree/master) are not present. The functions here will remain static and will only be updated to fix bugs.
 
 &nbsp;  
 &nbsp;  
@@ -47,7 +47,7 @@ Utilities.
 
 Key references.  
  1. V.S. Afraimovich, M.I. Rabinovich, and P. Varona, &#8220;Heteroclinic contours in neural ensembles and the winnerless competition principle,&#8221; *Int. J. Bifurcation Chaos*, Vol. 14, 2004, pp. 1195&ndash;1208. [[PDF Preprint](http://arxiv.org/abs/nlin/0304016)] [[http://dx.doi.org/10.1142/S0218127404009806](http://dx.doi.org/10.1142/S0218127404009806)]  
- 2. A.D. Horchler, K.A. Daltorio, H.J. Chiel, and R.D Quinn &#8220;Designing Responsive Pattern Generators: Stable Heteroclinic Channel Cycles for Modeling and Control,&#8221; *Bioinspir. Biomim.*, Submitted for review, Jun. 2014. (Please contact me for a copy of the manuscript.)  
+ 2. A.D. Horchler, K.A. Daltorio, H.J. Chiel, and R.D Quinn &#8220;Designing Responsive Pattern Generators: Stable Heteroclinic Channel Cycles for Modeling and Control,&#8221; *Bioinspir. Biomim.*, Vol. 10, No. 2, 2015, pp. 1?16. [[http://dx.doi.org/10.1088/1748-3190/10/2/026001](http://dx.doi.org/10.1088/1748-3190/10/2/026001)]
  3. M.I. Rabinovich, R. Huerta, P. Varona, and V.S. Afraimovich, &#8220;Transient Cognitive Dynamics, Metastability, and Decision Making,&#8221; *PLoS Comp. Biol.*, Vol. 4, No. 5, 2008, e1000072. [[http://dx.doi.org/10.1371/journal.pcbi.1000072](http://dx.doi.org/10.1371/journal.pcbi.1000072)]  
  4. J.W. Reyn, &#8220;A Stability Criterion for Separatrix Polygons in the Phase Plane,&#8221; *Nieuw Archief Voor Wiskunde (3)*, Vol. 27, 1979, pp. 238&ndash;254. [[PDF](https://github.com/horchler/SHCTools/blob/master/references/reyn_criterion_1979.pdf?raw=true)]  
  5. K.M. Shaw, Y.-M. Park, H.J. Chiel, and P.J. Thomas, &#8220;Phase Resetting in an Asymptotically Phaseless System: On the Phase Response of Limit Cycles Verging on a Heteroclinic Orbit,&#8221; *SIAM J. Appl. Dyn. Syst.*, Vol. 11, No. 1, 2012, pp. 350&ndash;391. [[http://dx.doi.org/10.1137/110828976](http://dx.doi.org/10.1137/110828976)]  
@@ -57,10 +57,10 @@ Key references.
 --------
 
 Andrew D. Horchler, *adh9 @ case . edu*, [biorobots.case.edu](http://biorobots.case.edu/)  
-Created: 1-4-12, Version: 1.0, 6-16-14  
+Created: 1-4-12, Version: 1.0, 4-5-15  
 
-This version tested with Matlab 8.2.0.701 (R2013b)  
-Mac OS X 10.9.3 (Build: 13D65), Java 1.7.0_60-b19 
+This version tested with Matlab 8.5.0.173394 (R2015a)  
+Mac OS X 10.10.2 (Build: 14C1514), Java 1.7.0_60-b19 
 Compatibility maintained back through Matlab 7.4 (R2007a)  
 &nbsp;  
 
@@ -69,7 +69,7 @@ Compatibility maintained back through Matlab 7.4 (R2007a)
 Acknowledgment of support: This material is based upon work supported by the [National Science Foundation](http://www.nsf.gov/) under [Grant No.&nbsp;1065489](http://www.nsf.gov/awardsearch/showAward.do?AwardNumber=1065489). Disclaimer: Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.  
 &nbsp;  
 
-Copyright &copy; 2012&ndash;2014, Andrew D. Horchler  
+Copyright &copy; 2012&ndash;2015, Andrew D. Horchler  
 All rights reserved.  
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

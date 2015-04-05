@@ -11,13 +11,20 @@ function shc_lv_demo(dt,tau,epsilon_hat,bet,nu,N)
 %   compensated noise magnitude using SHC_LV_EPSILONFIT. Finally, SHC_LV_IC and
 %   SHC_LV_INTEGRATE are used to find initial conditions on the SHC manifold and
 %   simulate the compensated system for ten mean sub-periods TAU.
-%
+%   
 %   See also:
 %       SHC_LV_PARAMS, SHC_LV_CREATECYCLE, SHC_LV_MEANPERIOD, SHC_LV_EPSILONFIT,
 %       SHC_LV_IC, SHC_LV_INTEGRATE, SHC_LV_NEIGHBORHOOD
 
+%   For details of the methods used, see:
+%   
+%   Andrew D. Horchler, Kathryn A. Daltorio, Hillel J. Chiel, and Roger D.
+%   Quinn, "Designing Responsive Pattern Generators: Stable Heteroclinic Channel
+%   Cycles for Modeling and Control," Bioinspiration & Biomimetics, Vol. 10,
+%   No. 2., 2015, pp. 1-16.
+
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-16-14
-%   Revision: 1.0, 6-16-14
+%   Revision: 1.0, 4-5-15
 
 
 if nargin == 0
