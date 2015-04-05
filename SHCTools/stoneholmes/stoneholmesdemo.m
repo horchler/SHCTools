@@ -172,7 +172,7 @@ drawnow('expose')
 
 % Initialize simulation
 a = NaN(lt,2);
-RandStream.setGlobalStream(RandStream('mt19937ar','Seed',0));
+rng(1);
 lamdt = [-lambda_s lambda_u]*dt;
 eta = epsilon;
 tp(Np,1) = 0;
@@ -316,9 +316,9 @@ n = histc(tp,edges);
 ybar = n/(binx*sum(n));
 
 waittext('Passage Time Distribution... Fitting Data.')
-[delhat,ephat,lamhat] = stoneholmesfit(tp,delta);
+[delhat,ephat,lamuhat,lamshat] = stoneholmesfit(tp,delta,lambda_s);
 yexact = stoneholmespdf(x,delta,epsilon,lambda_u,lambda_s);
-yfit = stoneholmespdf(x,delhat,ephat,lamhat,lambda_s);
+yfit = stoneholmespdf(x,delhat,ephat,lamuhat,lamshat);
 
 [hypoth,pvalue,stats] = chi2gof(tp,'cdf',@(x)stoneholmescdf(x,delta,epsilon,...
     lambda_u,lambda_s));	%#ok<ASGLU>
@@ -328,12 +328,13 @@ subplot(223)
 hb = bar(edges,ybar,1);
 he = plot(x,yexact,'r','LineWidth',1);
 hf = plot(x,yfit,'m');
+h0 = plot(NaN,'w');
 axis([x(1) x(end) 0 1.4*max([max(yexact) max(yfit) max(ybar)])])
-hl = legend([hb he hf 0],[' ' int2str(Np) ' Simulations'],...
+hl = legend([hb he hf h0],[' ' int2str(Np) ' Simulations'],...
     [' Exact: $\delta$ = ' num2str(delta) ', $\epsilon$ = ' num2str(epsilon) ...
     ', $\lambda_\mathrm{u}$ = ' num2str(lambda_u)],...
     [' Fit:  $\hat{\epsilon}$ = ' num2str(ephat) ...
-    ', $\hat{\lambda_\mathrm{u}}$ = ' num2str(lamhat)],[' $\chi^2$ = ' ...
+    ', $\hat{\lambda_\mathrm{u}}$ = ' num2str(lamuhat)],[' $\chi^2$ = ' ...
     num2str(stats.chi2stat) ', $p$-value = ' num2str(pvalue)]);
 set(hl,'Interpreter','latex','Box','off','FontSize',10,'Location','NorthWest')
 set(hb,'EdgeColor','none','FaceColor',[0 0 1],'ShowBaseLine','off')
@@ -362,9 +363,11 @@ subplot(224)
 hb = bar(edges,ybar,1);
 he = plot(x,yexact,'r','LineWidth',1);
 hf = plot(x,yfit,'m');
+h0 = plot(NaN,'w');
+h1 = plot(NaN,'w');
 plot([0 0],[0 max([max(yexact) max(yfit) max(ybar)])],'k--')
 axis([x(1) x(end) 0 1.5*max([max(yexact) max(yfit) max(ybar)])])
-hl = legend([hb he 0 hf 0],[' ' int2str(Ne) ' Simulations (' int2str(Nr) ...
+hl = legend([hb he h0 hf h1],[' ' int2str(Ne) ' Simulations (' int2str(Nr) ...
     ' Re-injections)'],[' Exact: $\delta$  = ' num2str(delta) ...
     ', $\epsilon$ = ' num2str(epsilon) ', $\lambda_\mathrm{s}$ = ' ...
     num2str(lambda_s)],[' $\mu$ = ' num2str(mu) ...
