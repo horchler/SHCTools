@@ -1,15 +1,16 @@
-function [N,tspan,lt,a0,rho,alpv,epsilon,mu,h,sh,ConstStep,dataType,...
+function [N,tspan,lt,a0,rho,alpha,epsilon,mu,h,sh,ConstStep,dataType,...
           NonNegative,NonNegativeFUN,ScalarNoise,ConstGFUN,ConstInputFUN,...
           RandFUN,ResetStream,EventsFUN,EventsValue,OutputFUN,WSelect] ...
-          = shc_sdearguments(solver,tspan,a0,net,epsilon,mu,options)
+          = shc_sdearguments(solver,tspan,a0,rho,alpha,epsilon,mu,options)
 %SHC_SDEARGUMENTS  Process arguments.
-%
+%   [...] = SHC_SDEARGUMENTS(SOLVER,TSPAN,A0,RHO,ALPHA,EPSILON,MU,OPTIONS) 
+%   
 %   See also:
 %       SHC_LV_ITEGRATE, SHC_SDEGET, SHC_SDEEVENTS, SHC_SDEZERO, SHC_SDEOUTPUT,
 %       SHC_SDERESET_STREAM, FUNCTION_HANDLE
         
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.2, 11-17-13
+%   Revision: 1.3, 4-5-15
 
 %   SHC_SDEARGUMENTS is partially based on an updating of version 1.12.4.15 of
 %   Matlab's ODEARGUMENTS.
@@ -58,18 +59,17 @@ end
 a0 = a0(:).';
 N = length(a0);         	% Number of state variables
 
-% Check Rho matrix
-if ~isstruct(net) || ~isfield(net,'rho') || ~isfield(net,'alpha')
-    error('SHCTools:shc_sdearguments:InvalidRho',...
-          ['RHO must be an SHC network structure with ''rho'' and ''alpha'' '...
-           'fields.']);
-end
-rho = net.rho.';
-alpv = net.alpha.';
-if ~shc_ismatrix(rho) || any(size(rho) ~= N)
+% Validate network
+shc_lv_validate(rho,alpha);
+
+if size(rho,1) ~= N
     error('SHCTools:shc_sdearguments:RhoDimensionMismatch',...
           'RHO must be a square matrix the same dimension as A0.');
 end
+
+% Transpose for integrator
+rho = rho.';
+alpha = alpha(:).';
 
 % Check Epsilon
 if isa(epsilon,'function_handle')

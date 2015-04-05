@@ -1,22 +1,23 @@
-function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,net,epsilon,varargin)
+function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,rho,alpha,epsilon,varargin)
 %SHC_LV_INTEGRATE  Solve stochastic Lotka-Volterra differential equations.
-%   AOUT = SHC_LV_INTEGRATE(TSPAN,A0,RHO,EPSILON) with TSPAN = [T0 T1 ...TFINAL]
-%   integrates the stochastic differential equations for the N-dimensional
-%   Lotka-Volterra system with diagonal additive noise from time T0 to TFINAL
-%   (all increasing or all decreasing with arbitrary step size) with initial
-%   conditions A0. RHO is an SHC network structure describing an N-by-N
-%   connection matrix and its parameters. EPSILON is a scalar or length N vector
-%   denoting the root-mean-squared magnitude of the noise perturbing each
+%   AOUT = SHC_LV_INTEGRATE(TSPAN,A0,RHO,ALPHA,EPSILON) with
+%   TSPAN = [T0 T1 ...TFINAL] integrates the stochastic differential equations
+%   for the N-dimensional Lotka-Volterra system with diagonal additive noise
+%   from time T0 to TFINAL (all increasing or all decreasing with arbitrary step
+%   size) with initial conditions A0. The connection matrix, RHO, is a
+%   floating-point N-by-N matrix. ALPHA is a floating-point scalar or length N
+%   vector of growth rates. EPSILON is a floating-point scalar or length N
+%   vector denoting the root-mean-squared magnitude of the noise perturbing each
 %   dimension. If all elelments of EPSILON are equal to zero, the system is
 %   treated as an ODE rather than an SDE. Each row in the solution array AOUT
 %   corresponds to a time in the input vector TSPAN.
 %
-%   [AOUT, W] = SHC_LV_INTEGRATE(TSPAN,A0,RHO,EPSILON) outputs the matrix W of
-%   integrated Weiner increments that were used for integration. W is N columns
-%   by LENGTH(TSPAN) rows, corresponding to [T0 T1 T2 ... TFINAL].
+%   [AOUT, W] = SHC_LV_INTEGRATE(TSPAN,A0,RHO,ALPHA,EPSILON) outputs the matrix
+%   W of integrated Weiner increments that were used for integration. W is N
+%   columns by LENGTH(TSPAN) rows, corresponding to [T0 T1 T2 ... TFINAL].
 %
-%   [...] = SHC_LV_INTEGRATE(TSPAN,A0,RHO,EPSILON,MU) specifies the additional
-%   parameter MU which must be a scalar or vector of length N.
+%   [...] = SHC_LV_INTEGRATE(TSPAN,A0,RHO,ALPHA,EPSILON,MU) specifies the
+%   additional parameter MU which must be a scalar or vector of length N.
 %
 %   [...] = SHC_LV_INTEGRATE(...,OPTIONS) specifies options to for generating
 %   the random variates that are used to calculate the Wiener increments, detect
@@ -52,24 +53,24 @@ function [A,W,TE,AE,WE,IE]=shc_lv_integrate(tspan,a0,net,epsilon,varargin)
 %   Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
-%   Revision: 1.2, 11-28-13
+%   Revision: 1.3, 4-5-15
 
 
 solver = 'SHC_LV_INTEGRATE';
 
 % Check inputs and outputs
-if nargin < 4
+if nargin < 5
     error('SHCTools:shc_lv_integrate:NotEnoughInputs',...
           'Not enough input arguments.');
 end
-if nargin > 6
+if nargin > 7
     error('SHCTools:shc_lv_integrate:TooManyInputs',...
           'Too many input arguments.');
 end
-if nargin == 4
+if nargin == 5
     mu = 0;
     options = [];
-elseif nargin == 5
+elseif nargin == 6
     v = varargin{1};
     if isstruct(v) || isempty(v) && shc_ismatrix(v)
         mu = 0;
@@ -84,10 +85,10 @@ else
 end
 
 % Handle solver arguments (NOTE: ResetStream is called by onCleanup())
-[N,tspan,lt,a0,rho,alpv,epsilon,mu,h,sh,ConstStep,dataType,NonNegative,...
+[N,tspan,lt,a0,rho,alpha,epsilon,mu,h,sh,ConstStep,dataType,NonNegative,...
     NonNegativeFUN,ScalarNoise,ConstGFUN,ConstInputFUN,RandFUN,ResetStream,...
     EventsFUN,EventsValue,OutputFUN,WSelect] ...
-    = shc_sdearguments(solver,tspan,a0,net,epsilon,mu,options);	%#ok<ASGLU>
+    = shc_sdearguments(solver,tspan,a0,rho,alpha,epsilon,mu,options);   %#ok<ASGLU>
 
 % Initialize outputs for zero-crossing events
 isEvents = ~isempty(EventsFUN);
@@ -247,7 +248,7 @@ for i = 1:lt-1
     dWi = A(i+1,:);
     
     % Euler-Maruyama step
-    Ai = Ai+(Ai.*(alpv-Ai*rho)+mui)*dt+epsiloni.*dWi;
+    Ai = Ai+(Ai.*(alpha-Ai*rho)+mui)*dt+epsiloni.*dWi;
     
     % Force specified solution to be >= 0
     if NonNegative

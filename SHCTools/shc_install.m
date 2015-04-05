@@ -3,24 +3,24 @@ function shc_install(opt)
 %   SHC_INSTALL adds the SHCTools directory (where this function is located) and
 %   subdirectories to the Matlab search path, saves the path, and prints the
 %   help for the toolbox.
-%
+%   
 %   SHC_INSTALL('remove') uninstalls SHCTools by removing the SHCTools
 %   directories from the Matlab search path and saving the path. If SHCTools is
 %   not installed (on the path), a warning is issued.
-%
+%   
 %   See also: PATH, ADDPATH, RMPATH, SAVEPATH
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-12-13
-%   Revision: 1.2, 11-16-13
+%   Revision: 1.3, 4-5-15
 
 
 if nargin == 0 || any(strcmp(opt,{'add','install','addpath'}))
     p = fileparts(mfilename('fullpath'));
-    addpath(p,[p filesep 'stoneholmes'],[p filesep 'xml']);
+    addpath(p,[p filesep 'stoneholmes']);
     status = true;
 elseif any(strcmp(opt,{'remove','uninstall','rmpath'}))
     p = fileparts(mfilename('fullpath'));
-    rmpath(p,[p filesep 'stoneholmes'],[p filesep 'xml']);
+    rmpath(p,[p filesep 'stoneholmes']);
     status = false;
 else
     error('SHCTools:shc_install:UnknownOption',...

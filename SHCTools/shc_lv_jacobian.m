@@ -1,68 +1,33 @@
-function J=shc_lv_jacobian(rho,eqpt)
+function J=shc_lv_jacobian(rho,alpha,eqpt)
 %SHC_LV_JACOBIAN  Jacobian of N-dimensional Lotka-Volterra system.
-%   J = SHC_LV_JACOBIAN(RHO,EQPT) returns the N-by-N Jacobian matrix of the
-%   N-dimensional Lotka-Volterra SHC network described by the connection matrix
-%   RHO evaluated at the equilibrium point vector EQPT. RHO is an N-by-N
-%   floating-point or symbolic matrix or an SHC network structure. If RHO is a
-%   matrix, the amplitude scaling parameters, beta, are asummed to all be equal
-%   to one. If RHO is an SHC network structure, arbitrary beta values may be
-%   used. EQPT is vector of length N.
-%
-%   J = SHC_LV_JACOBIAN(RHO) returns a 1-by-N cell array of Jacobian matrices at
-%   all N nodes of the SHC. The row elements of the cell array correspond to
-%   equilibrium point vectors from the columns of an identity matrix of size N.
-%
+%   J = SHC_LV_JACOBIAN(RHO,ALPHA,EQPT) returns the N-by-N Jacobian matrix of
+%   the N-dimensional Lotka-Volterra SHC network, with connection matrix RHO and
+%   growth rates ALPHA, evaluated at the equilibrium point vector EQPT. RHO is a
+%   floating-point or symbolic N-by-N matrix. ALPHA and EQPT are floating-point
+%   or symbolic scalars or length N vectors.
+%   
+%   J = SHC_LV_JACOBIAN(RHO,ALPHA) returns a 1-by-N cell array of Jacobian
+%   matrices at all N nodes of the SHC. The row elements of the cell array
+%   correspond to equilibrium point vectors from the columns of an identity
+%   matrix of size N.
+%   
 %   See also:
-%       SHC_LV_EIGS, SHC_LV_SYMEQUILIBRIA, SHC_LV_LAMBDA_US, SHC_LV_ODE,
-%       SHC_CREATE
+%       SHC_LV_EIGS, SHC_LV_LAMBDA_US, SHC_LV_ODE, SHC_LV_CREATECYCLE
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 12-1-10
-%   Revision: 1.2, 5-4-13
+%   Revision: 1.3, 4-5-15
 
 
-% Check Rho matrix
-if isstruct(rho) && isfield(rho,'rho')
-    p = rho.rho;
-    if ~(isfloat(p) || isa(p,'sym'))
-        error('SHCTools:shc_lv_jacobian:InvalidRhoStruct',...
-             ['The ''rho'' field of the SHC network structure must be a '...
-              'symbolic or floating-point matrix.']);
-    end
-    if ~isreal(p) || ~all(isfinitesym(p(:)))
-        error('SHCTools:shc_lv_jacobian:RhoStructNonFiniteReal',...
-             ['The ''rho'' field of the SHC network structure must be a '...
-              'finite real symbolic or floating-point matrix.']);
-    end
-    
-    alpv = rho.alpha;
-    betv = rho.beta;
-    n = rho.size;
-else
-    p = rho;
-    if ~(isfloat(p) || isa(p,'sym'))
-        error('SHCTools:shc_lv_jacobian:InvalidRho',...
-             ['The connection matrix, Rho, must be a symbolic or '...
-              'floating-point matrix.']);
-    end
-    if ~isreal(p) || ~all(isfinitesym(p(:)))
-        error('SHCTools:shc_lv_jacobian:RhoNonFiniteReal',...
-             ['The connection matrix, Rho, must be a finite real symbolic '...
-              'or floating-point matrix.']);
-    end
-    [m,n] = size(p);
-    if isempty(p) || ~shc_ismatrix(p) || m ~= n
-        error('SHTools:shc_lv_jacobian:RhoDimensionMismatch',...
-              'The connection matrix, Rho, must be a non-empty square matrix.');
-    end
-    
-    alpv = diag(p);
-    betv = ones(n,1);
-end
+% Validate network
+shc_lv_validate(rho,alpha);
+alpha = alpha(:);
 
-if nargin == 2
+n = size(rho,1);
+z = ones(1,n);
+if nargin == 3
     % Check equilibrium point vector
     if ~isvector(eqpt) || length(eqpt) ~= n
-        error('SHTools:shc_lv_jacobian:EquilibriumPointDimensionMismatch',...
+        error('SHCTools:shc_lv_jacobian:EquilibriumPointDimensionMismatch',...
              ['The equilibrium point must be a vector the same dimension as '...
               'the connetion matrix, Rho.']);
     end
@@ -79,16 +44,16 @@ if nargin == 2
     eqpt = -eqpt(:);
     
     % Calculate Jacobian
-    J = p.*eqpt(:,ones(1,n));
-    J(1:n+1:end) = alpv.*(1+eqpt./betv)+p*eqpt;
+    J = rho.*eqpt(:,z);
+    J(1:n+1:end) = alpha+diag(rho).*eqpt+rho*eqpt;
 else
-    eqpt = diag(-betv);
+    rhoii = diag(rho);
+    eqpt = diag(-alpha./rhoii);
     
-    z = ones(1,n);
     for i = n:-1:1
         % Calculate Jacobian
         v = eqpt(:,i);
-        J{i} = p.*v(:,z);
-        J{i}(1:n+1:end) = alpv.*(1+v./betv)+p*v;
+        J{i} = rho.*v(:,z);
+        J{i}(1:n+1:end) = alpha+rhoii.*v+rho*v;
     end
 end
