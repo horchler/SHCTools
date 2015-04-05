@@ -8,7 +8,8 @@ function shc_install(opt)
 %   directories from the Matlab search path and saving the path. If SHCTools is
 %   not installed (on the path), a warning is issued.
 %   
-%   See also: PATH, ADDPATH, RMPATH, SAVEPATH
+%   See also:
+%       PATH, ADDPATH, RMPATH, SAVEPATH
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 8-12-13
 %   Revision: 1.3, 4-5-15

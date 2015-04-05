@@ -3,11 +3,12 @@ function tau=shc_periods(t,a)
 %   TAU = SHC_PERIODS(T, A) returns the periods of the columns of A. T is a
 %   monotonically increasing or decreasing vector of times. A must have the
 %   same numer of rows as the length of T.
-%
-%   See also: SHC_WHOLEPERIODS, SHC_PHASE, SHC_RELATIVE_PHASE, WRAP, UNWRAP
+%   
+%   See also:
+%       SHC_WHOLEPERIODS, SHC_PHASE, SHC_RELATIVE_PHASE, WRAP, UNWRAP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 9-23-13
-%   Revision: 1.0, 6-14-14
+%   Revision: 1.0, 4-5-15
 
 
 if ~isfloat(t) || ~isreal(t) || ~isvector(t)

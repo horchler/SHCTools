@@ -1,8 +1,12 @@
 function p=shc_relative_phase(a1,a2,bet1,bet2)
 %SHC_RELATIVE_PHASE  
+%   P = SHC_RELATIVE_PHASE(A1,A2,BETA1,BETA2) 
 %
-%
-%   See also: SHC_PHASE, HILBERT, FFT, IFFT, WRAP, UNWRAP
+%   See also:
+%       SHC_PHASE, HILBERT, FFT, IFFT, WRAP, UNWRAP
+
+%   Andrew D. Horchler, adh9 @ case . edu, Created 3-6-13
+%   Revision: 1.0, 7-24-13
 
 
 % Shift dimensions to work along first non-singleton dimension

@@ -7,7 +7,7 @@ function status=shc_sdeprint(t,y,flag,w)
 %   16 components are specified, an abreviated output is given. To print only
 %   particular components of the solution, specify their indices via the
 %   'OutputYSelect' SDE options property.
-%
+%   
 %   At the start of integration, the solver calls SHC_SDEPRINT(TSPAN,Y0,'init')
 %   to initialize the output function. After each integration step to new time,
 %   T, and solution vector, Y, the solver calls STATUS = SHC_SDEPRINT(T,Y,'').
@@ -15,7 +15,7 @@ function status=shc_sdeprint(t,y,flag,w)
 %   the most recent output time and Y is the corresponding column vector. The
 %   STATUS return value is 1. When the integration is complete, the solver calls
 %   SHC_SDEPRINT([],[],'done').
-%
+%   
 %   Set the 'OutputWSelect' SDE options property to 'yes' or to a vector of
 %   indices to output the integrated Wiener increments, W. The integrated Wiener
 %   increments are passed to SHC_SDEPRINT as a fourth argument,
@@ -24,7 +24,7 @@ function status=shc_sdeprint(t,y,flag,w)
 %   SHC_SDEPRINT(TSPAN,Y0,'init',W0) to initialize the output function at the
 %   start of integration and SHC_SDEPRINT([],[],'done',[]) when the integration
 %   is complete.
-%
+%   
 %   The display format of the printed output can be changed via FORMAT.
 %   
 %   See also:
@@ -34,7 +34,7 @@ function status=shc_sdeprint(t,y,flag,w)
 %   SHC_SDEPRINT is based on an updating of Matlab's ODEPRINT, version 1.17.4.4
 
 %   Andrew D. Horchler, adh9 @ case . edu, 5-11-13
-%   Revision: 1.2, 5-13-13
+%   Revision: 1.2, 4-5-15
 
 
 persistent LEN_TSPAN ITERATION STR BSSTR FSTR C;	%#ok<PUSE>

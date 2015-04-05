@@ -11,6 +11,10 @@ function delta=shc_lv_neighborhood(bet,kappa)
 %   this value until it is changed, the function is cleared, or Matlab is
 %   relaunched. KAPPA should be a finite real floating-point scalar greter than
 %   zero and less than 0.5.
+%   
+%   See also:
+%       SHC_LV_IC, SHC_LV_MEANPERIOD, SHC_LV_MINTRANSITIONTIME, SHC_LV_PARAMS,
+%       SHC_LV_PASSAGETIME
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-6-13
 %   Revision: 1.1, 4-5-15

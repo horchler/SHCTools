@@ -1,10 +1,12 @@
 function [gam,del] = shc_lv_nu2gammadelta(alp,bet,nu)
 %SHC_LV_NU2GAMMADELTA  
 %   [GAM,DEL] = SHC_LV_NU2GAMMADELTA(ALP,BET,NU)
-%
+%   
+%   See also:
+%       SHC_LV_SYMPARAMS
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 2-26-14
-%   Revision: 1.0, 2-26-14
+%   Revision: 1.0, 4-5-15
 
 
 % Check Alpha

@@ -1,15 +1,16 @@
 function varargout=shc_wholeperiods(a,type)
 %SHC_WHOLEPERIODS  Trim periodic input to nearest whole number of periods.
 %   A = SHC_WHOLEPERIODS(A) 
-%
+%   
 %   [I1, I2] = SHC_WHOLEPERIODS(A) 
-%
+%   
 %   [...] = SHC_WHOLEPERIODS(A, TYPE) 
-%
-%   See also: SHC_PERIODS, SHC_PHASE, SHC_RELATIVE_PHASE, WRAP, UNWRAP
+%   
+%   See also:
+%       SHC_PERIODS, SHC_PHASE, SHC_RELATIVE_PHASE, WRAP, UNWRAP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 7-23-13
-%   Revision: 1.0, 6-14-14
+%   Revision: 1.0, 4-5-15
 
 
 if ~isfloat(a) || ~shc_ismatrix(a)

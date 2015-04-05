@@ -10,7 +10,7 @@ function status=shc_sdephaseplot3(t,y,flag,w)
 %   'OutputYSelect' SDE options property. The first specified component is
 %   plotted with respect to the X-axis, the second component with respect to the
 %   Y-axis, and the third component with respect to the Z-axis.
-%
+%   
 %   At the start of integration, the solver calls
 %   SHC_SDEPHASEPLOT3(TSPAN,Y0,'init') to initialize the output function. After
 %   each integration step to new time, T, and solution vector, Y, the solver
@@ -20,7 +20,7 @@ function status=shc_sdephaseplot3(t,y,flag,w)
 %   value is 1 if the figure window and plot axis are still open and 0
 %   otherwise. When the integration is complete, the solver calls
 %   SHC_SDEPHASEPLOT3([],[],'done').
-%
+%   
 %   If fewer than three components of the solution, Y, are specified, one or two
 %   components of the integrated Wiener increments, W, can be plotted versus Y
 %   solution components or three integrated Wiener increment components can be
@@ -40,7 +40,7 @@ function status=shc_sdephaseplot3(t,y,flag,w)
 %   version 1.27.4.10
 
 %   Andrew D. Horchler, adh9 @ case . edu, 5-11-13
-%   Revision: 1.2, 5-13-13
+%   Revision: 1.2, 4-15-15
 
 
 persistent FIG_HANDLE AX_HANDLE;

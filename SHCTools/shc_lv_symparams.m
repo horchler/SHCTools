@@ -2,19 +2,19 @@ function [alp,bet,varargout]=shc_lv_symparams(n,stability)
 %SHC_LV_SYMPARAMS  Symbolic Lotka-Volterra SHC parameters with assumptions.
 %   [ALPHA, BETA, NU] = SHC_LV_SYMPARAMS(N)
 %   [ALPHA, BETA, GAMMA, DELTA] = SHC_LV_SYMPARAMS(N)
-%
+%   
 %   [...] = SHC_LV_SYMPARAMS(N,'Unstable')
 %   [...] = SHC_LV_SYMPARAMS(N,'Marginal')
 %   [...] = SHC_LV_SYMPARAMS(N,'Stable')
 %   [...] = SHC_LV_SYMPARAMS(N,'All')
 %   [...] = SHC_LV_SYMPARAMS(N,{'Marginal','Stable'})
-%
+%   
 %   See also:
 %       SHC_LV_PARAMS, SYM, SYM/ASSUME, SYM/ASSUMEALSO, ASSUMPTIONS,
 %       SYM/ISALWAYS, SHC_LV_NU2GAMMADELTA
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-19-13
-%   Revision: 1.3, 3-1-14
+%   Revision: 1.3, 4-5-15
 
 
 % Check number of input and output arguments

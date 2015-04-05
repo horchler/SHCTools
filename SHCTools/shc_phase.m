@@ -1,13 +1,14 @@
 function p=shc_phase(a,bet)
-%SHC_PHASE  Instantaneous phase via Hilbert transform
+%SHC_PHASE  Instantaneous phase via Hilbert transform.
 %   P = SHC_PHASE(A) 
-%
-%   P = SHC_PHASE(A,BETA)
-%
-%   See also: SHC_RELATIVE_PHASE, HILBERT, FFT, IFFT, WRAP, UNWRAP
+%   
+%   P = SHC_PHASE(A,BETA) 
+%   
+%   See also:
+%       SHC_RELATIVE_PHASE, HILBERT, FFT, IFFT, WRAP, UNWRAP
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-7-13
-%   Revision: 1.0, 7-24-13
+%   Revision: 1.0, 4-5-15
 
 
 % Shift dimensions to work along first non-singleton dimension

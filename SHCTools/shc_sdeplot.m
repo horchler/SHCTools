@@ -8,7 +8,7 @@ function status=shc_sdeplot(t,y,flag,w)
 %   the solution, specify their indices via the 'OutputYSelect' SDE options
 %   property. SHC_SDEPLOT is the default output function of the solvers when
 %   they are called with no output arguments.
-%
+%   
 %   At the start of integration, the solver calls SHC_SDEPLOT(TSPAN,Y0,'init')
 %   to initialize the output function. After each integration step to new time,
 %   T, and solution vector, Y, the solver calls STATUS = SHC_SDEPLOT(T,Y,''). If
@@ -17,7 +17,7 @@ function status=shc_sdeplot(t,y,flag,w)
 %   vectors. The STATUS return value is 1 if the figure window and plot axis are
 %   still open and 0 otherwise. When the integration is complete, the solver
 %   calls SHC_SDEPLOT([],[],'done').
-%
+%   
 %   Set the 'OutputWSelect' SDE options property to 'yes' or to a vector of
 %   indices to output the integrated Wiener increments, W. The integrated Wiener
 %   increments are passed to SHC_SDEPLOT as a fourth argument,
@@ -33,7 +33,7 @@ function status=shc_sdeplot(t,y,flag,w)
 %   SHC_SDEPLOT is based on an updating of Matlab's ODEPLOT, version 1.25.4.9
 
 %   Andrew D. Horchler, adh9 @ case . edu, 4-29-13
-%   Revision: 1.2, 5-13-13
+%   Revision: 1.2, 4-5-15
 
 
 persistent FIG_HANDLE AX_HANDLE LEN_TSPAN;
