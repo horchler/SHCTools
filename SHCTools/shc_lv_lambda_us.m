@@ -31,11 +31,13 @@ function [lambda_u,lambda_s]=shc_lv_lambda_us(rho,alpha,M)
 
 % Validate network
 shc_lv_validate(rho,alpha);
+
+n = size(rho,1);
 alpha = alpha(:);
     
 if nargin > 2
     % Check M
-    if ~validateindex(M) || ~isnumeric(M) || M > m
+    if ~validateindex(M) || ~isnumeric(M) || M > n
         error('SHCTools:shc_lv_lambda_us:InvalidM',...
              ['M must be a finite real integer greater than or equal to one '...
               'and less than or equal to the dimension of RHO.']);
@@ -67,7 +69,7 @@ else
     % Get eigenvalues
     E = shc_lv_eigs(rho,alpha);
     
-    for i = size(rho,1):-1:1
+    for i = n:-1:1
         if isa(E,'sym')
             Ec = num2cell(E(:,i));
             lambda_u(i,1) = feval(symengine,'min',Ec{isAlways(sym(E(:,i)>=0))});

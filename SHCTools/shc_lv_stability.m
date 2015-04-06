@@ -35,7 +35,7 @@ function nu=shc_lv_stability(rho,alpha,M)
 shc_lv_validate(rho,alpha);
 
 n = size(rho,1);
-if nargin == 2
+if nargin > 2
     % Check M
     if ~validateindex(M) || ~isnumeric(M) || M > n
         error('SHCTools:shc_lv_stability:InvalidM',...

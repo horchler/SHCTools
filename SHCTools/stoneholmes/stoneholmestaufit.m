@@ -1,10 +1,10 @@
 function tau=stoneholmestaufit(tau_bar,epsilon,epsilon_hat,lambda_u)
-%SHC_TAUFIT  Mean period as a function of fitted constants.
-%   TAU = STONEHOLMESTAUFIT(TAU_BAR,EPSILON,EPSILON_HAT,LAMBDA_U) returns the periods
-%   TAU corresponding to the noise magnitude components EPSILON. The system has
-%   unstable eigenvalues LAMBDA_U and measured mean periods TAU_BAR when
-%   simulated at noise magnitudes of EPSILON_HAT. The input must be scalars or
-%   equal length vectors, which are applied elementwise to the output.
+%STONEHOLMESTAUFIT  Mean period as a function of fitted constants.
+%   TAU = STONEHOLMESTAUFIT(TAU_BAR,EPSILON,EPSILON_HAT,LAMBDA_U) returns the
+%   periods TAU corresponding to the noise magnitude components EPSILON. The
+%   system has unstable eigenvalues LAMBDA_U and measured mean periods TAU_BAR
+%   when simulated at noise magnitudes of EPSILON_HAT. The input must be scalars
+%   or equal length vectors, which are applied elementwise to the output.
 %   
 %   NOTE:
 %       No input validation is performed.

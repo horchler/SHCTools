@@ -39,7 +39,7 @@ if n < 3
 else
     isNegative = false;
     isPositive = false;
-    if nargin == 2
+    if nargin == 3
         if ischar(S)
             s = strcmpi(S,{'negative','positive','non-negative'});
             if s(1)

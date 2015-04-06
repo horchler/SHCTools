@@ -28,6 +28,13 @@ function tau=shc_lv_passagetime(rho,alpha,epsilon)
 % Validate network
 shc_lv_validate(rho,alpha,epsilon);
 
+% Check if cycle
+if ~shc_lv_iscycle(rho,alpha)
+    error('SHCTools:shc_lv_passagetime:NotCycle',...
+         ['The network described by Rho and Alpha does not appear to be an '...
+          'SHC cycle, as required.']);
+end
+
 alpha = alpha(:)+zeros(size(rho,1),1);
 bet = alpha./diag(rho);
 
