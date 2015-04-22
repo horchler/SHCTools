@@ -19,6 +19,7 @@ How to install (and uninstall) SHCTools:
  1. Download and expand the *[SHCTools-master.zip](https://github.com/horchler/SHCTools/archive/master.zip)* ZIP archive of the repository.  
  2. Move the resultant *SHCTools-master* folder to the desired permanent location.  
  3. In Matlab, navigate to *SHCTools-master/SHCTools/* and run ```shc_install```. This adds the necessary files and folders to the Matlab search path. To uninstall SHCTools, run ```shc_install('remove')```.  
+ 4. Minor edits and bug reports and fixes can be submitted by [filing an issue](https://github.com/horchler/SHCTools/issues) or via email. To add new functionality or make propose major changes, please [fork the repository](https://help.github.com/articles/fork-a-repo). Any new features should be accompanied by some means of testing. Email or file an issue if you have any questions.  
 &nbsp;  
 
 --------
