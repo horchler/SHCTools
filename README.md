@@ -3,7 +3,7 @@ SHCTools &ndash; Horchler, et al. 2015
 #####Matlab Tools for the Simulation, Analysis, and Design of Stable Heteroclinic Channel (SHC) cycles.#####
 ######Version 1.0, 4-5-15######
 
-This branch of the SHCTools repository maintains the code for the paper *Designing Responsive Pattern Generators: Stable Heteroclinic Channel Cycles for Modeling and Control* (Horchler, et al. 2015) The code in this branch is meant for readability and is specific to the subject the paper: mean first passage time and Lotka-Volterra SHC cycles. Many optimizations and features found in the [master SHCTools branch](https://github.com/horchler/SHCTools/tree/master) are not present. The functions here will remain static and will only be updated to fix bugs.
+This branch of the SHCTools repository maintains the code for the paper *Designing Responsive Pattern Generators: Stable Heteroclinic Channel Cycles for Modeling and Control* (Horchler, et al. 2015). The code in this branch is meant for readability and is specific to the subject the paper: mean first passage time and Lotka-Volterra SHC cycles. Many optimizations and features found in the [master SHCTools branch](https://github.com/horchler/SHCTools/tree/master) are not present. The functions here will remain static and will only be updated to fix bugs.
 
 &nbsp;  
 &nbsp;  
@@ -12,6 +12,7 @@ How to install:
  2. Move the resultant *SHCTools-SHC-Design-Paper* folder to the desired permanent location.  
  3. In Matlab, navigate to *SHCTools-SHC-Design-Paper/SHCTools-Horchler_etal_2015/*. Add this folder to your Matlab search ```path``` if desired.  
  4. Code to produce the basic form of the figures in the paper can be found in *SHCTools-SHC-Design-Paper/Figures-Horchler_etal_2015/*. These M-files use the functions in the *SHCTools-Horchler_etal_2015/* folder. Either move these M-files or set the search path as described in step&nbsp;3.  
+ 5. Minor edits and bug reports and fixes can be submitted by [filing an issue](https://github.com/horchler/SHCTools/issues) or via email (please be sure to to refer to the *SHC-Design-Paper* branch). To add new functionality or make propose major changes, please [fork the repository](https://help.github.com/articles/fork-a-repo) and work from the main branch. Any new features should be accompanied by some means of testing. Email or file an issue if you have any questions.  
 &nbsp;  
 
 --------
