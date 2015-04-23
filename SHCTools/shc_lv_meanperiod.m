@@ -28,7 +28,7 @@ function [tau_bar,tau]=shc_lv_meanperiod(dt,rho,alpha,epsilon_hat,M)
 %   Differential Equations," Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.5, 4-5-15
+%   Revision: 1.5, 4-23-15
 
 
 % Check DT
@@ -42,7 +42,7 @@ if dt <= 0 || ~isfinite(dt)
 end
 
 % Validate network
-shc_lv_validate(rho,alpha,epsilon);
+shc_lv_validate(rho,alpha,epsilon_hat);
 
 % Check M
 if ~isfloat(M) || ~isreal(M) || ~isscalar(M)
