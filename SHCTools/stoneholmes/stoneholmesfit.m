@@ -76,7 +76,7 @@ function varargout=stoneholmesfit(x,varargin)
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-11-12
-%   Revision: 1.0, 6-16-14
+%   Revision: 1.1, 2-15-16
 
 
 % Check number of input and output arguments
@@ -245,7 +245,7 @@ elseif isNoCensoring
     % Estimate Lambda_U parameter as a starting value
     fx = freq.*x;
     wtx = sum(fx)/n;
-    lambda_uhat = sqrt((n-1)*4/(pi*(sum(x.*fx)-n*wtx^2))); % = 2/sqrt(pi*var(x))
+    lambda_uhat = pi*sqrt((n-1)/(8*sum((fx-wtx).^2)));  % = pi/sqrt(8*var(x))
 else
     xuncensored = x(uncensored);
     if range(xuncensored) < eps(min(xuncensored))
@@ -264,7 +264,7 @@ else
     lambda_uhat = R(1)*R(4)/(xp(2:end).'*Q*[-R(4);R(3)]);	% = -1./(R\(Q'*xp))
     wtx = sum(frequncensored.*xuncensored)/n;
 end
-
+%
 % Create function handles for FZERO
 if isinf(lambda_s)
     likelihood = @(lambda_u)likeeq_UInf(lambda_u,x,3/n,4*wtx,freq);
@@ -286,7 +286,7 @@ elseif eps(likelihoodval) > options.TolX
     warning('SHCTools:stoneholmesfit:IllConditioned',...
             'The likelihood equation may be ill-conditioned.');
 end
-
+%
 % Calculate explicit MLE for Theta (Epsilon/Delta) in terms of Lambda_U
 lx = 2*lambda_uhat*x;
 if any(lx > log(realmax))

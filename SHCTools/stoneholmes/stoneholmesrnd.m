@@ -55,7 +55,7 @@ function r=stoneholmesrnd(delta,epsilon,lambda_u,lambda_s,varargin)
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 3-6-12
-%   Revision: 1.0, 6-16-14
+%   Revision: 1.0, 2-15-16
 
 
 % Check four parameters
@@ -88,7 +88,7 @@ else
     try
         stream = RandStream.getGlobalStream;
     catch
-        stream = RandStream.getDefaultStream;	%#ok<GETRS>
+        stream = RandStream.getDefaultStream;
     end
 end
 
