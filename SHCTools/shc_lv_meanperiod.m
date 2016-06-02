@@ -28,7 +28,7 @@ function [tau_bar,tau]=shc_lv_meanperiod(dt,rho,alpha,epsilon_hat,M)
 %   Differential Equations," Springer-Verlag, 1992.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
-%   Revision: 1.5, 4-23-15
+%   Revision: 1.5, 6-2-16
 
 
 % Check DT
@@ -105,7 +105,7 @@ else
 end
 
 % Crossing values where periods are measured, edge of neighborhood
-d = beta-shc_lv_neighborhood(beta);
+d = bet-shc_lv_neighborhood(bet);
 
 % Initial conditions for integration
 a = [zeros(n-1,1)+max(epsilon_hat);d(1)];

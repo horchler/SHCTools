@@ -30,7 +30,7 @@ function rho=shc_lv_createcycle(alpha,bet,nu,direction)
 %   No. 2., 2015, pp. 1-16.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 2-27-14
-%   Revision: 1.2, 4-5-15
+%   Revision: 1.2, 6-2-16
 
 
 % Check ALPHA
@@ -118,7 +118,7 @@ else
     rho = c*(alpha./bet)*z.';
     rho([n+1:n+1:end n]) = -alpha./(bet.*nu);
     rho(1:n+1:end) = 0;
-    rho = rho+(z./beta)*alpha.';
+    rho = rho+(z./bet)*alpha.';
 end
 
 % Make non-negative

@@ -6,7 +6,7 @@ function [gam,del] = shc_lv_nu2gammadelta(alp,bet,nu)
 %       SHC_LV_SYMPARAMS
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 2-26-14
-%   Revision: 1.0, 4-5-15
+%   Revision: 1.0, 6-2-16
 
 
 % Check Alpha
@@ -58,7 +58,7 @@ lv = [length(alp) length(bet) length(nu)];
 lv = lv(lv ~= 1);
 if length(lv) > 1 && ~all(lv(2:end) == lv(1))
     error('SHCTools:shc_lv_nu2gammadelta:DimensionMismatch',...
-         ['If any combination of Alpha, Beta, Beta, and Nu are non-scalar '...
+         ['If any combination of Alpha, Beta, and Nu are non-scalar '...
           'vectors, they must have the same length.']);
 end
 
