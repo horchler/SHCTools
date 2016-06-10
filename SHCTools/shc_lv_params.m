@@ -29,9 +29,10 @@ function [alpha,bet,nu]=shc_lv_params(tau,epsilon,bet,nu,flag)
 %   No. 2., 2015, pp. 1-16.
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
-%   Revision: 1.4, 4-5-15
+%   Revision: 1.5, 6-10-16
 
 
+n0 = max([length(tau) length(epsilon) length(bet) length(nu)]);
 if (isscalar(tau) || all(tau==tau(1))) ...
         && (isscalar(epsilon) || all(epsilon==epsilon(1))) ...
         && (isscalar(bet) || all(bet==bet(1))) ...
@@ -45,7 +46,7 @@ if (isscalar(tau) || all(tau==tau(1))) ...
     isUniform = true;
 else
     % Expand parameter vectors
-    n = max([length(tau) length(epsilon) length(bet) length(nu)]);
+    n = n0;
     z = zeros(n,1);
     tau = tau(:)+z;
     epsilon = epsilon(:)+z;
@@ -85,8 +86,8 @@ end
 % Alpha in terms of Tau, Tau_Nu, Delta, Epsilon, and Nu
 alpha = alpfun(nu,1:n);
 
-% Solve for Nu to meet Alpha(i) >= Alpha(i-1)/Nu(i-1) requirement if needed
 if ~isUniform
+    % Solve for Nu to meet Alpha(i) >= Alpha(i-1)/Nu(i-1) requirement if needed
     alpnu = alpha([end 1:end-1])./nu([end 1:end-1]);
     idx = (alpnu > alpha);
     if any(idx)
@@ -96,6 +97,12 @@ if ~isUniform
         end
         alpha(idx) = alpfun(nu(idx),idx);
     end
+elseif n0 > 1
+    % Ouput as n-by-1 vectors if any input is non-scalar
+    z = zeros(n0,1);
+    alpha = alpha+z;
+    bet = bet+z;
+    nu = nu+z;
 end
 
 

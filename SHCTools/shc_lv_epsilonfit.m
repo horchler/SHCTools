@@ -23,7 +23,7 @@ function epsilon=shc_lv_epsilonfit(epsilon_hat,tau,tau_bar,rho,alpha)
 %   Vol. 50, No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
 %   Andrew D. Horchler, adh9 @ case . edu, Created 4-21-13
-%   Revision: 1.2, 4-5-15
+%   Revision: 1.2, 6-10-16
 
 
 % Validate network
@@ -35,7 +35,7 @@ if ~(isfloat(epsilon_hat) || isa(epsilon_hat,'sym'))
     error('SHCTools:shc_lv_epsilonfit:InvalidEpsilon_Hat',...
           'The input Epsilon_Hat must be a symbolic or floating-point vector.');
 end
-if ~isreal(epsilon_hat) || epsilon_hat < 0 || ~all(isfinitesym(epsilon_hat(:)))
+if ~isreal(epsilon_hat) || any(epsilon_hat < 0) || ~all(isfinitesym(epsilon_hat(:)))
     error('SHCTools:shc_lv_epsilonfit:Epsilon_HatNonFiniteReal',...
          ['The input Epsilon_Hat must be a nonnegative finite real symbolic '...
           'or floating-point vector.']);
@@ -50,7 +50,7 @@ if ~(isfloat(tau) || isa(tau,'sym'))
     error('SHCTools:shc_lv_epsilonfit:InvalidTau',...
           'The input Tau must be a symbolic or floating-point vector.');
 end
-if ~isreal(tau) || tau < 0 || ~all(isfinitesym(tau(:)))
+if ~isreal(tau) || any(tau < 0) || ~all(isfinitesym(tau(:)))
     error('SHCTools:shc_lv_epsilonfit:TauNonFiniteReal',...
          ['The input Tau must be a nonnegative finite real symbolic or '...
           'floating-point vector.']);
@@ -65,7 +65,7 @@ if ~(isfloat(tau_bar) || isa(tau_bar,'sym'))
     error('SHCTools:shc_lv_epsilonfit:InvalidTau_Bar',...
           'The input Tau_Bar must be a symbolic or floating-point vector.');
 end
-if ~isreal(tau_bar) || tau_bar < 0 || ~all(isfinitesym(tau_bar(:)))
+if ~isreal(tau_bar) || any(tau_bar < 0) || ~all(isfinitesym(tau_bar(:)))
     error('SHCTools:shc_lv_epsilonfit:Tau_BarNonFiniteReal',...
          ['The input Tau_Bar must be a nonnegative finite real symbolic or '...
           'floating-point vector.']);
