@@ -29,7 +29,7 @@ function y=stoneholmescv(x,flag,dim)
 %       STD, MEAN, NANSTD, NANMEAN, KURTOSIS, STONEHOLMESVAR
 %       STONEHOLMESPASSAGETIME, STONEHOLMESSTAT
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 6-6-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 6-6-13
 %   Revision: 1.0, 6-16-14
 
 

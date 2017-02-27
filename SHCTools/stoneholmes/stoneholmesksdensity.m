@@ -41,7 +41,7 @@ function varargout=stoneholmesksdensity(tau,varargin)
 %       STONEHOLMESCDF, STONEHOLMESPDF, STONEHOLMESRND, STONEHOLMESLIKE,
 %       STONEHOLMESPASSAGETIME
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 6-5-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 6-5-13
 %   Revision: 1.1, 6-5-13
 
 

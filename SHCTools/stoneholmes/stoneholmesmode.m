@@ -43,7 +43,7 @@ function y=stoneholmesmode(varargin)
 %   Perturbations of Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50,
 %   No. 3, pp. 726-743, Jun. 1990.  http://jstor.org/stable/2101884
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 3-23-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 3-23-12
 %   Revision: 1.0, 6-16-14
 
 

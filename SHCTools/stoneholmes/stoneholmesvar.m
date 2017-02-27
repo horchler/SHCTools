@@ -29,7 +29,7 @@ function y=stoneholmesvar(x,flag,dim)
 %       VAR, NANVAR, KURTOSIS, STONEHOLMESCV, STONEHOLMESPASSAGETIME,
 %       STONEHOLMESSTAT
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 6-7-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 6-7-13
 %   Revision: 1.0, 11-8-13
 
 

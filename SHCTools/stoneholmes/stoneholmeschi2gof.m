@@ -65,7 +65,7 @@ function varargout=stoneholmeschi2gof(tau,varargin)
 %       CHI2GOF, STONEHOLMESKSTEST, KSTEST, STONEHOLMESFIT, STONEHOLMESCDF,
 %       STONEHOLMESPDF, STONEHOLMESRND, STONEHOLMESLIKE, STONEHOLMESPASSAGETIME
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 4-9-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 4-9-13
 %   Revision: 1.0, 4-25-13
 
 

@@ -13,7 +13,7 @@ function varargout=stoneholmessymparams(varargin)
 %   See also:
 %       SYM, SYM/ASSUME, SYM/ASSUMEALSO, ASSUMPTIONS, SYM/ISALWAYS
 
-%   Andrew D. Horchler, adh9@case.edu, Created 4-21-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 4-21-13
 %   Revision: 1.0, 4-21-13
 
 
