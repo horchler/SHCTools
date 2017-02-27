@@ -9,7 +9,7 @@ function s=shc_lv_equilibria(rho,alpha)
 %   See also:
 %       SHC_LV_JACOBIAN, SHC_LV_EIGS, SHC_CREATE, SHC_LV_ODE
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 1-3-11
+%   Andrew D. Horchler, horchler @ gmail . com, Created 1-3-11
 %   Revision: 1.3, 4-5-15
 
 

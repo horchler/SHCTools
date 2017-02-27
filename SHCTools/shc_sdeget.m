@@ -15,7 +15,7 @@ function opts=shc_sdeget(options,name,default,noErrorCheck)
 
 %   SHC_SDEGET is based on an updating of version 1.37.4.5 of Matlab's ODEGET
 
-%   Andrew D. Horchler, adh9 @ case . edu, 10-28-10
+%   Andrew D. Horchler, horchler @ gmail . com, 10-28-10
 %   Revision: 1.2, 5-4-13
 
 

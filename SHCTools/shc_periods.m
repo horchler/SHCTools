@@ -7,7 +7,7 @@ function tau=shc_periods(t,a)
 %   See also:
 %       SHC_WHOLEPERIODS, SHC_PHASE, SHC_RELATIVE_PHASE, WRAP, UNWRAP
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 9-23-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 9-23-13
 %   Revision: 1.0, 4-5-15
 
 

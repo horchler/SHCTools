@@ -41,7 +41,7 @@ function tf=shc_lv_isstable(rho,alpha,M,S)
 %       SHC_LV_STABILITY, SHC_LV_ISCYCLE, SHC_LV_LAMBDA_US, SHC_LV_JACOBIAN,
 %       SHC_LV_EIGS, SHC_LV_EQUILIBRIA, SHC_CREATE
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 8-30-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 8-30-12
 %   Revision: 1.3, 4-5-15
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the

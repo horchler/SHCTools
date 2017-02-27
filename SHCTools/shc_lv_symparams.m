@@ -13,7 +13,7 @@ function [alp,bet,varargout]=shc_lv_symparams(n,stability)
 %       SHC_LV_PARAMS, SYM, SYM/ASSUME, SYM/ASSUMEALSO, ASSUMPTIONS,
 %       SYM/ISALWAYS, SHC_LV_NU2GAMMADELTA
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 4-19-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 4-19-13
 %   Revision: 1.3, 4-5-15
 
 

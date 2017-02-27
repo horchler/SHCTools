@@ -14,7 +14,7 @@ function J=shc_lv_jacobian(rho,alpha,eqpt)
 %   See also:
 %       SHC_LV_EIGS, SHC_LV_LAMBDA_US, SHC_LV_ODE, SHC_LV_CREATECYCLE
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 12-1-10
+%   Andrew D. Horchler, horchler @ gmail . com, Created 12-1-10
 %   Revision: 1.3, 4-5-15
 
 

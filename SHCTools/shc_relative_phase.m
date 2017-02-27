@@ -5,7 +5,7 @@ function p=shc_relative_phase(a1,a2,bet1,bet2)
 %   See also:
 %       SHC_PHASE, HILBERT, FFT, IFFT, WRAP, UNWRAP
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 3-6-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 3-6-13
 %   Revision: 1.0, 7-24-13
 
 

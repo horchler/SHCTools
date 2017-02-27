@@ -9,7 +9,7 @@ function varargout=shc_wholeperiods(a,type)
 %   See also:
 %       SHC_PERIODS, SHC_PHASE, SHC_RELATIVE_PHASE, WRAP, UNWRAP
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 7-23-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 7-23-13
 %   Revision: 1.0, 4-5-15
 
 

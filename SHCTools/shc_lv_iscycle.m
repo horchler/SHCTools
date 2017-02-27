@@ -26,7 +26,7 @@ function tf=shc_lv_iscycle(rho,alpha,S)
 %       SHC_LV_ISSTABLE, SHC_LV_STABILITY, SHC_LV_LAMBDA_US, SHC_LV_JACOBIAN,
 %       SHC_LV_EIGS, SHC_LV_EQUILIBRIA, SHC_CREATE
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 2-12-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 2-12-13
 %   Revision: 1.4, 4-5-15
 
 

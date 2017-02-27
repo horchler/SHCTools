@@ -5,7 +5,7 @@ function [gam,del] = shc_lv_nu2gammadelta(alp,bet,nu)
 %   See also:
 %       SHC_LV_SYMPARAMS
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 2-26-14
+%   Andrew D. Horchler, horchler @ gmail . com, Created 2-26-14
 %   Revision: 1.0, 6-2-16
 
 

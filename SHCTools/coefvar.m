@@ -20,7 +20,7 @@ function y=coefvar(x,flag,dim)
 %   See also:
 %       MEAN, NANMEAN, VAR, NANVAR
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 6-6-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 6-6-13
 %   Revision: 1.1, 4-5-15
 
 

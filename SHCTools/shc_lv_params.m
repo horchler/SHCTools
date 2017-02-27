@@ -28,7 +28,7 @@ function [alpha,bet,nu]=shc_lv_params(tau,epsilon,bet,nu,flag)
 %   Cycles for Modeling and Control," Bioinspiration & Biomimetics, Vol. 10,
 %   No. 2., 2015, pp. 1-16.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-10
+%   Andrew D. Horchler, horchler @ gmail . com, Created 4-5-10
 %   Revision: 1.5, 6-10-16
 
 

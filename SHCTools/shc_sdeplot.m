@@ -32,7 +32,7 @@ function status=shc_sdeplot(t,y,flag,w)
 
 %   SHC_SDEPLOT is based on an updating of Matlab's ODEPLOT, version 1.25.4.9
 
-%   Andrew D. Horchler, adh9 @ case . edu, 4-29-13
+%   Andrew D. Horchler, horchler @ gmail . com, 4-29-13
 %   Revision: 1.2, 4-5-15
 
 

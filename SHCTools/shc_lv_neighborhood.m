@@ -16,7 +16,7 @@ function delta=shc_lv_neighborhood(bet,kappa)
 %       SHC_LV_IC, SHC_LV_MEANPERIOD, SHC_LV_MINTRANSITIONTIME, SHC_LV_PARAMS,
 %       SHC_LV_PASSAGETIME
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 4-6-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 4-6-13
 %   Revision: 1.1, 4-5-15
 
 

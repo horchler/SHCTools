@@ -27,7 +27,7 @@ function [tau_bar,tau]=shc_lv_meanperiod(dt,rho,alpha,epsilon_hat,M)
 %   Peter E. Kloeden and Eckhard Platen, "Numerical solution of Stochastic
 %   Differential Equations," Springer-Verlag, 1992.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 6-1-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 6-1-12
 %   Revision: 1.5, 6-2-16
 
 

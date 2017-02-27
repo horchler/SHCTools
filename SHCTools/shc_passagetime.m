@@ -36,7 +36,7 @@ function tau=shc_passagetime(delta,epsilon,lambda_u,lambda_s)
 %   Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50, No. 3, pp. 726-743,
 %   Jun. 1990. http://jstor.org/stable/2101884
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 7-19-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 7-19-12
 %   Revision: 1.1, 4-5-15
 
 

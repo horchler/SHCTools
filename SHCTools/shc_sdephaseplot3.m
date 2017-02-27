@@ -39,7 +39,7 @@ function status=shc_sdephaseplot3(t,y,flag,w)
 %   SHC_SDEPHASEPLOT3 is based on an updating of Matlab's ODEPHAS3,
 %   version 1.27.4.10
 
-%   Andrew D. Horchler, adh9 @ case . edu, 5-11-13
+%   Andrew D. Horchler, horchler @ gmail . com, 5-11-13
 %   Revision: 1.2, 4-15-15
 
 

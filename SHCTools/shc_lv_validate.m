@@ -6,7 +6,7 @@ function varargout=shc_lv_validate(rho,alpha,epsilon)
 %   SHC_LV_VALIDATE(RHO,ALPHA,EPSILON) Additionally checks the noise magnitudes
 %   EPSILON.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 4-5-15
+%   Andrew D. Horchler, horchler @ gmail . com, Created 4-5-15
 %   Revision: 1.0, 4-5-15
 
 
