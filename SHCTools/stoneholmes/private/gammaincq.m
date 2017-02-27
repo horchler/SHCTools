@@ -54,7 +54,7 @@ function y=gammaincq(z,a,varargin)
 
 %   Based on: http://functions.wolfram.com/GammaBetaErf/Gamma3/
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 8-5-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 8-5-12
 %   Revision: 1.1, 7-3-14
 
 

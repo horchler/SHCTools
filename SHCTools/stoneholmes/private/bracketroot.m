@@ -35,7 +35,7 @@ function bounds=bracketroot(fun,varargin)
 
 %   Some code partially based on version 1.1.8.3 of Matlab's EVFIT.m
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 4-20-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 4-20-12
 %   Revision: 1.0, 6-29-12
 
 

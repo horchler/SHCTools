@@ -10,7 +10,7 @@ function z=sym2float(s,dtype)
 %
 %   See also DOUBLE, SINGLE, CAST, STR2DOUBLE, SYM.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 11-11-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 11-11-13
 %   Revision: 1.0, 11-14-13
 
 

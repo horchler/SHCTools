@@ -56,8 +56,8 @@ function W=wrightOmegaq(Z)
 %   properly evaluates values greater than 2^28, supports single-precision
 %   evaluation, and handles NaN inputs.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 7-12-12
-%   Revision: 1.0, 3-12-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 7-12-12
+%   Revision: 1.0, 3-12-13
 
 
 % Convert symbolic input, converted back at end

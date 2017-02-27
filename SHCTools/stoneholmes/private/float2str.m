@@ -7,7 +7,7 @@ function s=float2str(z)
 %
 %   See also SPRINTF, SYM.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 11-11-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 11-11-13
 %   Revision: 1.0, 11-13-13
 
 

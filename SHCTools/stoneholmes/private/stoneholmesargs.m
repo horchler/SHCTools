@@ -29,7 +29,7 @@ function [szy,expnd]=stoneholmesargs(str,varargin)
 %   ISROW, ISCOLUMN, and ISMATRIX are not used to maintain compatibility with
 %   versions prior to Matlab 7.11 (R2010b).
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 3-12-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 3-12-12
 %   Revision: 1.1, 6-16-14
 
 

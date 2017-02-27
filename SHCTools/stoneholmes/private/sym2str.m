@@ -6,7 +6,7 @@ function c=sym2str(s)
 %
 %   See also DOUBLE, SINGLE, CAST, STR2DOUBLE, SYM.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 11-11-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 11-11-13
 %   Revision: 1.1, 6-19-14
 
 

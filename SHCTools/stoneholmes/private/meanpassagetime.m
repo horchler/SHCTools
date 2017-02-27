@@ -21,7 +21,7 @@ function tau=meanpassagetime(delta,epsilon,lambda_u,lambda_s)
 %   improved speed and accuracy for large noise cases. The generalized gamma
 %   function capability of the latter is used to avoid cancellation errors.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 7-19-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 7-19-12
 %   Revision: 1.3, 7-9-14
 
 
