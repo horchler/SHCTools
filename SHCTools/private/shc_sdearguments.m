@@ -9,7 +9,7 @@ function [N,tspan,lt,a0,rho,alpha,epsilon,mu,h,sh,ConstStep,dataType,...
 %       SHC_LV_ITEGRATE, SHC_SDEGET, SHC_SDEEVENTS, SHC_SDEZERO, SHC_SDEOUTPUT,
 %       SHC_SDERESET_STREAM, FUNCTION_HANDLE
         
-%   Andrew D. Horchler, adh9 @ case . edu, Created 3-30-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 3-30-12
 %   Revision: 1.3, 4-5-15
 
 %   SHC_SDEARGUMENTS is partially based on an updating of version 1.12.4.15 of

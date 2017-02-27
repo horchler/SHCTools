@@ -5,7 +5,7 @@ function [EventsFUN,EventsValue]=shc_sdeeventsfun(solver,t0,a0,options)
 %       SHC_SDEOUTPUTFUN, SHC_SDERANDFUN, SHC_SDEZERO, SHC_SDEGET,
 %       FUNCTION_HANDLE
         
-%   Andrew D. Horchler, adh9 @ case . edu, Created 5-2-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 5-2-13
 %   Revision: 1.2, 5-4-13
 
 

@@ -4,7 +4,7 @@ function [te,ae,we,ie,vnew,stop] = shc_sdezero(EventsFUN,t,a,w,value)
 %   See also:
 %       SHC_LV_INTEGRATE, SHC_SDEEVENTS, FUNCTION_HANDLE
         
-%   Andrew D. Horchler, adh9 @ case . edu, Created 12-30-11
+%   Andrew D. Horchler, horchler @ gmail . com, Created 12-30-11
 %   Revision: 1.2, 11-26-13
 
 %   SHC_SDEZERO is loosely based on Matlab's ODEZERO helper function.

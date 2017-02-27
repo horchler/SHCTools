@@ -3,7 +3,7 @@ function varargout=validateindex(i)
 %
 %
 
-%   Andrew D. Horchler, adh9@case.edu, Created 1-19-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 1-19-12
 %   Revision: 1.0, 4-7-13
 
 

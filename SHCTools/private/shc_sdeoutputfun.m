@@ -5,7 +5,7 @@ function [OutputFUN,WSelect]=shc_sdeoutputfun(solver,tspan,a0,N,options)
 %       SHC_SDEARGUMENTS, SHC_SDEEVENTSFUN, SHC_SDERANDFUN, SHC_SDEGET,
 %       SHC_SDEPLOT, FUNCTION_HANDLE
         
-%   Andrew D. Horchler, adh9 @ case . edu, Created 5-2-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 5-2-13
 %   Revision: 1.2, 5-6-13
 
 

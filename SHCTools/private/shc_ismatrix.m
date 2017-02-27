@@ -1,9 +1,9 @@
 function bool=shc_ismatrix(V)
 %SHC_ISMATRIX  Replicate functionality of builtin ismatrix for pre-R2010b Matlab
 %
-%   See also: SHC_ISSQUARE
+%   
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 5-9-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 5-9-12
 %   Revision: 1.2, 5-4-13
 
 

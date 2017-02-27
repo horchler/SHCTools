@@ -14,7 +14,7 @@ function p=wrap(q,cutoff,dim)
 %
 %   See also: UNWRAP, ANGLE, ABS, MOD
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 3-5-13
+%   Andrew D. Horchler, ahorchler @ gmail . com, Created 3-5-13
 %   Revision: 1.0, 3-7-13
 
 

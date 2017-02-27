@@ -4,7 +4,7 @@ function y=isfinitesym(x)
 %
 %   See also ISINFSYM, SYM, SYM/ISALWAYS, ISFINITE, ISNAN, ISINF
 
-%   Andrew D. Horchler, adh9@case.edu, Created 4-19-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 4-19-13
 %   Revision: 1.0, 2-28-14
 
 
