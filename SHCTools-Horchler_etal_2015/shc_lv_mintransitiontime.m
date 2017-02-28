@@ -20,7 +20,7 @@ function tt=shc_lv_mintransitiontime(alpha)
 %   No. 2., 2015, pp. 1-16.
 %  
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 3-29-14
+%   Andrew D. Horchler, horchler @ gmail . com, Created 3-29-14
 %   Revision: 1.2, 4-5-15
 
 

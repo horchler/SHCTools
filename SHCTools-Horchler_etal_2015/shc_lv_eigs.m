@@ -27,7 +27,7 @@ function varargout=shc_lv_eigs(rho,alpha,M)
 %   See also:
 %       SHC_LV_JACOBIAN, SHC_CREATECYCLE, SHC_LV_LAMBDA_US
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 4-6-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 4-6-12
 %   Revision: 1.3, 6-15-14
 
     

@@ -30,7 +30,7 @@
 %  Mac OS X 10.10.2 (Build: 14C1514), Java 1.7.0_60-b19
 %  Compatibility maintained back through Matlab 7.4 (R2007a)
 
-%  Andrew D. Horchler, adh9 @ case . edu
+%  Andrew D. Horchler, horchler @ gmail . com
 %  Created: 1-4-12, Version: 1.0, 4-5-15
 
 
@@ -41,7 +41,7 @@
 %  of the National Science Foundation.
 
 
-%  Copyright © 2012-2015, Andrew D. Horchler
+%  Copyright © 2012-2017, Andrew D. Horchler
 %  All rights reserved.
 %
 %  Redistribution and use in source and binary forms, with or without

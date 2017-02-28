@@ -20,7 +20,7 @@ function a0=shc_lv_ic(dt,rho,alpha,epsilon)
 %   Peter E. Kloeden and Eckhard Platen, "Numerical solution of Stochastic
 %   Differential Equations," Springer-Verlag, 1992.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 5-29-14
+%   Andrew D. Horchler, horchler @ gmail . com, Created 5-29-14
 %   Revision: 1.0, 6-15-14
 
 

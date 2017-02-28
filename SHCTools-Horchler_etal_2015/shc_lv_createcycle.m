@@ -29,7 +29,7 @@ function rho=shc_lv_createcycle(alpha,beta,nu,direction)
 %   Cycles for Modeling and Control," Bioinspiration & Biomimetics, Vol. 10,
 %   No. 2., 2015, pp. 1-16.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 2-27-14
+%   Andrew D. Horchler, horchler @ gmail . com, Created 2-27-14
 %   Revision: 1.1, 4-5-15
 
 

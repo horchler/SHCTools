@@ -17,7 +17,7 @@ function y=coefvar(x,flag,dim)
 %   Y = COEFVAR(X,FLAG,DIM) returns the coefficient of variation along the
 %   dimension DIM of X.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 6-6-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 6-6-13
 %   Revision: 1.1, 6-1-14
 
 

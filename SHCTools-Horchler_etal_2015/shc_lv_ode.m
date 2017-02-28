@@ -14,7 +14,7 @@ function adot=shc_lv_ode(t,a,rho,alpha) %#ok<INUSL>
 %   See also:
 %       SHC_LV_JACOBIAN, SHC_LV_INTEGRATE, ODE45
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 3-28-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 3-28-12
 %   Revision: 1.2, 5-29-14
 
 

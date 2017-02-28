@@ -23,7 +23,7 @@ function shc_lv_demo(dt,tau,epsilon_hat,bet,nu,N)
 %   Cycles for Modeling and Control," Bioinspiration & Biomimetics, Vol. 10,
 %   No. 2., 2015, pp. 1-16.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 6-16-14
+%   Andrew D. Horchler, horchler @ gmail . com, Created 6-16-14
 %   Revision: 1.0, 4-5-15
 
 

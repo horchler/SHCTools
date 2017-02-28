@@ -21,7 +21,7 @@ function tau=shc_lv_passagetime(rho,alpha,epsilon)
 %   Heteroclinic Attractors," SIAM J. Appl. Math., Vol. 50, No. 3, pp. 726-743,
 %   Jun. 1990. http://jstor.org/stable/2101884
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 4-20-14
+%   Andrew D. Horchler, horchler @ gmail . com, Created 4-20-14
 %   Revision: 1.0, 4-5-15
 
 

@@ -18,7 +18,7 @@ function [lambda_u,lambda_s]=shc_lv_lambda_us(rho,alpha,M)
 %   See also:
 %       SHC_LV_JACOBIAN, SHC_LV_EIGS, SHC_CREATECYCLE
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 8-29-12
+%   Andrew D. Horchler, horchler @ gmail . com, Created 8-29-12
 %   Revision: 1.2, 3-30-14
 
 %   Based on: J.W. Reyn, "A Stability Criterion for Separatrix Polygons in the

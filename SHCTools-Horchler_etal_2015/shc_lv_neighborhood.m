@@ -12,7 +12,7 @@ function delta=shc_lv_neighborhood(beta,kappa)
 %   relaunched. KAPPA should be a finite real floating-point scalar greter than
 %   zero and less than 0.5.
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 4-6-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 4-6-13
 %   Revision: 1.1, 6-15-14
 
 
