@@ -1,7 +1,7 @@
 function figure7
 %FIGURE7  Non-linear compensation for an Lotka-Volterra SHC cycle
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 4-20-14
+%   Andrew D. Horchler, horchler @ gmail . com, Created 4-20-14
 %   Revision: 1.1, 6-15-14
 
 

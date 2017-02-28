@@ -1,7 +1,7 @@
 function figure2
 %FIGURE2  Time series plots of a Lotka-Volterra SHC Cycle
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 6-20-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 6-20-13
 %   Revision: 1.1, 6-14-14
 
 

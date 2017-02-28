@@ -1,7 +1,7 @@
 function figure8
 %FIGURE8  Responsiveness of a designed Lotka-Volterra SHC Cycle
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 8-7-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 8-7-13
 %   Revision: 1.1, 6-15-14
 
 

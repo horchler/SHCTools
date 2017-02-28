@@ -1,8 +1,8 @@
 function figure6
 %FIGURE6  A dissipative linear saddle equilibrium point
 
-%   Kathryn A. Daltorio & Andrew D. Horchler, adh9 @ case . edu, Created 6-7-14
-%   Revision: 1.1, 6-15-14
+%   Kathryn A. Daltorio & Andrew D. Horchler, horchler @ gmail . com
+%   Created 6-7-14, Revision: 1.1, 6-15-14
 
 
 rng(15);                            % Set random seed to mak repeatable

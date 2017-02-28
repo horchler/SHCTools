@@ -1,7 +1,7 @@
 function figure11
 %FIGURE11  Lotka-Volterra SHC cycle fit to a Van der Pol limit cycle
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 5-5-14
+%   Andrew D. Horchler, horchler @ gmail . com, Created 5-5-14
 %   Revision: 1.1, 6-15-14
 
 

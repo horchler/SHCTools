@@ -1,7 +1,7 @@
 function figure5
 %FIGURE5  Effect of Lotka-Volterra SHC Cycle Parameters in time and phase space
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 7-1-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 7-1-13
 %   Revision: 1.2, 6-15-14
 
 

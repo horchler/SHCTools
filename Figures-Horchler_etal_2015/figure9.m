@@ -1,7 +1,7 @@
 function figure9
 %FIGURE9  Mean period distributions (passage time) of Lotka-Volterra SHC cycle
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 6-2-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 6-2-13
 %   Revision: 1.1, 6-15-14
 
 

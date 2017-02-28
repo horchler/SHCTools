@@ -1,7 +1,7 @@
 function figure1
 %FIGURE1  Finite State Machine, Hopf Oscillator, and 2-Torus Heteroclinic Cycle
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 7-5-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 7-5-13
 %   Revision: 1.1, 6-15-14
 
 

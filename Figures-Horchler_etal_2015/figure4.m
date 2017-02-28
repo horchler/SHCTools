@@ -1,7 +1,7 @@
 function figure4
 %FIGURE4  Effect of saddle value on shape of SHC cycle manifold and eigenvectors
 
-%   Andrew D. Horchler, adh9 @ case . edu, Created 6-20-13
+%   Andrew D. Horchler, horchler @ gmail . com, Created 6-20-13
 %   Revision: 1.1, 6-15-14
 
 
